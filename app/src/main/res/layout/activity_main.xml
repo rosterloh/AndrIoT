@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+        <variable name="info" type="com.rosterloh.andriot.Info"/>
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        android:id="@+id/cl_main_layout"
+        app:layout_editor_absoluteX="0dp"
+        app:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <TextClock
+            android:id="@+id/tc_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp"
+            android:format12Hour="hh:mm"
+            android:format24Hour="kk:mm"
+            android:textColor="@android:color/white"
+            android:textSize="200sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextClock
+            android:id="@+id/tc_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="dd MMM yyyy"
+            android:format24Hour="dd MMM yyyy"
+            android:textColor="@android:color/white"
+            android:textSize="54sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tc_time" />
+
+        <TextView
+            android:id="@+id/tv_wifi_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{info.wifiConnected ? View.VISIBLE : View.GONE}"
+            android:text="@{info.wifi}"
+            tools:text="WiFi SSID: MySSID IP: 192.168.1.1"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tv_eth_info"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_eth_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{info.ethernetConnected ? View.VISIBLE : View.GONE}"
+            android:text="@{info.ethernet}"
+            tools:text="Ethernet IP: 192.168.1.2"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

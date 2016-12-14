@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+def versionMajor = 0
+def versionMinor = 0
+def versionPatch = 1
+def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
+
+def cfg = rootProject.ext.configuration
+def libs = rootProject.ext.libraries;
+def test = rootProject.ext.testingLibraries;
+
+android {
+    compileSdkVersion cfg.compileVersion
+    buildToolsVersion cfg.buildToolsVersion
+
+    defaultConfig {
+        applicationId cfg.package
+        minSdkVersion cfg.minSdk
+        targetSdkVersion cfg.targetSdk
+        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    provided 'com.google.android.things:androidthings:0.1-devpreview'
+
+    compile "com.android.support.constraint:constraint-layout:${libs.constraintLayout}"
+
+    compile "com.google.firebase:firebase-crash:${libs.playServices}"
+    compile "com.google.firebase:firebase-analytics:${libs.playServices}"
+
+    // Test
+    testCompile "junit:junit:${test.junit}"
+}
+
+apply plugin: 'com.google.gms.google-services'

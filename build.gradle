@@ -1,0 +1,46 @@
+ext {
+    configuration = [
+            package             : "com.rosterloh.andriot",
+            buildToolsVersion   : "25.0.2",
+            compileVersion      : 25,
+            minSdk              : 24,
+            targetSdk           : 25
+    ]
+
+    libraries = [
+            supportVersion      : "25.0.1",
+            playServices        : "10.0.1",
+            constraintLayout    : "1.0.0-beta4"
+    ]
+
+    testingLibraries = [
+            junit               : "4.12",
+            mockito             : "2.2.9",
+            espresso            : "2.2.2",
+            espressoRunner      : "0.5",
+            espressoRules       : "0.5"
+    ]
+}
+
+apply plugin: 'com.github.ben-manes.versions'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.0-alpha3'
+        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.github.ben-manes:gradle-versions-plugin:0.13.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
