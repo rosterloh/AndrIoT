@@ -43,8 +43,20 @@ dependencies {
 
     compile "com.android.support.constraint:constraint-layout:${libs.constraintLayout}"
 
-    compile "com.google.firebase:firebase-crash:${libs.playServices}"
     compile "com.google.firebase:firebase-analytics:${libs.playServices}"
+    compile "com.google.firebase:firebase-core:${libs.playServices}"
+    compile "com.google.firebase:firebase-crash:${libs.playServices}"
+    compile "com.google.firebase:firebase-database:${libs.playServices}"
+
+    compile "com.squareup.retrofit2:retrofit:${libs.retrofit}"
+    compile "com.squareup.retrofit2:converter-gson:${libs.retrofit}"
+    compile "com.squareup.retrofit2:adapter-rxjava2:2.1.1-SNAPSHOT"
+
+    compile "io.reactivex.rxjava2:rxandroid:${libs.rxandroid}"
+    compile "io.reactivex.rxjava2:rxjava:${libs.rxjava}"
+
+    compile "com.squareup.okhttp3:okhttp:${libs.okhttp}"
+    compile "com.squareup.okhttp3:logging-interceptor:${libs.okhttp}"
 
     // Test
     testCompile "junit:junit:${test.junit}"

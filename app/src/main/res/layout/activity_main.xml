@@ -6,13 +6,13 @@
 
     <data>
         <import type="android.view.View"/>
-        <variable name="info" type="com.rosterloh.andriot.Info"/>
+        <variable name="info" type="com.rosterloh.andriot.databinding.Info"/>
     </data>
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black"
+        android:background="@color/colorBackground"
         android:id="@+id/cl_main_layout"
         app:layout_editor_absoluteX="0dp"
         app:layout_editor_absoluteY="0dp"
@@ -23,15 +23,15 @@
             android:id="@+id/tc_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingBottom="24dp"
-            android:format12Hour="hh:mm"
+            android:format12Hour="kk:mm"
             android:format24Hour="kk:mm"
-            android:textColor="@android:color/white"
+            android:paddingBottom="24dp"
+            android:textColor="@color/textColorPrimary"
             android:textSize="200sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextClock
             android:id="@+id/tc_date"
@@ -39,11 +39,18 @@
             android:layout_height="wrap_content"
             android:format12Hour="dd MMM yyyy"
             android:format24Hour="dd MMM yyyy"
-            android:textColor="@android:color/white"
+            android:textColor="@color/textColorPrimary"
             android:textSize="54sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/tc_time" />
+
+        <ImageView
+            android:id="@+id/iv_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
 
         <TextView
             android:id="@+id/tv_wifi_info"
@@ -52,7 +59,8 @@
             android:visibility="@{info.wifiConnected ? View.VISIBLE : View.GONE}"
             android:text="@{info.wifi}"
             tools:text="WiFi SSID: MySSID IP: 192.168.1.1"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="@color/textColorHint"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/tv_eth_info"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -65,11 +73,59 @@
             android:visibility="@{info.ethernetConnected ? View.VISIBLE : View.GONE}"
             android:text="@{info.ethernet}"
             tools:text="Ethernet IP: 192.168.1.2"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textColor="@color/textColorHint"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_weather_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/textColorHint"
+            android:textSize="52sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Icon" />
+
+        <TextView
+            android:id="@+id/tv_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="@color/textColorHint"
+            android:textSize="80sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/tv_weather_icon"
+            tools:text="19"/>
+
+        <TextView
+            android:id="@+id/tv_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorHint"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tv_temperature"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:text="Clear sky"/>
+
+        <TextView
+            android:id="@+id/tv_last_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:maxLines="3"
+            android:textColor="@color/textColorHint"
+            app:layout_constraintTop_toBottomOf="@id/tv_description"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:text="Last update: 6:59 am"/>
 
     </android.support.constraint.ConstraintLayout>
 

@@ -1,9 +1,13 @@
-package com.rosterloh.andriot;
+package com.rosterloh.andriot.databinding;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
+import com.rosterloh.andriot.BR;
+import com.rosterloh.andriot.ConnectionDetector;
+
 import java.net.InetAddress;
+import java.util.Map;
 
 public class Info extends BaseObservable {
 
@@ -12,6 +16,21 @@ public class Info extends BaseObservable {
     private InetAddress wifiIp;
     private String wifiName;
     private boolean wifiConnected = false;
+    private ConnectionDetector connectionDetector;
+
+    public Info(ConnectionDetector connectionDetector) {
+        this.connectionDetector = connectionDetector;
+
+        Map<String, InetAddress> ips = connectionDetector.getIpAddresses();
+
+        if(ips.containsKey("eth0"))
+            setEthIp(ips.get("eth0"));
+
+        if(ips.containsKey("wlan0")) {
+            setWifiIp(ips.get("wlan0"));
+            setWifiName(connectionDetector.getWifiSSid());
+        }
+    }
 
     @Bindable
     public boolean getEthernetConnected() {
@@ -20,7 +39,11 @@ public class Info extends BaseObservable {
 
     @Bindable
     public String getEthernet() {
-        return "Ethernet IP: " + ethIp;
+        if (ethIp == null) {
+            return "No Ethernet Connection";
+        } else {
+            return "Ethernet IP: " + ethIp.getHostAddress();
+        }
     }
 
     public void setEthIp(InetAddress ip) {
@@ -48,6 +71,6 @@ public class Info extends BaseObservable {
 
     @Bindable
     public String getWifi() {
-        return "WiFi SSID: " + wifiName + " IP: " + wifiIp;
+        return "WiFi SSID: " + wifiName + " IP: " + wifiIp.getHostAddress();
     }
 }
