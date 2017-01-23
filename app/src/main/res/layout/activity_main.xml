@@ -84,8 +84,7 @@
             android:id="@+id/tv_weather_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_margin="16dp"
             android:gravity="center"
             android:textAlignment="center"
             android:textColor="@color/textColorHint"
@@ -98,13 +97,14 @@
             android:id="@+id/tv_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             android:gravity="center"
             android:textAlignment="center"
             android:textColor="@color/textColorHint"
-            android:textSize="80sp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="70sp"
             app:layout_constraintLeft_toRightOf="@id/tv_weather_icon"
-            tools:text="19"/>
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="19" />
 
         <TextView
             android:id="@+id/tv_description"
@@ -113,7 +113,7 @@
             android:textColor="@color/textColorHint"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@id/tv_temperature"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/tv_weather_icon"
             tools:text="Clear sky"/>
 
         <TextView
@@ -124,7 +124,7 @@
             android:maxLines="3"
             android:textColor="@color/textColorHint"
             app:layout_constraintTop_toBottomOf="@id/tv_description"
-            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintLeft_toLeftOf="@id/tv_weather_icon"
             tools:text="Last update: 6:59 am"/>
 
     </android.support.constraint.ConstraintLayout>

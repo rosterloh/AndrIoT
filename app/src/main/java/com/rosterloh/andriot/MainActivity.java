@@ -187,7 +187,7 @@ public class MainActivity extends Activity {
                     public Flowable<Weather> apply(WeatherResponse response) throws Exception {
                         Log.d(TAG, "Parsing received data");
                         return Flowable.just(new Weather.Builder()
-                                .temperature(response.getMain().getTemp().intValue() + "ºC")
+                                .temperature(response.getMain().getTemp().intValue() + "º")
                                 .description(response.getWeather().get(0).getDescription())
                                 .iconId(response.getWeather().get(0).getIcon())
                                 .lastUpdated(new SimpleDateFormat("H:mm", Locale.getDefault()).format(new Date((long) response.getDt() * 1000)))
