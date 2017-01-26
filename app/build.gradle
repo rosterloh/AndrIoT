@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 def versionMajor = 0
-def versionMinor = 0
-def versionPatch = 1
+def versionMinor = 1
+def versionPatch = 0
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
 
 def cfg = rootProject.ext.configuration
@@ -20,7 +20,6 @@ android {
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -39,24 +38,22 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    provided 'com.google.android.things:androidthings:0.1-devpreview'
+    provided "com.google.android.things:androidthings:${libs.things}"
 
+    compile "com.android.support:appcompat-v7:${libs.supportVersion}"
     compile "com.android.support.constraint:constraint-layout:${libs.constraintLayout}"
 
-    compile "com.google.firebase:firebase-analytics:${libs.playServices}"
-    compile "com.google.firebase:firebase-core:${libs.playServices}"
+    //compile "com.google.firebase:firebase-analytics:${libs.playServices}"
     compile "com.google.firebase:firebase-crash:${libs.playServices}"
-    compile "com.google.firebase:firebase-database:${libs.playServices}"
+    //compile "com.google.firebase:firebase-database:${libs.playServices}"
 
     compile "com.squareup.retrofit2:retrofit:${libs.retrofit}"
     compile "com.squareup.retrofit2:converter-gson:${libs.retrofit}"
     compile "com.squareup.retrofit2:adapter-rxjava2:2.1.1-SNAPSHOT"
+    compile "com.squareup.okhttp3:logging-interceptor:${libs.okhttp}"
 
     compile "io.reactivex.rxjava2:rxandroid:${libs.rxandroid}"
     compile "io.reactivex.rxjava2:rxjava:${libs.rxjava}"
-
-    compile "com.squareup.okhttp3:okhttp:${libs.okhttp}"
-    compile "com.squareup.okhttp3:logging-interceptor:${libs.okhttp}"
 
     // Test
     testCompile "junit:junit:${test.junit}"

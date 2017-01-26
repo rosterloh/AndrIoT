@@ -1,4 +1,4 @@
-package com.rosterloh.andriot;
+package com.rosterloh.andriot.sensors;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
