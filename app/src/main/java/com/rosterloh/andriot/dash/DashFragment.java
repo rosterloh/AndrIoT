@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.rosterloh.andriot.data.ConnectionDetector;
 import com.rosterloh.andriot.databinding.DashFragBinding;
 import com.rosterloh.andriot.weather.Weather;
 
@@ -41,7 +42,13 @@ public class DashFragment extends Fragment implements DashContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        presenter.start();
+        presenter.onViewResumed();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.onViewDetached();
     }
 
     @Override
@@ -100,13 +107,15 @@ public class DashFragment extends Fragment implements DashContract.View {
     }
 
     @Override
-    public void setNetworkInfo(Map<String, InetAddress> ips) {
+    public void setNetworkInfo(ConnectionDetector network) {
+
+        Map<String, InetAddress> ips = network.getIpAddresses();
         if(ips.containsKey("eth0"))
             dashViewModel.setEthIp(ips.get("eth0"));
 
         if(ips.containsKey("wlan0")) {
             dashViewModel.setWifiIp(ips.get("wlan0"));
-            //dashViewModel.setWifiName(connectionDetector.getWifiSSid());
+            dashViewModel.setWifiName(network.getWifiSSid());
         }
     }
 

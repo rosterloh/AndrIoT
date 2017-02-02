@@ -1,9 +1,7 @@
 package com.rosterloh.andriot.dash;
 
+import com.rosterloh.andriot.data.ConnectionDetector;
 import com.rosterloh.andriot.weather.Weather;
-
-import java.net.InetAddress;
-import java.util.Map;
 
 /**
  * This specifies the contract between the view and the presenter.
@@ -18,7 +16,7 @@ public interface DashContract {
 
         void showWeather(Weather weather);
 
-        void setNetworkInfo(Map<String, InetAddress> ips);
+        void setNetworkInfo(ConnectionDetector network);
 
         void showLoadingError();
 
@@ -29,7 +27,9 @@ public interface DashContract {
 
     interface Presenter {
 
-        void start();
+        void onViewResumed();
+
+        void onViewDetached();
 
         void result(int requestCode, int resultCode);
     }

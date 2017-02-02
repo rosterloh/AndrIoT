@@ -12,9 +12,10 @@ import android.os.HandlerThread;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.rosterloh.andriot.data.ConnectionDetector;
+import com.rosterloh.andriot.networking.WeatherRequestManager;
 import com.rosterloh.andriot.sensors.DeskCamera;
 import com.rosterloh.andriot.R;
-import com.rosterloh.andriot.data.DataRepository;
 import com.rosterloh.andriot.utils.ActivityUtils;
 
 import java.nio.ByteBuffer;
@@ -81,7 +82,8 @@ public class DashActivity extends AppCompatActivity {
         }
 
         // Create the presenter
-        dashPresenter = new DashPresenter(DataRepository.getInstance(getApplicationContext()), dashFragment);
+        dashPresenter = new DashPresenter(ConnectionDetector.getInstance(getApplicationContext()),
+                WeatherRequestManager.getInstance(getApplicationContext()), dashFragment);
 
         DashViewModel dashViewModel =
                 new DashViewModel(getApplicationContext(), dashPresenter);
