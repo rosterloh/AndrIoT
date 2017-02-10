@@ -1,6 +1,7 @@
 package com.rosterloh.andriot.dash;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -9,12 +10,12 @@ import android.media.ImageReader;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import com.rosterloh.andriot.data.ConnectionDetector;
+import com.rosterloh.andriot.ui.ViewModelHolder;
 import com.rosterloh.andriot.networking.MqttManager;
-import com.rosterloh.andriot.networking.WeatherRequestManager;
 import com.rosterloh.andriot.sensors.DeskCamera;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.utils.ActivityUtils;
@@ -22,10 +23,11 @@ import com.rosterloh.andriot.utils.ActivityUtils;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public class DashActivity extends AppCompatActivity {
+public class DashActivity extends AppCompatActivity implements DashNavigator {
 
     private static final String TAG = DashActivity.class.getSimpleName();
-    DashPresenter dashPresenter;
+    public static final String DASH_VIEWMODEL_TAG = "DASH_VIEWMODEL_TAG";
+    private DashViewModel viewModel;
 
     private MqttManager mqttManager;
     private SensorManager sensorManager;
@@ -74,28 +76,64 @@ public class DashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dash_act);
 
-        DashFragment dashFragment =
-                (DashFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
-        if (dashFragment == null) {
-            // Create the fragment
-            dashFragment = DashFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(
-                    getSupportFragmentManager(), dashFragment, R.id.contentFrame);
-        }
+        DashFragment dashFragment = findOrCreateViewFragment();
 
-        // Create the presenter
-        dashPresenter = new DashPresenter(ConnectionDetector.getInstance(getApplicationContext()),
-                WeatherRequestManager.getInstance(getApplicationContext()), dashFragment);
+        viewModel = findOrCreateViewModel();
 
-        DashViewModel dashViewModel =
-                new DashViewModel(getApplicationContext(), dashPresenter);
-
-        dashFragment.setViewModel(dashViewModel);
+        // Link View and ViewModel
+        dashFragment.setViewModel(viewModel);
 
         setupSensors();
         setupCamera();
 
         mqttManager = MqttManager.getInstance(getApplicationContext());
+    }
+
+    private DashViewModel findOrCreateViewModel() {
+        // In a configuration change we might have a ViewModel present. It's retained using the
+        // Fragment Manager.
+        @SuppressWarnings("unchecked")
+        ViewModelHolder<DashViewModel> retainedViewModel =
+                (ViewModelHolder<DashViewModel>) getSupportFragmentManager()
+                        .findFragmentByTag(DASH_VIEWMODEL_TAG);
+
+        if (retainedViewModel != null && retainedViewModel.getViewmodel() != null) {
+            // If the model was retained, return it.
+            return retainedViewModel.getViewmodel();
+        } else {
+            // There is no ViewModel yet, create it.
+            DashViewModel viewModel = new DashViewModel(getApplicationContext(), this);
+            // and bind it to this Activity's lifecycle using the Fragment Manager.
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(),
+                    ViewModelHolder.createContainer(viewModel),
+                    DASH_VIEWMODEL_TAG);
+            return viewModel;
+        }
+    }
+
+    @NonNull
+    private DashFragment findOrCreateViewFragment() {
+
+        DashFragment fragment =
+                (DashFragment) getSupportFragmentManager().findFragmentById(R.id.contentFrame);
+        if (fragment == null) {
+            // Create the fragment
+            fragment = DashFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(
+                    getSupportFragmentManager(), fragment, R.id.contentFrame);
+        }
+        return fragment;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        viewModel.handleActivityResult(requestCode, resultCode);
+    }
+
+    @Override
+    public void showForecast() {
+        viewModel.showForecast();
     }
 
     @Override
@@ -156,19 +194,15 @@ public class DashActivity extends AppCompatActivity {
         }
     }
 
-    private ImageReader.OnImageAvailableListener onImageAvailableListener =
-            new ImageReader.OnImageAvailableListener() {
-        @Override
-        public void onImageAvailable(ImageReader reader) {
-            Image image = reader.acquireLatestImage();
+    private ImageReader.OnImageAvailableListener onImageAvailableListener = (reader) -> {
+        Image image = reader.acquireLatestImage();
 
-            // get image bytes
-            ByteBuffer imageBuf = image.getPlanes()[0].getBuffer();
-            final byte[] imageBytes = new byte[imageBuf.remaining()];
-            imageBuf.get(imageBytes);
-            image.close();
+        // get image bytes
+        ByteBuffer imageBuf = image.getPlanes()[0].getBuffer();
+        final byte[] imageBytes = new byte[imageBuf.remaining()];
+        imageBuf.get(imageBytes);
+        image.close();
 
-            //binding.ivCamera.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
-        }
+        //binding.ivCamera.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
     };
 }

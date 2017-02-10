@@ -9,8 +9,12 @@
         <import type="android.view.View"/>
 
         <variable
-            name="dash"
-            type="com.rosterloh.andriot.dash.DashViewModel"/>
+            name="view"
+            type="com.rosterloh.andriot.dash.DashFragment" />
+
+        <variable
+            name="viewmodel"
+            type="com.rosterloh.andriot.dash.DashViewModel" />
 
     </data>
 
@@ -60,8 +64,8 @@
             android:id="@+id/tv_wifi_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{dash.wifiConnected ? View.VISIBLE : View.GONE}"
-            android:text="@{dash.wifi}"
+            android:visibility="@{viewmodel.wifiConnected ? View.VISIBLE : View.GONE}"
+            android:text="@{viewmodel.wifi}"
             tools:text="WiFi SSID: MySSID IP: 192.168.1.1"
             android:textColor="@color/textColorHint"
             android:textSize="18sp"
@@ -74,8 +78,8 @@
             android:id="@+id/tv_eth_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{dash.ethernetConnected ? View.VISIBLE : View.GONE}"
-            android:text="@{dash.ethernet}"
+            android:visibility="@{viewmodel.ethernetConnected ? View.VISIBLE : View.GONE}"
+            android:text="@{viewmodel.ethernet}"
             tools:text="Ethernet IP: 192.168.1.2"
             android:textColor="@color/textColorHint"
             android:textSize="18sp"
@@ -95,14 +99,14 @@
             <ProgressBar
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{dash.loadingVisible ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewmodel.isLoading ? View.VISIBLE : View.GONE}"
                 style="?android:attr/progressBarStyleLarge" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="@{dash.loadingVisible ? View.GONE : View.VISIBLE}">
+                android:visibility="@{viewmodel.isLoading ? View.GONE : View.VISIBLE}">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -120,7 +124,7 @@
                         android:textAlignment="center"
                         android:textColor="@color/textColorHint"
                         android:textSize="52sp"
-                        android:text="@{dash.weatherIcon}"
+                        android:text="@{viewmodel.weatherIcon}"
                         tools:text="Icon" />
 
                     <TextView
@@ -133,7 +137,7 @@
                         android:textAlignment="center"
                         android:textColor="@color/textColorHint"
                         android:textSize="70sp"
-                        android:text="@{dash.temperature}"
+                        android:text="@{viewmodel.temperature}"
                         tools:text="19" />
 
                 </LinearLayout>
@@ -152,7 +156,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/textColorHint"
                         android:textSize="16sp"
-                        android:text="@{dash.description}"
+                        android:text="@{viewmodel.description}"
                         tools:text="Clear sky" />
 
                     <TextView
@@ -162,7 +166,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="3"
                         android:textColor="@color/textColorHint"
-                        android:text="@{dash.lastUpdate}"
+                        android:text="@{viewmodel.lastUpdate}"
                         tools:text="Last update: 6:59 am" />
 
                 </LinearLayout>

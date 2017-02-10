@@ -53,6 +53,7 @@ dependencies {
 
     compile "com.android.support:appcompat-v7:${libs.supportVersion}"
     compile "com.android.support.constraint:constraint-layout:${libs.constraintLayout}"
+    compile "com.android.support:design:${libs.supportVersion}"
 
     //compile "com.google.firebase:firebase-analytics:${libs.playServices}"
     compile "com.google.firebase:firebase-crash:${libs.playServices}"
