@@ -1,22 +1,21 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0-beta3'
+        classpath 'com.android.tools.build:gradle:2.3.0-beta4'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'me.tatarka.retrolambda' version '3.5.0'
 }
 
 allprojects {
     repositories {
         jcenter()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
     }
 }
 
@@ -36,12 +35,13 @@ ext {
     libraries = [
             supportVersion      : "25.1.1",
             playServices        : "10.0.1",
-            constraintLayout    : "1.0.0-beta4",
-            things              : "0.1-devpreview",
+            constraintLayout    : "1.0.0-beta5",
+            things              : "0.2-devpreview",
             rxjava              : "2.0.5",
             rxandroid           : "2.0.1",
             retrofit            : "2.1.0",
-            okhttp              : "3.6.0"
+            okhttp              : "3.6.0",
+            pahoMqtt            : "1.1.1-SNAPSHOT"
     ]
 
     testingLibraries = [

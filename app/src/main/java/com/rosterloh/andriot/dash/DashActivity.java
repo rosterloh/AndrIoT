@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.rosterloh.andriot.data.ConnectionDetector;
+import com.rosterloh.andriot.networking.MqttManager;
 import com.rosterloh.andriot.networking.WeatherRequestManager;
 import com.rosterloh.andriot.sensors.DeskCamera;
 import com.rosterloh.andriot.R;
@@ -26,6 +27,7 @@ public class DashActivity extends AppCompatActivity {
     private static final String TAG = DashActivity.class.getSimpleName();
     DashPresenter dashPresenter;
 
+    private MqttManager mqttManager;
     private SensorManager sensorManager;
     //private Lsm9Ds1SensorDriver sensorDriver;
     //private float lastTemperature;
@@ -92,6 +94,8 @@ public class DashActivity extends AppCompatActivity {
 
         setupSensors();
         setupCamera();
+
+        mqttManager = MqttManager.getInstance(getApplicationContext());
     }
 
     @Override

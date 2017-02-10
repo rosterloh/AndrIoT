@@ -13,6 +13,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.ImageReader;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
 
@@ -52,6 +53,7 @@ public class DeskCamera {
     /**
      * Initialise the camera device
      */
+    @SuppressWarnings({"MissingPermission"})
     public void initialiseCamera(Context context,
                                  Handler backgroundHandler,
                                  ImageReader.OnImageAvailableListener imageAvailableListener) {
@@ -89,25 +91,25 @@ public class DeskCamera {
      */
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
-        public void onOpened(CameraDevice device) {
+        public void onOpened(@NonNull CameraDevice device) {
             Log.d(TAG, "Opened camera.");
             cameraDevice = device;
         }
 
         @Override
-        public void onDisconnected(CameraDevice device) {
+        public void onDisconnected(@NonNull CameraDevice device) {
             Log.d(TAG, "Camera disconnected, closing.");
             device.close();
         }
 
         @Override
-        public void onError(CameraDevice device, int i) {
+        public void onError(@NonNull CameraDevice device, int i) {
             Log.d(TAG, "Camera device error, closing.");
             device.close();
         }
 
         @Override
-        public void onClosed(CameraDevice device) {
+        public void onClosed(@NonNull CameraDevice device) {
             Log.d(TAG, "Closed camera, releasing");
             cameraDevice = null;
         }
@@ -139,7 +141,7 @@ public class DeskCamera {
     private CameraCaptureSession.StateCallback sessionCallback =
             new CameraCaptureSession.StateCallback() {
                 @Override
-                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
                     // The camera is already closed
                     if (cameraDevice == null) {
                         return;
@@ -151,7 +153,7 @@ public class DeskCamera {
                 }
 
                 @Override
-                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
+                public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                     Log.w(TAG, "Failed to configure camera");
                 }
             };
@@ -179,21 +181,20 @@ public class DeskCamera {
             new CameraCaptureSession.CaptureCallback() {
 
                 @Override
-                public void onCaptureProgressed(CameraCaptureSession session,
-                                                CaptureRequest request,
-                                                CaptureResult partialResult) {
+                public void onCaptureProgressed(@NonNull CameraCaptureSession session,
+                                                @NonNull CaptureRequest request,
+                                                @NonNull CaptureResult partialResult) {
                     Log.d(TAG, "Partial result");
                 }
 
                 @Override
-                public void onCaptureCompleted(CameraCaptureSession session,
-                                               CaptureRequest request,
-                                               TotalCaptureResult result) {
-                    if (session != null) {
-                        session.close();
-                        captureSession = null;
-                        Log.d(TAG, "CaptureSession closed");
-                    }
+                public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                               @NonNull CaptureRequest request,
+                                               @NonNull TotalCaptureResult result) {
+
+                    session.close();
+                    captureSession = null;
+                    Log.d(TAG, "CaptureSession closed");
                 }
             };
 
