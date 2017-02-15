@@ -57,7 +57,7 @@ public class MqttManager implements IMqttActionListener, MqttCallbackExtended, M
         try {
             status = ConnectionStatus.CONNECTING;
             client.connect(connectOptions, null, this);
-        } catch (MqttException e) {
+        } catch (/*Mqtt*/Exception e) {
             Log.e(TAG, "Failed to connect to MQTT server");
         }
     }
@@ -82,7 +82,7 @@ public class MqttManager implements IMqttActionListener, MqttCallbackExtended, M
             try {
                 Log.d(TAG, "subscribe to " + topic + " qos:" + qos);
                 client.subscribe(topic, qos);
-            } catch (MqttException e) {
+            } catch (/*Mqtt*/Exception e) {
                 Log.e(TAG, "subscribe error: ", e);
             }
         }

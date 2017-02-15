@@ -22,6 +22,14 @@ android {
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         buildConfigField "String", "BUILD_TIME", "\"${buildTime}\""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters 'armeabi-v7a', 'x86'
+        }
+        externalNativeBuild {
+            cmake {
+                arguments "-DPROJECT_DIR=${rootProject.projectDir}"
+            }
+        }
     }
 
     buildTypes {
@@ -31,13 +39,19 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     dataBinding {
         enabled = true
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
     }
 }
 
@@ -67,11 +81,14 @@ dependencies {
     compile "io.reactivex.rxjava2:rxandroid:${libs.rxandroid}"
     compile "io.reactivex.rxjava2:rxjava:${libs.rxjava}"
 
-    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${libs.pahoMqtt}"
-    compile "org.eclipse.paho:org.eclipse.paho.android.service:${libs.pahoMqtt}"
+    compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:${libs.mqttv3}"
+    compile "org.eclipse.paho:org.eclipse.paho.android.service:${libs.mqttAndroid}"
 
     // Test
     testCompile "junit:junit:${test.junit}"
+    androidTestCompile "com.android.support:support-annotations:${libs.supportVersion}"
+    androidTestCompile "com.android.support.test:runner:${test.runner}"
+    androidTestCompile "com.android.support.test:rules:${test.rules}"
 }
 
 apply plugin: 'com.google.gms.google-services'

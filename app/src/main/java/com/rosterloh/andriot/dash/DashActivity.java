@@ -3,8 +3,6 @@ package com.rosterloh.andriot.dash;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Bundle;
@@ -14,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.ViewModelHolder;
 import com.rosterloh.andriot.networking.MqttManager;
 import com.rosterloh.andriot.sensors.DeskCamera;
@@ -21,7 +20,6 @@ import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.utils.ActivityUtils;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 public class DashActivity extends AppCompatActivity implements DashNavigator {
 
@@ -30,47 +28,12 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
     private DashViewModel viewModel;
 
     private MqttManager mqttManager;
-    private SensorManager sensorManager;
-    //private Lsm9Ds1SensorDriver sensorDriver;
-    //private float lastTemperature;
+    private SensorHub sensorHub;
 
     private DeskCamera camera;
     private Handler cameraHandler;
     private HandlerThread cameraThread;
 
-    /*
-        // Callback used when we register the LSM9DS1 sensor driver with the system's SensorManager.
-        private SensorManager.DynamicSensorCallback dynamicSensorCallback
-                = new SensorManager.DynamicSensorCallback() {
-            @Override
-            public void onDynamicSensorConnected(Sensor sensor) {
-                if (sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE) {
-                    // Our sensor is connected. Start receiving temperature data.
-                    sensorManager.registerListener(temperatureListener, sensor,
-                            SensorManager.SENSOR_DELAY_NORMAL);
-                }
-            }
-
-            @Override
-            public void onDynamicSensorDisconnected(Sensor sensor) {
-                super.onDynamicSensorDisconnected(sensor);
-            }
-        };
-
-        // Callback when SensorManager delivers temperature data.
-        private SensorEventListener temperatureListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                lastTemperature = event.values[0];
-                Log.d(TAG, "sensor changed: " + lastTemperature);
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-                Log.d(TAG, "accuracy changed: " + accuracy);
-            }
-        };
-    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,10 +46,10 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
         // Link View and ViewModel
         dashFragment.setViewModel(viewModel);
 
-        setupSensors();
         setupCamera();
 
         mqttManager = MqttManager.getInstance(getApplicationContext());
+        sensorHub = SensorHub.getInstance(getApplicationContext());
     }
 
     private DashViewModel findOrCreateViewModel() {
@@ -139,43 +102,11 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        /*
-        // Clean up sensor registrations
-        sensorManager.unregisterListener(temperatureListener);
-        sensorManager.unregisterDynamicSensorCallback(dynamicSensorCallback);
 
-        // Clean up peripheral.
-        if (sensorDriver != null) {
-            try {
-                sensorDriver.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            sensorDriver = null;
-        }*/
+        sensorHub.destroyInstance();
 
         camera.shutDown();
         cameraThread.quitSafely();
-    }
-
-    void setupSensors() {
-
-        sensorManager = ((SensorManager) getSystemService(SENSOR_SERVICE));
-
-        List<Sensor> sensors = sensorManager.getDynamicSensorList(Sensor.TYPE_ALL);
-        for ( Sensor s : sensors) {
-            Log.d(TAG, "Sensor " + s.getName() + " (" + s.getId() + ") " + " is " + s.getType());
-        }
-
-        /*
-        try {
-            sensorDriver = new Lsm9Ds1SensorDriver("I2C1");
-            sensorManager.registerDynamicSensorCallback(dynamicSensorCallback);
-            sensorDriver.registerTemperatureSensor();
-            Log.d(TAG, "Initialised I2C LSM9DS1");
-        } catch (IOException e) {
-            throw new RuntimeException("Error initialising LSM9DS1"+ e);
-        }*/
     }
 
     void setupCamera() {

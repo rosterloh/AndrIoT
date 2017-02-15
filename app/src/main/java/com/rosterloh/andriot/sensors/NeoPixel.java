@@ -9,34 +9,15 @@ public class NeoPixel implements AutoCloseable {
 
     private static String TAG = NeoPixel.class.getSimpleName();
 
-    /**
-     * Color ordering for the RGB LED messages; the most common modes are BGR and RGB.
-     */
-    public enum Mode {
-        RGB,
-        RBG,
-        GRB,
-        GBR,
-        BRG,
-        BGR
-    }
+    public static final int MAX_BRIGHTNESS = 255;
 
-    /**
-     * The direction to apply colors when writing LED data
-     */
-    public enum Direction {
-        NORMAL,
-        REVERSED,
-    }
-
-    private static final int SPI_BPW = 8; // Bits per word
-    private static final int SPI_FREQUENCY = 1000000;
-    private static final int SPI_MODE = 2;
+    // RGB LED strip settings that have sensible defaults.
+    private int brightness = MAX_BRIGHTNESS >> 1; // default to half
 
     // For peripherals access
     private SpiDevice device = null;
 
-    public NeoPixel(String port, Mode mode, Direction direction) throws IOException {
+    public NeoPixel(String port) throws IOException {
 
         PeripheralManagerService pioService = new PeripheralManagerService();
         device = pioService.openSpiDevice(port);
@@ -52,11 +33,49 @@ public class NeoPixel implements AutoCloseable {
     }
 
     private void configure(SpiDevice device) throws IOException {
-        // Note: You may need to set bit justification for your board.
-        // this.device.setBitJustification(SPI_BITJUST);
-        device.setFrequency(SPI_FREQUENCY);
-        device.setMode(SPI_MODE);
-        device.setBitsPerWord(SPI_BPW);
+
+        device.setMode(SpiDevice.MODE0);    // Low clock, leading edge transfer
+        device.setFrequency(6000000);       // 6 MHz
+        device.setBitsPerWord(8);           // 8 BPW
+        device.setBitJustification(false);  // MSB first
+    }
+
+    /**
+     * Sets the brightness for all LEDs in the strip.
+     * @param ledBrightness The brightness of the LED strip, between 0 and {@link #MAX_BRIGHTNESS}.
+     */
+    public void setBrightness(int ledBrightness) {
+        if (ledBrightness < 0 || ledBrightness > MAX_BRIGHTNESS) {
+            throw new IllegalArgumentException("Brightness needs to be between 0 and "
+                    + MAX_BRIGHTNESS);
+        }
+        brightness = ledBrightness;
+    }
+
+    /**
+     * Get the current brightness level
+     */
+    public int getBrightness() {
+        return brightness;
+    }
+
+    /**
+     * Writes the current RGB Led data to the peripheral bus.
+     * @throws IOException
+     */
+    public void setColour(int r, int g, int b) throws IOException {
+
+        if (device == null) {
+            throw new IllegalStateException("SPI device not open");
+        }
+
+        byte[] values = new byte[] {
+                (byte) ((r * brightness) >> 8),
+                (byte) ((g * brightness) >> 8),
+                (byte) ((b * brightness) >> 8),
+        };
+
+        device.write(values, values.length);
     }
 
     /**

@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'com.github.ben-manes.versions' version '0.14.0'
     id 'me.tatarka.retrolambda' version '3.5.0'
 }
 
@@ -41,14 +41,15 @@ ext {
             rxandroid           : "2.0.1",
             retrofit            : "2.1.0",
             okhttp              : "3.6.0",
-            pahoMqtt            : "1.1.1-SNAPSHOT"
+            mqttv3              : "1.1.1-SNAPSHOT",
+            mqttAndroid         : "1.1.2-SNAPSHOT"
     ]
 
     testingLibraries = [
             junit               : "4.12",
             mockito             : "2.2.9",
             espresso            : "2.2.2",
-            espressoRunner      : "0.5",
-            espressoRules       : "0.5"
+            runner              : "0.5",
+            rules               : "0.5"
     ]
 }
