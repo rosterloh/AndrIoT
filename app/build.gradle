@@ -63,6 +63,8 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
+    //debugCompile project(path: ':tensorflow_inference', configuration: 'debug')
+
     provided "com.google.android.things:androidthings:${libs.things}"
 
     compile "com.android.support:appcompat-v7:${libs.supportVersion}"

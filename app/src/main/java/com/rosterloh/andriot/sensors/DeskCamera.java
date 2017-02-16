@@ -25,12 +25,11 @@ public class DeskCamera {
 
     private static final String TAG = DeskCamera.class.getSimpleName();
 
-    private static final int IMAGE_WIDTH = 320;
-    private static final int IMAGE_HEIGHT = 240;
+    public static final int IMAGE_WIDTH = 640;
+    public static final int IMAGE_HEIGHT = 480;
+
     private static final int MAX_IMAGES = 1;
-
     private CameraDevice cameraDevice;
-
     private CameraCaptureSession captureSession;
 
     /**
@@ -53,10 +52,11 @@ public class DeskCamera {
     /**
      * Initialise the camera device
      */
-    @SuppressWarnings({"MissingPermission"})
     public void initialiseCamera(Context context,
                                  Handler backgroundHandler,
                                  ImageReader.OnImageAvailableListener imageAvailableListener) {
+
+        //dumpFormatInfo(context);
         // Discover the camera instance
         CameraManager manager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
         String[] camIds = {};
@@ -74,7 +74,7 @@ public class DeskCamera {
 
         // Initialise the image processor
         imageReader = ImageReader.newInstance(IMAGE_WIDTH, IMAGE_HEIGHT,
-                ImageFormat.JPEG, MAX_IMAGES);
+                ImageFormat.YUV_420_888, MAX_IMAGES);
         imageReader.setOnImageAvailableListener(
                 imageAvailableListener, backgroundHandler);
 
@@ -167,6 +167,7 @@ public class DeskCamera {
                     cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(imageReader.getSurface());
             captureBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON);
+            captureBuilder.set(CaptureRequest.CONTROL_AWB_MODE, CaptureRequest.CONTROL_AWB_MODE_AUTO);
             Log.d(TAG, "Session initialized.");
             captureSession.capture(captureBuilder.build(), captureCallback, null);
         } catch (CameraAccessException cae) {

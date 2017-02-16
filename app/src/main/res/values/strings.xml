@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">AndrIoT</string>
     <string name="toast_parse_error">An error has occurred. Try later!</string>
+    <string name="image_title">Captured Image</string>
 
     <!-- Weather icons -->
     <string name="icon_clear_sky_day" translatable="false">&#xf00d;</string>

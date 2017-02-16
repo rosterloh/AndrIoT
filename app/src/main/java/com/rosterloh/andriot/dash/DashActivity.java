@@ -1,38 +1,38 @@
 package com.rosterloh.andriot.dash;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.Image;
-import android.media.ImageReader;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.widget.Toast;
 
+import com.rosterloh.andriot.images.ImageDialog;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.ViewModelHolder;
 import com.rosterloh.andriot.networking.MqttManager;
-import com.rosterloh.andriot.sensors.DeskCamera;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.utils.ActivityUtils;
 
-import java.nio.ByteBuffer;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
+import static android.Manifest.permission.CAMERA;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class DashActivity extends AppCompatActivity implements DashNavigator {
 
     private static final String TAG = DashActivity.class.getSimpleName();
     public static final String DASH_VIEWMODEL_TAG = "DASH_VIEWMODEL_TAG";
+    private static final int PERMISSIONS_REQUEST = 1;
     private DashViewModel viewModel;
 
     private MqttManager mqttManager;
     private SensorHub sensorHub;
-
-    private DeskCamera camera;
-    private Handler cameraHandler;
-    private HandlerThread cameraThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +46,40 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
         // Link View and ViewModel
         dashFragment.setViewModel(viewModel);
 
-        setupCamera();
+        if (hasPermission()) {
+            if (savedInstanceState == null) {
+                sensorHub = SensorHub.getInstance(getApplicationContext());
+                sensorHub.observeImages()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<Bitmap>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Bitmap bitmap) {
+                                final ImageDialog dialog = ImageDialog.getInstance(bitmap);
+                                dialog.show(getSupportFragmentManager(), null);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+            }
+        } else {
+            requestPermission();
+        }
 
         mqttManager = MqttManager.getInstance(getApplicationContext());
-        sensorHub = SensorHub.getInstance(getApplicationContext());
     }
 
     private DashViewModel findOrCreateViewModel() {
@@ -104,36 +134,44 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
         super.onDestroy();
 
         sensorHub.destroyInstance();
-
-        camera.shutDown();
-        cameraThread.quitSafely();
     }
 
-    void setupCamera() {
-
-        // We need permission to access the camera
-        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            // A problem occurred auto-granting the permission
-            Log.d(TAG, "No camera permission");
-        } else {
-            cameraThread = new HandlerThread("CameraBackground");
-            cameraThread.start();
-            cameraHandler = new Handler(cameraThread.getLooper());
-
-            camera = DeskCamera.getInstance();
-            camera.initialiseCamera(this, cameraHandler, onImageAvailableListener);
+    // Permission-related methods. This is not needed for Android Things, where permissions are
+    // automatically granted. However, it is kept here in case the developer
+    // needs to test on a regular Android device
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    sensorHub = SensorHub.getInstance(getApplicationContext());
+                } else {
+                    requestPermission();
+                }
+            }
         }
     }
 
-    private ImageReader.OnImageAvailableListener onImageAvailableListener = (reader) -> {
-        Image image = reader.acquireLatestImage();
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true;
+        }
+    }
 
-        // get image bytes
-        ByteBuffer imageBuf = image.getPlanes()[0].getBuffer();
-        final byte[] imageBytes = new byte[imageBuf.remaining()];
-        imageBuf.get(imageBytes);
-        image.close();
-
-        //binding.ivCamera.setImageBitmap(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length));
-    };
+    private void requestPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (shouldShowRequestPermissionRationale(CAMERA) ||
+                    shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) {
+                Toast.makeText(DashActivity.this, "Camera AND storage permission are " +
+                        "required for this application", Toast.LENGTH_LONG).show();
+            }
+            requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST);
+        }
+    }
 }
