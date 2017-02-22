@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0-beta4'
+        classpath 'com.android.tools.build:gradle:2.3.0-rc1'
         classpath 'com.google.gms:google-services:3.0.0'
     }
 }
@@ -33,13 +33,13 @@ ext {
     ]
 
     libraries = [
-            supportVersion      : "25.1.1",
-            playServices        : "10.0.1",
+            supportVersion      : "25.2.0",
+            playServices        : "10.2.0",
             constraintLayout    : "1.0.0-beta5",
             things              : "0.2-devpreview",
             rxjava              : "2.0.6",
             rxandroid           : "2.0.1",
-            retrofit            : "2.1.0",
+            retrofit            : "2.2.0",
             okhttp              : "3.6.0",
             mqttv3              : "1.1.1-SNAPSHOT",
             mqttAndroid         : "1.1.2-SNAPSHOT"
