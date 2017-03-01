@@ -21,6 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -146,7 +147,8 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
             case PERMISSIONS_REQUEST: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
                     sensorHub = SensorHub.getInstance(getApplicationContext());
                 } else {
                     requestPermission();
@@ -158,7 +160,8 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
     private boolean hasPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                    checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                    checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                    checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         } else {
             return true;
         }
@@ -167,11 +170,12 @@ public class DashActivity extends AppCompatActivity implements DashNavigator {
     private void requestPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (shouldShowRequestPermissionRationale(CAMERA) ||
-                    shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)) {
-                Toast.makeText(DashActivity.this, "Camera AND storage permission are " +
+                    shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE) ||
+                    shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION)) {
+                Toast.makeText(DashActivity.this, "Camera, location AND storage permission are " +
                         "required for this application", Toast.LENGTH_LONG).show();
             }
-            requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST);
+            requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE, ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST);
         }
     }
 }

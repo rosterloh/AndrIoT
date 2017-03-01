@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'realm-android'
 
 def versionMajor = 0
-def versionMinor = 1
+def versionMinor = 2
 def versionPatch = 0
 def buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'", TimeZone.getTimeZone("UTC"))
 
@@ -53,6 +54,16 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        // Remove unneeded Realm native libs (nearly no devices use these)
+        exclude 'lib/mips/librealm-jni.so'
+        exclude 'lib/x86_64/librealm-jni.so'
+    }
 }
 
 repositories {
@@ -70,6 +81,7 @@ dependencies {
     compile "com.android.support.constraint:constraint-layout:${libs.constraintLayout}"
     compile "com.android.support:design:${libs.supportVersion}"
 
+    compile "com.google.android.gms:play-services-location:${libs.playServices}"
     //compile "com.google.firebase:firebase-analytics:${libs.playServices}"
     compile "com.google.firebase:firebase-crash:${libs.playServices}"
     //compile "com.google.firebase:firebase-database:${libs.playServices}"

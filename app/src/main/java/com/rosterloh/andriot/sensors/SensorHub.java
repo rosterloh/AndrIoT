@@ -47,6 +47,7 @@ public class SensorHub implements ImageReader.OnImageAvailableListener {
     private AtomicBoolean ready = new AtomicBoolean(false);
     private ImagePreprocessor imagePreprocessor;
     private TensorFlowImageClassifier tensorFlowClassifier;
+    private LocationService locationService;
 
     private PublishSubject<Boolean> buttonObservable = PublishSubject.create();
     private PublishSubject<Bitmap> imageObservable = PublishSubject.create();
@@ -84,6 +85,9 @@ public class SensorHub implements ImageReader.OnImageAvailableListener {
         cameraThread.start();
         cameraHandler = new Handler(cameraThread.getLooper());
         cameraHandler.post(initialiseOnBackground);
+
+        locationService = new LocationService(appContext);
+        locationService.getLastLocation();
     }
 
     public static SensorHub getInstance(Context context) {
