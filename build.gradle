@@ -1,56 +1,45 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0-rc1'
-        classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'io.realm:realm-gradle-plugin:2.3.1'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha1'
+        classpath 'com.google.gms:google-services:3.1.0'
     }
 }
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.14.0'
-    id 'me.tatarka.retrolambda' version '3.5.0'
 }
+
+ext.compile_sdk_version = "android-O"
+ext.build_tools_version = "26.0.0-rc2"
+ext.min_sdk_version = 24
+ext.target_sdk_version = 25
+ext.arch_version = "1.0.0-alpha1"
+ext.support_version = "26.0.0-beta1"
+ext.constraint_layout_version = "1.1.0-beta1"
+ext.play_services_version = "10.2.6"
+ext.things_version = "0.4-devpreview"
+ext.dagger_version = "2.11-rc2"
+ext.retrofit_version = "2.3.0"
+ext.okhttp_version = "3.8.0"
+ext.rxjava_version = "2.1.0"
+ext.rxandroid_version = "2.0.1"
+ext.mqtt_version = "1.1.2-SNAPSHOT"
+ext.timber_version = "4.5.1"
+ext.junit_version = "4.12"
+ext.espresso_version = "2.2.2"
+ext.mockito_version = "2.8.9"
 
 allprojects {
     repositories {
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-ext {
-    configuration = [
-            package             : "com.rosterloh.andriot",
-            buildToolsVersion   : "25.0.2",
-            compileVersion      : 25,
-            minSdk              : 24,
-            targetSdk           : 25
-    ]
-
-    libraries = [
-            supportVersion      : "25.2.0",
-            playServices        : "10.2.0",
-            constraintLayout    : "1.0.0",
-            things              : "0.2-devpreview",
-            rxjava              : "2.0.6",
-            rxandroid           : "2.0.1",
-            retrofit            : "2.2.0",
-            okhttp              : "3.6.0",
-            mqttv3              : "1.1.1-SNAPSHOT",
-            mqttAndroid         : "1.1.2-SNAPSHOT"
-    ]
-
-    testingLibraries = [
-            junit               : "4.12",
-            mockito             : "2.2.9",
-            espresso            : "2.2.2",
-            runner              : "0.5",
-            rules               : "0.5"
-    ]
 }

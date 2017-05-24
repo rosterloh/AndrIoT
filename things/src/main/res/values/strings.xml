@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">AndrIoT</string>
+    <string name="toast_parse_error">An error has occurred. Try later!</string>
+    <string name="image_title">Captured Image</string>
+
+    <!-- Weather icons -->
+    <string name="icon_clear_sky_day" translatable="false">&#xf00d;</string>
+    <string name="icon_clear_sky_night" translatable="false">&#xf02e;</string>
+    <string name="icon_few_clouds_day" translatable="false">&#xf002;</string>
+    <string name="icon_few_clouds_night" translatable="false">&#xf086;</string>
+    <string name="icon_scattered_clouds" translatable="false">&#xf041;</string>
+    <string name="icon_broken_clouds" translatable="false">&#xf013;</string>
+    <string name="icon_shower_rain" translatable="false">&#xf01a;</string>
+    <string name="icon_rain_day" translatable="false">&#xf008;</string>
+    <string name="icon_rain_night" translatable="false">&#xf028;</string>
+    <string name="icon_thunderstorm" translatable="false">&#xf01e;</string>
+    <string name="icon_snow" translatable="false">&#xf01b;</string>
+    <string name="icon_mist" translatable="false">&#xf014;</string>
+    <string name="icon_weather_default" translatable="false">&#xf075;</string>
+    <string name="icon_wind" translatable="false">&#xf050;</string>
+    <string name="icon_humidity" translatable="false">&#xf07a;</string>
+    <string name="icon_barometer" translatable="false">&#xf079;</string>
+    <string name="icon_cloudiness" translatable="false">&#xf002;</string>
+    <string name="icon_sunrise" translatable="false">&#xf051;</string>
+    <string name="icon_sunset" translatable="false">&#xf052;</string>
+
+    <!-- Weather conditions label strings -->
+    <string name="last_update_label">Last update: %s</string>
+    <string name="local_temperature_format">%.1f°C</string>
+    <string name="local_humidity_format">%.1f%%</string>
+    <string name="temperate_description">Thermometer with lines</string>
+    <string name="motion_description">Motion icon</string>
+</resources>
