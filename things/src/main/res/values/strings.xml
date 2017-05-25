@@ -26,6 +26,7 @@
 
     <!-- Weather conditions label strings -->
     <string name="last_update_label">Last update: %s</string>
+    <string name="remote_temperature_format">%.0f°</string>
     <string name="local_temperature_format">%.1f°C</string>
     <string name="local_humidity_format">%.1f%%</string>
     <string name="temperate_description">Thermometer with lines</string>

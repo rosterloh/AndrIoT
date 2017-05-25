@@ -11,6 +11,9 @@ import com.rosterloh.andriot.vo.Weather;
 import com.rosterloh.things.common.AppExecutors;
 import com.rosterloh.things.common.vo.Resource;
 
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,7 +23,7 @@ public class DashViewModel extends ViewModel {
 
     private static final String TAG = DashViewModel.class.getSimpleName();
 
-    private static final int RATE = 20 * 1000;
+    private static final int POLL_RATE = 5 * 60 * 1000;
 
     private final AppExecutors appExecutors;
     private final SensorHub sensorHub;
@@ -28,11 +31,14 @@ public class DashViewModel extends ViewModel {
     private final MutableLiveData<Sensors> sensors = new MutableLiveData<>();
     private final LiveData<Resource<Weather>> weather;
 
+    private DateTime lastWeatherUpdate;
+
     @Inject
     DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors, SensorHub sensorHub) {
         this.appExecutors = appExecutors;
         this.sensorHub = sensorHub;
         weather = weatherRepository.loadWeather();
+        lastWeatherUpdate = new DateTime();
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -44,8 +50,12 @@ public class DashViewModel extends ViewModel {
                         sensors.setValue(new Sensors(data[0], data[1], null, null, null));
                     });
                 });
+                if (lastWeatherUpdate.isBefore(new DateTime().minusMinutes(30))) {
+                    lastWeatherUpdate = new DateTime();
+                    // update
+                }
             }
-        }, RATE, RATE);
+        }, 0, POLL_RATE);
 
     }
 

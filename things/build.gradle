@@ -69,6 +69,7 @@ dependencies {
         exclude group: 'com.google.android', module: 'support-v4'
     })
     compile "com.jakewharton.timber:timber:$timber_version"
+    compile "joda-time:joda-time:$joda_time_version"
 
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"

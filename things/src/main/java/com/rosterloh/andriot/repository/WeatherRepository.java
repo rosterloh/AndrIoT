@@ -14,6 +14,8 @@ import com.rosterloh.things.common.api.ApiResponse;
 import com.rosterloh.things.common.repository.NetworkBoundResource;
 import com.rosterloh.things.common.vo.Resource;
 
+import org.joda.time.DateTime;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -53,7 +55,7 @@ public class WeatherRepository {
                 Weather weather = new Weather(
                         item.getId(),
                         item.getWeather().get(0).getIcon(),
-                        Long.toString(Math.round(item.getMain().getTemp())),
+                        item.getMain().getTemp(),
                         item.getWeather().get(0).getDescription(),
                         item.getDt(),
                         update);
@@ -66,8 +68,7 @@ public class WeatherRepository {
                     Log.d(TAG, "No data in database. Fetching new");
                     return true;
                 }
-                // TODO: Consider using Yoda Time
-                if (System.currentTimeMillis() - data.lastUpdate > 30L*60*1000) {
+                if (new DateTime(data.lastUpdate).isBefore(new DateTime().minusMinutes(30))) {
                     Log.d(TAG, "Data in database too old. Refreshing");
                     return true;
                 } else {

@@ -25,7 +25,7 @@ public class Weather {
     @SerializedName("weather_icon")
     public final String weatherIcon;
     @SerializedName("temperature")
-    public final String temperature;
+    public final Double temperature;
     @SerializedName("description")
     public final String description;
     @SerializedName("last_update")
@@ -33,7 +33,7 @@ public class Weather {
     @SerializedName("update_string")
     public final String updateString;
 
-    public Weather(int id, String weatherIcon, String temperature, String description, long lastUpdate, String updateString) {
+    public Weather(int id, String weatherIcon, Double temperature, String description, long lastUpdate, String updateString) {
         this.id = id;
         this.weatherIcon = weatherIcon;
         this.temperature = temperature;

@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@{weather.temperature}"
+            android:text="@{String.format(@string/remote_temperature_format, weather.temperature)}"
             android:textAlignment="center"
             android:textSize="70sp"
             app:layout_constraintTop_toTopOf="parent"
