@@ -3,7 +3,6 @@ package com.rosterloh.andriot.repository;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
@@ -14,22 +13,21 @@ import com.rosterloh.things.common.api.ApiResponse;
 import com.rosterloh.things.common.repository.NetworkBoundResource;
 import com.rosterloh.things.common.vo.Resource;
 
-import org.joda.time.DateTime;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import org.threeten.bp.Instant;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.ZoneOffset;
+import org.threeten.bp.temporal.ChronoUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import timber.log.Timber;
 
 /**
  * Repository that handles Weather objects.
  */
 @Singleton
 public class WeatherRepository {
-
-    private static final String TAG = WeatherRepository.class.getSimpleName();
 
     private final WeatherDao weatherDao;
     private final WeatherService weatherService;
@@ -51,25 +49,29 @@ public class WeatherRepository {
         return new NetworkBoundResource<Weather, WeatherResponse>(appExecutors) {
             @Override
             protected void saveCallResult(@NonNull WeatherResponse item) {
-                String update = new SimpleDateFormat("H:mm", Locale.getDefault()).format(new Date((long) item.getDt() * 1000));
+
+                // FIXME: This is not working for some reason
+                LocalDateTime date =
+                        LocalDateTime.ofInstant(Instant.ofEpochMilli(item.getDt()), ZoneOffset.UTC);
+
                 Weather weather = new Weather(
                         item.getId(),
                         item.getWeather().get(0).getIcon(),
                         item.getMain().getTemp(),
                         item.getWeather().get(0).getDescription(),
-                        item.getDt(),
-                        update);
+                        LocalDateTime.now());
                 weatherDao.insert(weather);
             }
 
             @Override
             protected boolean shouldFetch(@Nullable Weather data) {
                 if (data == null) {
-                    Log.d(TAG, "No data in database. Fetching new");
+                    Timber.d("No data in database. Fetching new");
                     return true;
                 }
-                if (new DateTime(data.lastUpdate).isBefore(new DateTime().minusMinutes(30))) {
-                    Log.d(TAG, "Data in database too old. Refreshing");
+
+                if (ChronoUnit.MINUTES.between(LocalDateTime.now(), data.lastUpdate) > 30) {
+                    Timber.d("Data in database too old. Refreshing");
                     return true;
                 } else {
                     return false;

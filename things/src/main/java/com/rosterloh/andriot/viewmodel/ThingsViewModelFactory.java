@@ -2,34 +2,29 @@ package com.rosterloh.andriot.viewmodel;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
-import android.support.v4.util.ArrayMap;
-
-import com.rosterloh.andriot.di.ViewModelSubComponent;
-import com.rosterloh.andriot.ui.dash.DashViewModel;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
 public class ThingsViewModelFactory implements ViewModelProvider.Factory {
-    private final ArrayMap<Class, Callable<? extends ViewModel>> creators;
+
+    private final Map<Class<? extends ViewModel>, Provider<ViewModel>> creators;
 
     @Inject
-    public ThingsViewModelFactory(ViewModelSubComponent viewModelSubComponent) {
-        creators = new ArrayMap<>();
-        // we cannot inject view models directly because they won't be bound to the owner's
-        // view model scope.
-        creators.put(DashViewModel.class, () -> viewModelSubComponent.dashViewModel());
+    public ThingsViewModelFactory(Map<Class<? extends ViewModel>, Provider<ViewModel>> creators) {
+        this.creators = creators;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
-        Callable<? extends ViewModel> creator = creators.get(modelClass);
+        Provider<? extends ViewModel> creator = creators.get(modelClass);
         if (creator == null) {
-            for (Map.Entry<Class, Callable<? extends ViewModel>> entry : creators.entrySet()) {
+            for (Map.Entry<Class<? extends ViewModel>, Provider<ViewModel>> entry : creators.entrySet()) {
                 if (modelClass.isAssignableFrom(entry.getKey())) {
                     creator = entry.getValue();
                     break;
@@ -40,7 +35,7 @@ public class ThingsViewModelFactory implements ViewModelProvider.Factory {
             throw new IllegalArgumentException("unknown model class " + modelClass);
         }
         try {
-            return (T) creator.call();
+            return (T) creator.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,17 +1,13 @@
 package com.rosterloh.andriot.di;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.persistence.room.Room;
-import android.content.Context;
 
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.ThingsDb;
 import com.rosterloh.andriot.db.WeatherDao;
-import com.rosterloh.andriot.images.CameraController;
 import com.rosterloh.andriot.sensors.SensorHub;
-import com.rosterloh.andriot.viewmodel.ThingsViewModelFactory;
 import com.rosterloh.things.common.util.LiveDataCallAdapterFactory;
 
 import javax.inject.Singleton;
@@ -21,8 +17,8 @@ import dagger.Provides;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-@Module(subcomponents = ViewModelSubComponent.class)
-public class AppModule {
+@Module(includes = ViewModelModule.class)
+class AppModule {
     /*
     OkHttpClient client;
 
@@ -59,12 +55,6 @@ public class AppModule {
     @Singleton @Provides
     SettingsDao provideSettingsDao(ThingsDb db) {
         return db.settingsDao();
-    }
-
-    @Singleton @Provides
-    ViewModelProvider.Factory provideViewModelFactory(
-            ViewModelSubComponent.Builder viewModelSubComponent) {
-        return new ThingsViewModelFactory(viewModelSubComponent.build());
     }
 
     @Singleton @Provides

@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingComponent;
 import android.databinding.DataBindingUtil;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -22,8 +21,6 @@ import com.rosterloh.things.common.util.AutoClearedValue;
 import javax.inject.Inject;
 
 public class DashFragment extends LifecycleFragment implements Injectable {
-
-    private static final String TAG = DashFragment.class.getSimpleName();
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;

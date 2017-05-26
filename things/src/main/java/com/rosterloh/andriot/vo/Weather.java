@@ -1,24 +1,18 @@
 package com.rosterloh.andriot.vo;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.rosterloh.andriot.api.weather.Clouds;
-import com.rosterloh.andriot.api.weather.Coord;
-import com.rosterloh.andriot.api.weather.CurrentWeather;
-import com.rosterloh.andriot.api.weather.Main;
-import com.rosterloh.andriot.api.weather.Sys;
-import com.rosterloh.andriot.api.weather.Wind;
+import com.rosterloh.andriot.db.DateTypeConverter;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.temporal.ChronoUnit;
 
-@Entity
+@Entity(tableName = "weather")
+@TypeConverters(DateTypeConverter.class)
 public class Weather {
 
     public final @PrimaryKey int id;
@@ -29,16 +23,21 @@ public class Weather {
     @SerializedName("description")
     public final String description;
     @SerializedName("last_update")
-    public final long lastUpdate;
-    @SerializedName("update_string")
-    public final String updateString;
+    public final LocalDateTime lastUpdate;
 
-    public Weather(int id, String weatherIcon, Double temperature, String description, long lastUpdate, String updateString) {
+    public Weather(int id, String weatherIcon, Double temperature, String description, LocalDateTime lastUpdate) {
         this.id = id;
         this.weatherIcon = weatherIcon;
         this.temperature = temperature;
         this.description = description;
         this.lastUpdate = lastUpdate;
-        this.updateString = updateString;
+    }
+
+    public long getMinutesSinceUpdate() {
+        return ChronoUnit.MINUTES.between(LocalDateTime.now(), lastUpdate);
+    }
+
+    public String getLastUpdateTime() {
+        return lastUpdate.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

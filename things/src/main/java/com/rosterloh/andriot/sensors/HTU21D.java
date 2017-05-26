@@ -1,7 +1,6 @@
 package com.rosterloh.andriot.sensors;
 
 import android.support.annotation.IntDef;
-import android.util.Log;
 
 import com.google.android.things.pio.I2cDevice;
 import com.google.android.things.pio.PeripheralManagerService;
@@ -10,10 +9,11 @@ import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import timber.log.Timber;
+
 public class HTU21D implements AutoCloseable {
 
-    private static final String TAG = HTU21D.class.getSimpleName();
-    private static final Boolean DEBUG = false;
+    private static final boolean DEBUG = false;
 
     private static final int I2C_ADDRESS = 0x40;
     public static final float MIN_TEMP_C = -40f;
@@ -57,19 +57,17 @@ public class HTU21D implements AutoCloseable {
 
         int user = device.readRegByte(HTU21D_REG_USER) & 0xff;
         resolution = user & HTU21D_RESOLUTION_MASK;
-        switch (resolution) {
-            case MODE_12_14:
-                Log.d(TAG, "Measurement resolution RH 12 bits Temp 14 bits");
-                break;
-            case MODE_8_12:
-                Log.d(TAG, "Measurement resolution RH 8 bits Temp 12 bits");
-                break;
-            case MODE_10_13:
-                Log.d(TAG, "Measurement resolution RH 10 bits Temp 13 bits");
-                break;
-            case MODE_11_11:
-                Log.d(TAG, "Measurement resolution RH 11 bits Temp 11 bits");
-                break;
+        if (DEBUG) {
+            switch (resolution) {
+                case MODE_12_14:
+                    Timber.d("Measurement resolution RH 12 bits Temp 14 bits"); break;
+                case MODE_8_12:
+                    Timber.d("Measurement resolution RH 8 bits Temp 12 bits"); break;
+                case MODE_10_13:
+                    Timber.d("Measurement resolution RH 10 bits Temp 13 bits"); break;
+                case MODE_11_11:
+                    Timber.d("Measurement resolution RH 11 bits Temp 11 bits"); break;
+            }
         }
 
         device.writeRegByte(HTU21D_REG_RESET, (byte) 1);
@@ -129,7 +127,7 @@ public class HTU21D implements AutoCloseable {
      */
     static float compensateTemperature(int rawTemp) {
         int temp = ((21965 * (rawTemp & 0xFFFC)) >> 13) - 46850;
-        if (DEBUG) Log.d(TAG, "Raw: " + rawTemp + " Temp: " + temp);
+        if (DEBUG) Timber.d("Raw: " + rawTemp + " Temp: " + temp);
         return (float) temp / 1000;
     }
 
@@ -140,7 +138,7 @@ public class HTU21D implements AutoCloseable {
      */
     static float compensateHumidity(int rawHumidity) {
         int hum = ((15625 * (rawHumidity & 0xFFFC)) >> 13) - 6000;
-        if (DEBUG) Log.d(TAG, "Raw: " + rawHumidity + " Hum: " + hum);
+        if (DEBUG) Timber.d("Raw: " + rawHumidity + " Hum: " + hum);
         return (float) hum / 1000;
     }
 }

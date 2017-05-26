@@ -2,7 +2,10 @@ package com.rosterloh.andriot;
 
 import android.app.Activity;
 import android.app.Application;
+import android.util.Log;
 
+import com.google.firebase.crash.FirebaseCrash;
+import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.rosterloh.andriot.di.AppInjector;
 
 import javax.inject.Inject;
@@ -19,8 +22,11 @@ public class ThingsApp extends Application implements HasActivityInjector {
     @Override
     public void onCreate() {
         super.onCreate();
+        AndroidThreeTen.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new CrashReportingTree());
         }
         AppInjector.init(this);
     }
@@ -30,4 +36,18 @@ public class ThingsApp extends Application implements HasActivityInjector {
         return dispatchingAndroidInjector;
     }
 
+    /** A tree which logs important information for crash reporting. */
+    private static class CrashReportingTree extends Timber.Tree {
+        @Override protected void log(int priority, String tag, String message, Throwable t) {
+            if (priority == Log.VERBOSE || priority == Log.DEBUG) {
+                return;
+            }
+
+            FirebaseCrash.logcat(priority, tag, message);
+
+            if (t != null) {
+                FirebaseCrash.report(t);
+            }
+        }
+    }
 }

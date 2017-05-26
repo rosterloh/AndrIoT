@@ -28,6 +28,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    lintOptions {
+        lintConfig rootProject.file('lint.xml')
+    }
     dataBinding {
         enabled = true
     }
@@ -69,7 +72,7 @@ dependencies {
         exclude group: 'com.google.android', module: 'support-v4'
     })
     compile "com.jakewharton.timber:timber:$timber_version"
-    compile "joda-time:joda-time:$joda_time_version"
+    compile "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
 
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
