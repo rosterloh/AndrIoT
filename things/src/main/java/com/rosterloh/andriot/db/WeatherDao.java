@@ -17,6 +17,6 @@ public interface WeatherDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Weather weather);
 
-    @Query("SELECT * FROM weather")
+    @Query("SELECT * FROM " + Weather.TABLE_NAME)
     LiveData<Weather> load();
 }

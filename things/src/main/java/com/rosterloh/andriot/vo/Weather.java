@@ -11,9 +11,13 @@ import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.ChronoUnit;
 
-@Entity(tableName = "weather")
+import static com.rosterloh.andriot.vo.Weather.TABLE_NAME;
+
+@Entity(tableName = TABLE_NAME)
 @TypeConverters(DateTypeConverter.class)
 public class Weather {
+
+    public static final String TABLE_NAME = "weather";
 
     public final @PrimaryKey int id;
     @SerializedName("weather_icon")

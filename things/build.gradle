@@ -51,6 +51,7 @@ dependencies {
     compile(name: 'tensorflow', ext: 'aar')
 
     provided "com.google.android.things:androidthings:$things_version"
+    compile 'io.mraa.at.upm:upm_htu21d:1.3.0'
 
     compile "com.android.support:appcompat-v7:$support_version"
     compile "com.android.support.constraint:constraint-layout:$constraint_layout_version"

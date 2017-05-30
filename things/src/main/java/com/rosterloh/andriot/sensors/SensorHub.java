@@ -114,7 +114,7 @@ public class SensorHub {
             FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading sensor data");
             FirebaseCrash.report(e);
         }
-        return new float[]{0, 0};
+        return null;
     }
 
     @Override

@@ -21,6 +21,7 @@ import javax.inject.Inject;
 public class DashViewModel extends ViewModel {
 
     private static final int POLL_RATE = 5 * 60 * 1000;
+    private static final int INIT_DELAY = 5 * 1000;
 
     private final AppExecutors appExecutors;
     private final SensorHub sensorHub;
@@ -43,16 +44,18 @@ public class DashViewModel extends ViewModel {
             public void run() {
                 appExecutors.diskIO().execute(() -> {
                     float[] data = sensorHub.getSensorData();
-                    appExecutors.mainThread().execute(() -> {
-                        sensors.setValue(new Sensors(data[0], data[1], null, null, null));
-                    });
+                    if(data != null) {
+                        appExecutors.mainThread().execute(() -> {
+                            sensors.setValue(new Sensors(data[0], data[1], null, null, null));
+                        });
+                    }
                 });
                 if (lastWeatherUpdate.isBefore(LocalDateTime.now().minusMinutes(30))) {
                     lastWeatherUpdate = LocalDateTime.now();
                     // update
                 }
             }
-        }, 0, POLL_RATE);
+        }, INIT_DELAY, POLL_RATE);
 
     }
 
