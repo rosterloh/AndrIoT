@@ -4,11 +4,12 @@ import android.app.Application;
 import android.arch.persistence.room.Room;
 
 import com.rosterloh.andriot.api.WeatherService;
+import com.rosterloh.andriot.bluetooth.GattServer;
 import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.ThingsDb;
 import com.rosterloh.andriot.db.WeatherDao;
+import com.rosterloh.andriot.nearby.ConnectionsServer;
 import com.rosterloh.andriot.sensors.SensorHub;
-import com.rosterloh.things.common.util.LiveDataCallAdapterFactory;
 
 import javax.inject.Singleton;
 
@@ -19,50 +20,64 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 class AppModule {
-    /*
-    OkHttpClient client;
 
-    if(BuildConfig.DEBUG) {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-    } else {
-        client = new OkHttpClient.Builder().build();
-    }
-    Retrofit.Builder().client(clent)...
-    */
-
-    @Singleton @Provides
+    @Singleton
+    @Provides
     WeatherService provideWeatherService() {
         return new Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org/data/2.5/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                 .build()
                 .create(WeatherService.class);
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     ThingsDb provideDb(Application app) {
         return Room.databaseBuilder(app, ThingsDb.class,"things.db").build();
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     WeatherDao provideWeatherDao(ThingsDb db) {
         return db.weatherDao();
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     SettingsDao provideSettingsDao(ThingsDb db) {
         return db.settingsDao();
     }
 
-    @Singleton @Provides
+    @Singleton
+    @Provides
     SensorHub provideSensorHub() {
         return new SensorHub();
     }
+
+    @Singleton
+    @Provides
+    ConnectionsServer provideConnectionsServer(Application app) {
+        return new ConnectionsServer(app.getApplicationContext());
+    }
+
+    @Singleton
+    @Provides
+    GattServer provideGattServer(Application app) {
+        return new GattServer(app.getApplicationContext());
+    }
+
     /*
-    @Singleton @Provides
+    @Singleton
+    @Provides
+    MQTTPublisher provideMqttPublisher(SettingsDao settingsDao) {
+        return new MQTTPublisher(settingsDao);
+    }
+    */
+
+    /*
+    @Singleton
+    @Provides
     CameraController provideCameraController(Application app, SensorHub hub) {
         return new CameraController(app, hub);
     }*/

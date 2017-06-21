@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="device" type="com.rosterloh.thingsclient.vo.ScannedDevice"/>
         <variable name="level" type="int"/>
     </data>
 
@@ -18,7 +17,6 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:text="@{device.btDevice.name}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/name"
@@ -29,7 +27,6 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
-                android:text="@{device.btDevice.address}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
@@ -40,7 +37,6 @@
                 android:layout_marginStart="@dimen/default_margin" />
 
             <TextView
-                android:text="@{device.rssi + ` dBm`}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/rssi"

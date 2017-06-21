@@ -9,7 +9,7 @@ import android.arch.persistence.room.Query;
 import com.rosterloh.andriot.vo.Settings;
 
 /**
- * Interface for database access for Weather related operations.
+ * Interface for database access for Settings related operations.
  */
 @Dao
 public interface SettingsDao {
@@ -17,6 +17,6 @@ public interface SettingsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Settings settings);
 
-    @Query("SELECT * FROM settings")
+    @Query("SELECT * FROM " + Settings.TABLE_NAME)
     LiveData<Settings> load();
 }

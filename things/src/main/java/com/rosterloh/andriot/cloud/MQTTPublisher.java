@@ -1,25 +1,21 @@
 package com.rosterloh.andriot.cloud;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
+import com.rosterloh.andriot.db.SettingsDao;
+import com.rosterloh.andriot.vo.Settings;
 
-import com.google.gson.Gson;
-
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MQTTPublisher implements AutoCloseable {
+import javax.inject.Inject;
 
-    private static final String TAG = MQTTPublisher.class.getSimpleName();
+import timber.log.Timber;
+
+public class MQTTPublisher implements AutoCloseable {
 
     // Indicate if this message should be a MQTT 'retained' message.
     private static final boolean SHOULD_RETAIN = false;
@@ -27,22 +23,19 @@ public class MQTTPublisher implements AutoCloseable {
     // Use mqttQos=1 (at least once delivery), mqttQos=0 (at most once delivery) also supported.
     private static final int MQTT_QOS = 1;
 
-    private MqttClient mqttClient;
-    private AndrIotOptions andrIotOptions;
+    private MqttAsyncClient mqttClient = null;
+    private final SettingsDao settingsDao;
+    private Settings settings;
     private AtomicBoolean ready = new AtomicBoolean(false);
 
-    public MQTTPublisher(@NonNull AndrIotOptions options) {
+    @Inject
+    public MQTTPublisher(SettingsDao settingsDao) {
 
-        if (!options.isValid()) {
+        this.settingsDao = settingsDao;
 
-        } else {
-            //try {
-                andrIotOptions = options;
-            //    initialiseMqttClient();
-            //} catch (MqttException | IOException | GeneralSecurityException e) {
-            //    throw new IllegalArgumentException("Could not initialise MQTT", e);
-            //}
-        }
+        initialiseSettings();
+
+        initialiseMqttClient();
     }
 
     public void publish(List<SensorData> data) {/*
@@ -71,33 +64,52 @@ public class MQTTPublisher implements AutoCloseable {
     }
 
     @Override
-    public void close()/* throws MqttException */{
-        andrIotOptions = null;/*
+    public void close() {
         if (mqttClient != null) {
-            if (mqttClient.isConnected()) {
+            try {
                 mqttClient.disconnect();
+                if (mqttClient.isConnected()) {
+                    mqttClient.close(); // maybe handle separately
+                }
+                mqttClient = null;
+            } catch (Exception e) {
+                Timber.d("Failed to disconnect: " + e.getLocalizedMessage());
             }
-            mqttClient = null;
-        }*/
+        }
     }
-/*
-    private void initialiseMqttClient()  {
 
-        mqttClient = new MqttClient(andrIotOptions.getBrokerUrl(),
-                andrIotOptions.getClientId(), new MemoryPersistence());
+    private void initialiseSettings() {
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-        options.setUserName(andrIotOptions.UNUSED_ACCOUNT_NAME);
+        settings = settingsDao.load().getValue();
 
-        // generate the jwt password
-        //options.setPassword(mqttAuth.createJwt(andrIotOptions.getProjectId()));
+        //if (settings.deviceId == null) {
+        //    settings.deviceId = MqttAsyncClient.generateClientId();
+        //}
 
-        mqttClient.connect(options);
-        ready.set(true);
+        Timber.d(settings.toString());
+    }
+
+    private void initialiseMqttClient() {
+
+        try {
+            mqttClient = new MqttAsyncClient(settings.getBrokerUrl(),
+                    settings.getClientId(), new MemoryPersistence());
+
+            //MqttConnectOptions options = new MqttConnectOptions();
+            //options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
+            //options.setUserName(settings.UNUSED_ACCOUNT_NAME);
+
+            // generate the jwt password
+            //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
+
+            mqttClient.connect(/*options*/);
+            ready.set(true);
+        } catch (Exception e) {
+            Timber.d("Failed to initialise mqtt: " + e.getLocalizedMessage());
+        }
     }
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {
         mqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
-    }*/
+    }
 }

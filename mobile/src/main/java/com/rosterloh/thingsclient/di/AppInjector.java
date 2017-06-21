@@ -1,8 +1,5 @@
 package com.rosterloh.thingsclient.di;
 
-import com.rosterloh.things.common.di.Injectable;
-import com.rosterloh.thingsclient.ThingsApplication;
-
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
@@ -10,26 +7,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 
+import com.rosterloh.thingsclient.ClientApplication;
+
 import dagger.android.AndroidInjection;
 import dagger.android.support.AndroidSupportInjection;
 import dagger.android.support.HasSupportFragmentInjector;
 
-/**
- * Helper class to automatically inject fragments if they implement {@link Injectable}.
- */
 public class AppInjector {
 
     private AppInjector() {}
 
-    public static void init(ThingsApplication thingsApp) {
-
-        DaggerAppComponent
-                .builder()
-                .application(thingsApp)
+    public static void init(ClientApplication clientApplication) {
+        DaggerAppComponent.builder()
+                .application(clientApplication)
                 .build()
-                .inject(thingsApp);
+                .inject(clientApplication);
 
-        thingsApp
+        clientApplication
                 .registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
@@ -78,10 +72,8 @@ public class AppInjector {
                             new FragmentManager.FragmentLifecycleCallbacks() {
                                 @Override
                                 public void onFragmentCreated(FragmentManager fm, Fragment f,
-                                        Bundle savedInstanceState) {
-                                    if (f instanceof Injectable) {
-                                        AndroidSupportInjection.inject(f);
-                                    }
+                                                              Bundle savedInstanceState) {
+                                    AndroidSupportInjection.inject(f);
                                 }
                             }, true);
         }

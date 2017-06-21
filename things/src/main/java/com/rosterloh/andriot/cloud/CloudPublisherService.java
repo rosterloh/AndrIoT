@@ -21,8 +21,6 @@ public class CloudPublisherService extends Service {
 
     private static final String TAG = CloudPublisherService.class.getSimpleName();
 
-    private static final String CONFIG_SHARED_PREFERENCES_KEY = "andriot_config";
-
     private static final int BUFFER_SIZE_FOR_ONCHANGE_SENSORS = 10;
     private static final long PUBLISH_INTERVAL_MS = TimeUnit.SECONDS.toMillis(20);
     private static final long ERRORS_TO_INITIATE_BACKOFF = 20;
@@ -39,7 +37,6 @@ public class CloudPublisherService extends Service {
     private final Runnable sensorConsumerRunnable = () -> {
         long delayForNextTentative = PUBLISH_INTERVAL_MS;
         try {
-            initialiseIfNeeded();
             processCollectedSensorData();
             unsuccessfulTentatives.set(0);
         } catch (Throwable t) {
@@ -86,19 +83,8 @@ public class CloudPublisherService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        initialiseIfNeeded();
         executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleWithFixedDelay(sensorConsumerRunnable, 0, PUBLISH_INTERVAL_MS, TimeUnit.MILLISECONDS);
-    }
-
-    private void initialiseIfNeeded() {
-        if (publisher == null) {
-            try {
-                publisher = new MQTTPublisher(AndrIotOptions.from(getSharedPreferences(CONFIG_SHARED_PREFERENCES_KEY, MODE_PRIVATE)));
-            } catch (Throwable t) {
-                Log.e(TAG, "Could not create MQTTPublisher. Will try again later", t);
-            }
-        }
     }
 
     @Nullable

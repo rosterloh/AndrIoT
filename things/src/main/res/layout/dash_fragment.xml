@@ -18,7 +18,7 @@
             android:id="@+id/tc_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_black"
+            android:fontFamily="@font/roboto_bold"
             android:format12Hour="kk:mm"
             android:format24Hour="kk:mm"
             android:paddingBottom="24dp"
@@ -28,7 +28,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="12:00"/>
+            tools:text="12:00" />
 
         <TextClock
             android:id="@+id/tc_date"
@@ -63,15 +63,16 @@
             android:id="@+id/tv_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/roboto_thin"
             android:gravity="center"
             android:text="@{String.format(@string/remote_temperature_format, weather.temperature)}"
             android:textAlignment="center"
             android:textSize="70sp"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toRightOf="@id/tv_weather_icon"
-            tools:text="19"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="19" />
 
         <TextView
             android:id="@+id/tv_description"
@@ -171,7 +172,7 @@
             android:layout_marginEnd="8dp"
             android:adjustViewBounds="false"
             android:contentDescription="@string/motion_description"
-            app:visibleGone="@{motion}"
+            app:visibleGone="@{safeUnbox(motion)}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:srcCompat="@drawable/ic_motion"/>

@@ -9,7 +9,7 @@ import com.rosterloh.andriot.vo.Weather;
 /**
  * Main database description.
  */
-@Database(entities = {Weather.class, Settings.class}, version = 1)
+@Database(entities = {Weather.class, Settings.class}, version = 1, exportSchema = false)
 public abstract class ThingsDb extends RoomDatabase {
 
     public abstract WeatherDao weatherDao();

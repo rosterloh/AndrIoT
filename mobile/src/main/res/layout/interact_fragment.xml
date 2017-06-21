@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="thing" type="com.rosterloh.thingsclient.vo.Thing"/>
+        <variable name="thing" type="String"/>
     </data>
 
     <android.support.constraint.ConstraintLayout

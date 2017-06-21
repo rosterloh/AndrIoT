@@ -3,7 +3,6 @@ package com.rosterloh.andriot.ui.dash;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingComponent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,24 +12,21 @@ import android.view.ViewGroup;
 
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.databinding.DashFragmentBinding;
-import com.rosterloh.andriot.ui.common.NavigationController;
-import com.rosterloh.things.common.binding.FragmentDataBindingComponent;
-import com.rosterloh.things.common.di.Injectable;
-import com.rosterloh.things.common.util.AutoClearedValue;
+import com.rosterloh.andriot.nearby.ConnectionsServer;
 
 import javax.inject.Inject;
 
-public class DashFragment extends LifecycleFragment implements Injectable {
+import dagger.android.support.AndroidSupportInjection;
+
+public class DashFragment extends LifecycleFragment {
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
     @Inject
-    NavigationController navigationController;
+    ConnectionsServer connectionsServer;
 
-    DataBindingComponent dataBindingComponent = new FragmentDataBindingComponent(this);
-
-    AutoClearedValue<DashFragmentBinding> binding;
+    DashFragmentBinding binding;
 
     private DashViewModel dashViewModel;
 
@@ -38,19 +34,18 @@ public class DashFragment extends LifecycleFragment implements Injectable {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        DashFragmentBinding dataBinding = DataBindingUtil.inflate(inflater,
-                R.layout.dash_fragment, container, false, dataBindingComponent);
-        binding = new AutoClearedValue<>(this, dataBinding);
-        return dataBinding.getRoot();
+        binding = DataBindingUtil.inflate(inflater, R.layout.dash_fragment, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
         dashViewModel = ViewModelProviders.of(this, viewModelFactory).get(DashViewModel.class);
 
-        dashViewModel.getMotion().observe(this, value -> binding.get().setMotion(value));
-        dashViewModel.getSensorData().observe(this, sensors -> binding.get().setSensors(sensors));
-        dashViewModel.getWeather().observe(this, weather -> binding.get().setWeather(weather.data));
+        dashViewModel.getMotion().observe(this, value -> binding.setMotion(value));
+        dashViewModel.getSensorData().observe(this, sensors -> binding.setSensors(sensors));
+        dashViewModel.getWeather().observe(this, weather -> binding.setWeather(weather));
     }
 }

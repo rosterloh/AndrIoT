@@ -1,6 +1,6 @@
 package com.rosterloh.andriot.di;
 
-import com.rosterloh.andriot.MainActivity;
+import com.rosterloh.andriot.ui.MainActivity;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

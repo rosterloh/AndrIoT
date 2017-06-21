@@ -8,8 +8,8 @@ import com.rosterloh.andriot.repository.WeatherRepository;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.vo.Sensors;
 import com.rosterloh.andriot.vo.Weather;
-import com.rosterloh.things.common.AppExecutors;
-import com.rosterloh.things.common.vo.Resource;
+import com.rosterloh.andriot.AppExecutors;
+import com.rosterloh.andriot.util.NetworkUtils;
 
 import org.threeten.bp.LocalDateTime;
 
@@ -27,7 +27,7 @@ public class DashViewModel extends ViewModel {
     private final SensorHub sensorHub;
 
     private final MutableLiveData<Sensors> sensors = new MutableLiveData<>();
-    private final LiveData<Resource<Weather>> weather;
+    private final LiveData<Weather> weather;
 
     private LocalDateTime lastWeatherUpdate;
 
@@ -35,7 +35,7 @@ public class DashViewModel extends ViewModel {
     DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors, SensorHub sensorHub) {
         this.appExecutors = appExecutors;
         this.sensorHub = sensorHub;
-        weather = weatherRepository.loadWeather();
+        weather = weatherRepository.getWeather();
         lastWeatherUpdate = LocalDateTime.now();
 
         Timer timer = new Timer();
@@ -46,13 +46,14 @@ public class DashViewModel extends ViewModel {
                     float[] data = sensorHub.getSensorData();
                     if(data != null) {
                         appExecutors.mainThread().execute(() -> {
-                            sensors.setValue(new Sensors(data[0], data[1], null, null, null));
+                            sensors.setValue(new Sensors(data[0], data[1], null,
+                                    NetworkUtils.getIPAddress(true), null));
                         });
                     }
                 });
-                if (lastWeatherUpdate.isBefore(LocalDateTime.now().minusMinutes(30))) {
+                if (lastWeatherUpdate.isBefore(LocalDateTime.now().minusMinutes(3))) {
                     lastWeatherUpdate = LocalDateTime.now();
-                    // update
+                    appExecutors.mainThread().execute(() -> weatherRepository.getWeather());
                 }
             }
         }, INIT_DELAY, POLL_RATE);
@@ -67,7 +68,7 @@ public class DashViewModel extends ViewModel {
         return sensors;
     }
 
-    LiveData<Resource<Weather>> getWeather() {
+    LiveData<Weather> getWeather() {
         return weather;
     }
 }

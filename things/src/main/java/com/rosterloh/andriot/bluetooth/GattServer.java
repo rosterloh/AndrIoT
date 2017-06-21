@@ -19,13 +19,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.ParcelUuid;
-import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+
+import timber.log.Timber;
 
 import static android.content.Context.BLUETOOTH_SERVICE;
 
@@ -37,13 +41,18 @@ public class GattServer {
     public static UUID SERVICE_UUID = UUID.fromString("15b63b79-ddbe-43f1-a53e-763690979de5");
     public static UUID CHARACTERISTIC_UUID = UUID.fromString("b26294c0-4f3b-44b3-b85a-a248975c8146");
 
+    private static final ParcelUuid EDDYSTONE_SERVICE_UUID =
+            ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB");
+
+    private static final String NAMESPACE_ID = "0003eebe2dd9d71889f4";
+    private static final String INSTANCE_ID = "6a074a";
+
     public interface GattServerListener {
 
         void onWriteRequested();
         byte[] onReadRequested();
 
     }
-    private static GattServer instance;
     private Context appContext;
     private GattServerListener btListener;
     private BluetoothManager bluetoothManager;
@@ -75,12 +84,12 @@ public class GattServer {
     private AdvertiseCallback advertiseCallback = new AdvertiseCallback() {
         @Override
         public void onStartSuccess(AdvertiseSettings settingsInEffect) {
-            Log.i(TAG, "LE Advertise Started.");
+            Timber.d("LE Advertise Started.");
         }
 
         @Override
         public void onStartFailure(int errorCode) {
-            Log.w(TAG, "LE Advertise Failed: " + errorCode);
+            Timber.w("LE Advertise Failed: " + errorCode);
         }
     };
 
@@ -89,9 +98,9 @@ public class GattServer {
         @Override
         public void onConnectionStateChange(BluetoothDevice device, int status, int newState) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i(TAG, "BluetoothDevice CONNECTED: " + device);
+                Timber.d("BluetoothDevice CONNECTED: " + device);
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i(TAG, "BluetoothDevice DISCONNECTED: " + device);
+                Timber.d("BluetoothDevice DISCONNECTED: " + device);
                 // Remove device from any active subscriptions
                 registeredDevices.remove(device);
             }
@@ -105,7 +114,7 @@ public class GattServer {
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, value);
             } else {
                 // Invalid characteristic
-                Log.w(TAG, "Invalid Characteristic Read: " + characteristic.getUuid());
+                Timber.w("Invalid Characteristic Read: " + characteristic.getUuid());
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0, null);
             }
         }
@@ -122,7 +131,7 @@ public class GattServer {
                 notifyRegisteredDevices();
             } else {
                 // Invalid characteristic
-                Log.w(TAG, "Invalid Characteristic Write: " + characteristic.getUuid());
+                Timber.w("Invalid Characteristic Write: " + characteristic.getUuid());
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0, null);
             }
         }
@@ -131,7 +140,7 @@ public class GattServer {
         public void onDescriptorReadRequest(BluetoothDevice device, int requestId, int offset,
                                             BluetoothGattDescriptor descriptor) {
             if (DESCRIPTOR_CONFIG.equals(descriptor.getUuid())) {
-                Log.d(TAG, "Config descriptor read request");
+                Timber.d("Config descriptor read request");
                 byte[] returnValue;
                 if (registeredDevices.contains(device)) {
                     returnValue = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE;
@@ -140,12 +149,12 @@ public class GattServer {
                 }
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, returnValue);
             } else if (DESCRIPTOR_USER_DESC.equals(descriptor.getUuid())) {
-                Log.d(TAG, "User description descriptor read request");
+                Timber.d("User description descriptor read request");
                 byte[] returnValue =  "Controls you AndrIoT device".getBytes(Charset.forName("UTF-8"));
                 returnValue = Arrays.copyOfRange(returnValue, offset, returnValue.length);
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, returnValue);
             } else {
-                Log.w(TAG, "Unknown descriptor read request");
+                Timber.w("Unknown descriptor read request");
                 bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0, null);
             }
         }
@@ -157,10 +166,10 @@ public class GattServer {
                                              int offset, byte[] value) {
             if (DESCRIPTOR_CONFIG.equals(descriptor.getUuid())) {
                 if (Arrays.equals(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE, value)) {
-                    Log.d(TAG, "Subscribe device to notifications: " + device);
+                    Timber.d("Subscribe device to notifications: " + device);
                     registeredDevices.add(device);
                 } else if (Arrays.equals(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE, value)) {
-                    Log.d(TAG, "Unsubscribe device from notifications: " + device);
+                    Timber.d("Unsubscribe device from notifications: " + device);
                     registeredDevices.remove(device);
                 }
 
@@ -168,7 +177,7 @@ public class GattServer {
                     bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
                 }
             } else {
-                Log.w(TAG, "Unknown descriptor write request");
+                Timber.w("Unknown descriptor write request");
                 if (responseNeeded) {
                     bluetoothGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_FAILURE, 0, null);
                 }
@@ -176,7 +185,7 @@ public class GattServer {
         }
     };
 
-    private GattServer(Context context) {
+    public GattServer(Context context) {
 
         appContext = context.getApplicationContext();
         bluetoothManager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
@@ -185,22 +194,14 @@ public class GattServer {
         IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         context.registerReceiver(bluetoothReceiver, filter);
         if (!bluetoothAdapter.isEnabled()) {
-            Log.d(TAG, "Bluetooth is currently disabled... enabling");
+            Timber.d("Bluetooth is currently disabled... enabling");
             bluetoothAdapter.enable();
-        } else {
-            Log.d(TAG, "Bluetooth enabled... starting services");
+        }/* else if (!bluetoothAdapter.isMultipleAdvertisementSupported()) {
+            Timber.e("BLE advertising not supported on this device");
+        }*/ else {
+            Timber.d("Bluetooth enabled... starting services");
             startAdvertising();
             startServer();
-        }
-    }
-
-    public static GattServer getInstance(Context context) {
-
-        synchronized (GattServer.class) {
-            if (instance == null) {
-                instance = new GattServer(context);
-            }
-            return instance;
         }
     }
 
@@ -209,21 +210,28 @@ public class GattServer {
         bluetoothAdapter.setName("AndrIoT");
         bluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (bluetoothLeAdvertiser == null) {
-            Log.w(TAG, "Failed to create advertiser");
+            Timber.w("Failed to create advertiser");
             return;
         }
 
         AdvertiseSettings settings = new AdvertiseSettings.Builder()
-                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_BALANCED)
-                .setConnectable(true)
-                .setTimeout(0)
+                .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
                 .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
+                .setConnectable(true)
                 .build();
 
+        byte[] serviceData = null;
+        try {
+            serviceData = buildServiceData();
+        } catch (IOException e) {
+            Timber.e(e);
+        }
+
         AdvertiseData data = new AdvertiseData.Builder()
-                .setIncludeDeviceName(true)
+                .addServiceData(EDDYSTONE_SERVICE_UUID, serviceData)
+                .addServiceUuid(EDDYSTONE_SERVICE_UUID)
                 .setIncludeTxPowerLevel(false)
-                .addServiceUuid(new ParcelUuid(SERVICE_UUID))
+                .setIncludeDeviceName(false)
                 .build();
 
         bluetoothLeAdvertiser
@@ -240,7 +248,7 @@ public class GattServer {
     private void startServer() {
         bluetoothGattServer = bluetoothManager.openGattServer(appContext, mGattServerCallback);
         if (bluetoothGattServer == null) {
-            Log.w(TAG, "Unable to create GATT server");
+            Timber.w("Unable to create GATT server");
             return;
         }
         bluetoothGattServer.addService(createService());
@@ -278,11 +286,11 @@ public class GattServer {
 
     private void notifyRegisteredDevices() {
         if (registeredDevices.isEmpty()) {
-            Log.i(TAG, "No subscribers registered");
+            Timber.d("No subscribers registered");
             return;
         }
 
-        Log.i(TAG, "Sending update to " + registeredDevices.size() + " subscribers");
+        Timber.d("Sending update to " + registeredDevices.size() + " subscribers");
         for (BluetoothDevice device : registeredDevices) {
             BluetoothGattCharacteristic characteristic = bluetoothGattServer
                     .getService(SERVICE_UUID)
@@ -291,6 +299,38 @@ public class GattServer {
             characteristic.setValue(value);
             bluetoothGattServer.notifyCharacteristicChanged(device, characteristic, false);
         }
+    }
+
+    private byte[] toByteArray(String hexString) {
+        // hexString guaranteed valid.
+        int len = hexString.length();
+        byte[] bytes = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return bytes;
+    }
+
+    private String randomHexString(int length) {
+        byte[] buf = new byte[length];
+        new Random().nextBytes(buf);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append(String.format("%02X", buf[i]));
+        }
+        return stringBuilder.toString();
+    }
+
+    private byte[] buildServiceData() throws IOException {
+        byte txPower = (byte) -26;
+        byte[] namespaceBytes = toByteArray(NAMESPACE_ID);
+        byte[] instanceBytes = toByteArray(INSTANCE_ID); //randomHexString(6));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        os.write(new byte[]{0x00, txPower}); // FRAME_TYPE_UID
+        os.write(namespaceBytes);
+        os.write(instanceBytes);
+        return os.toByteArray();
     }
 
     public void destroyInstance() {

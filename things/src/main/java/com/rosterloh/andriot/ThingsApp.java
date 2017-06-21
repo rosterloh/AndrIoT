@@ -22,13 +22,15 @@ public class ThingsApp extends Application implements HasActivityInjector {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        AppInjector.init(this);
+
         AndroidThreeTen.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new CrashReportingTree());
         }
-        AppInjector.init(this);
     }
 
     @Override

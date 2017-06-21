@@ -1,17 +1,13 @@
 package com.rosterloh.andriot.repository;
 
 import android.arch.lifecycle.LiveData;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.arch.lifecycle.MutableLiveData;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.db.WeatherDao;
 import com.rosterloh.andriot.vo.Weather;
-import com.rosterloh.things.common.AppExecutors;
-import com.rosterloh.things.common.api.ApiResponse;
-import com.rosterloh.things.common.repository.NetworkBoundResource;
-import com.rosterloh.things.common.vo.Resource;
+import com.rosterloh.andriot.AppExecutors;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.LocalDateTime;
@@ -21,6 +17,9 @@ import org.threeten.bp.temporal.ChronoUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import timber.log.Timber;
 
 /**
@@ -45,12 +44,32 @@ public class WeatherRepository {
         this.weatherService = weatherService;
     }
 
-    public LiveData<Resource<Weather>> loadWeather() {
-        return new NetworkBoundResource<Weather, WeatherResponse>(appExecutors) {
-            @Override
-            protected void saveCallResult(@NonNull WeatherResponse item) {
+    public LiveData<Weather> getWeather() {
 
-                // FIXME: This is not working for some reason
+        LiveData<Weather> dbData = weatherDao.load();
+        if (dbData != null) {
+
+            long time = ChronoUnit.MINUTES.between(dbData.getValue().lastUpdate, LocalDateTime.now());
+            if (time > 30L) {
+                Timber.d("Data in database too old. Refreshing");
+                return getFromNetwork();
+            } else {
+                Timber.d("DB data time difference " + time);
+                return dbData;
+            }
+        } else {
+            return getFromNetwork();
+        }
+    }
+
+    private LiveData<Weather> getFromNetwork() {
+        final MutableLiveData<Weather> liveData = new MutableLiveData<>();
+        Call<WeatherResponse> call = weatherService.getWeather(LAT, LONG, KEY, TYPE);
+        call.enqueue(new Callback<WeatherResponse>() {
+
+            @Override
+            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                WeatherResponse item = response.body();
                 LocalDateTime date =
                         LocalDateTime.ofInstant(Instant.ofEpochMilli(item.getDt()), ZoneOffset.UTC);
 
@@ -61,34 +80,15 @@ public class WeatherRepository {
                         item.getWeather().get(0).getDescription(),
                         LocalDateTime.now());
                 weatherDao.insert(weather);
+                liveData.setValue(weather);
             }
 
             @Override
-            protected boolean shouldFetch(@Nullable Weather data) {
-                if (data == null) {
-                    Timber.d("No data in database. Fetching new");
-                    return true;
-                }
-
-                if (ChronoUnit.MINUTES.between(LocalDateTime.now(), data.lastUpdate) > 30) {
-                    Timber.d("Data in database too old. Refreshing");
-                    return true;
-                } else {
-                    return false;
-                }
+            public void onFailure(Call<WeatherResponse> call, Throwable t) {
+                Timber.e("Failed to get weather: " + t.getMessage());
+                liveData.setValue(null);
             }
-
-            @NonNull
-            @Override
-            protected LiveData<Weather> loadFromDb() {
-                return weatherDao.load();
-            }
-
-            @NonNull
-            @Override
-            protected LiveData<ApiResponse<WeatherResponse>> createCall() {
-                return weatherService.getWeather(LAT, LONG, KEY, TYPE);
-            }
-        }.asLiveData();
+        });
+        return liveData;
     }
 }

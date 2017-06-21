@@ -4,24 +4,24 @@ buildscript {
         maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha2'
+        classpath 'com.android.tools.build:gradle:3.0.0-alpha4'
         classpath 'com.google.gms:google-services:3.1.0'
     }
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.14.0'
+    id 'com.github.ben-manes.versions' version '0.15.0'
 }
 
-ext.compile_sdk_version = "android-O"
-ext.build_tools_version = "26.0.0-rc2"
+ext.compile_sdk_version = 26
+ext.build_tools_version = "26.0.0"
 ext.min_sdk_version = 24
-ext.target_sdk_version = 25
-ext.arch_version = "1.0.0-alpha1"
-ext.support_version = "26.0.0-beta1"
+ext.target_sdk_version = 26
+ext.arch_version = "1.0.0-alpha3"
+ext.support_version = "26.0.0-beta2"
 ext.constraint_layout_version = "1.1.0-beta1"
-ext.play_services_version = "10.2.6"
-ext.things_version = "0.4-devpreview"
+ext.play_services_version = "11.0.1"
+ext.things_version = "0.4.1-devpreview"
 ext.dagger_version = "2.11"
 ext.retrofit_version = "2.3.0"
 ext.okhttp_version = "3.8.0"

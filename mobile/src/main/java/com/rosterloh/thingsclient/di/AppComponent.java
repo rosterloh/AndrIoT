@@ -2,7 +2,9 @@ package com.rosterloh.thingsclient.di;
 
 import android.app.Application;
 
-import com.rosterloh.thingsclient.ThingsApplication;
+import com.rosterloh.thingsclient.ClientApplication;
+import com.rosterloh.thingsclient.ui.MainActivity;
+import com.rosterloh.thingsclient.ui.interact.InteractFragment;
 
 import javax.inject.Singleton;
 
@@ -23,5 +25,5 @@ public interface AppComponent {
         Builder application(Application application);
         AppComponent build();
     }
-    void inject(ThingsApplication thingsApp);
+    void inject(ClientApplication clientApplication);
 }
