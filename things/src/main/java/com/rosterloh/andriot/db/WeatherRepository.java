@@ -1,18 +1,14 @@
-package com.rosterloh.andriot.repository;
+package com.rosterloh.andriot.db;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.MediatorLiveData;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
-import com.rosterloh.andriot.db.WeatherDao;
-import com.rosterloh.andriot.vo.Weather;
 import com.rosterloh.andriot.AppExecutors;
 
-import org.threeten.bp.Instant;
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.ZoneOffset;
-import org.threeten.bp.temporal.ChronoUnit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,58 +33,62 @@ public class WeatherRepository {
     private static final String KEY = "2e9e498e77b879ea237e3a571c57f1fa";
     private static final String TYPE = "metric";
 
+    private static final int POLL_RATE = 30 * 60 * 1000;
+    private static final int INIT_DELAY = 5 * 1000;
+
+    private final MediatorLiveData<Weather> weatherData = new MediatorLiveData<>();
+
     @Inject
     WeatherRepository(AppExecutors appExecutors, WeatherDao weatherDao, WeatherService weatherService) {
         this.appExecutors = appExecutors;
         this.weatherDao = weatherDao;
         this.weatherService = weatherService;
-    }
-
-    public LiveData<Weather> getWeather() {
 
         LiveData<Weather> dbData = weatherDao.load();
-        if (dbData != null) {
-
-            long time = ChronoUnit.MINUTES.between(dbData.getValue().lastUpdate, LocalDateTime.now());
-            if (time > 30L) {
-                Timber.d("Data in database too old. Refreshing");
-                return getFromNetwork();
+        weatherData.addSource(dbData, data -> {
+            weatherData.removeSource(dbData);
+            if (dbData.getValue() != null) {
+                weatherData.addSource(dbData, newData -> weatherData.setValue(newData));
             } else {
-                Timber.d("DB data time difference " + time);
-                return dbData;
+                getFromNetwork(dbData);
             }
-        } else {
-            return getFromNetwork();
-        }
+        });
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Timber.d("Refreshing weather data");
+                getFromNetwork(dbData);
+            }
+        }, INIT_DELAY, POLL_RATE);
     }
 
-    private LiveData<Weather> getFromNetwork() {
-        final MutableLiveData<Weather> liveData = new MutableLiveData<>();
+    public LiveData<Weather> loadWeather() {
+        return weatherData;
+    }
+
+    private void getFromNetwork(final LiveData<Weather> dbData) {
         Call<WeatherResponse> call = weatherService.getWeather(LAT, LONG, KEY, TYPE);
         call.enqueue(new Callback<WeatherResponse>() {
 
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                WeatherResponse item = response.body();
-                LocalDateTime date =
-                        LocalDateTime.ofInstant(Instant.ofEpochMilli(item.getDt()), ZoneOffset.UTC);
+                Weather weather = new Weather(response.body());
 
-                Weather weather = new Weather(
-                        item.getId(),
-                        item.getWeather().get(0).getIcon(),
-                        item.getMain().getTemp(),
-                        item.getWeather().get(0).getDescription(),
-                        LocalDateTime.now());
-                weatherDao.insert(weather);
-                liveData.setValue(weather);
+                appExecutors.diskIO().execute(() ->  {
+                    weatherDao.insert(weather);
+                    appExecutors.mainThread().execute(() -> {
+                        weatherData.addSource(weatherDao.load(), newData -> weatherData.setValue(newData));
+                    });
+                });
             }
 
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Timber.e("Failed to get weather: " + t.getMessage());
-                liveData.setValue(null);
+                weatherData.addSource(dbData, newData -> weatherData.setValue(newData));
             }
         });
-        return liveData;
     }
 }

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="weather" type="com.rosterloh.andriot.vo.Weather"/>
+        <variable name="weather" type="com.rosterloh.andriot.db.Weather"/>
         <variable name="sensors" type="com.rosterloh.andriot.vo.Sensors"/>
         <variable name="motion" type="Boolean"/>
     </data>

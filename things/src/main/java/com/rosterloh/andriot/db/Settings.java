@@ -1,4 +1,4 @@
-package com.rosterloh.andriot.vo;
+package com.rosterloh.andriot.db;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Locale;
 
-import static com.rosterloh.andriot.vo.Settings.TABLE_NAME;
+import static com.rosterloh.andriot.db.Settings.TABLE_NAME;
 
 @Entity(tableName = TABLE_NAME)
 public class Settings {

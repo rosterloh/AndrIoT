@@ -1,17 +1,17 @@
-package com.rosterloh.andriot.vo;
+package com.rosterloh.andriot.db;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
 import com.google.gson.annotations.SerializedName;
-import com.rosterloh.andriot.db.DateTypeConverter;
+import com.rosterloh.andriot.api.WeatherResponse;
 
 import org.threeten.bp.LocalDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.temporal.ChronoUnit;
 
-import static com.rosterloh.andriot.vo.Weather.TABLE_NAME;
+import static com.rosterloh.andriot.db.Weather.TABLE_NAME;
 
 @Entity(tableName = TABLE_NAME)
 @TypeConverters(DateTypeConverter.class)
@@ -35,6 +35,15 @@ public class Weather {
         this.temperature = temperature;
         this.description = description;
         this.lastUpdate = lastUpdate;
+    }
+
+    public Weather(WeatherResponse response) {
+        this.id = response.getId();
+        this.weatherIcon = response.getWeather().get(0).getIcon();
+        this.temperature = response.getMain().getTemp();
+        this.description = response.getWeather().get(0).getDescription();
+        this.lastUpdate = LocalDateTime.now();
+        //this.lastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
     }
 
     public long getMinutesSinceUpdate() {

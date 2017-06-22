@@ -1,10 +1,9 @@
 package com.rosterloh.andriot.cloud;
 
 import com.rosterloh.andriot.db.SettingsDao;
-import com.rosterloh.andriot.vo.Settings;
+import com.rosterloh.andriot.db.Settings;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 

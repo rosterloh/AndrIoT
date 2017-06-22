@@ -3,9 +3,6 @@ package com.rosterloh.andriot.db;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
-import com.rosterloh.andriot.vo.Settings;
-import com.rosterloh.andriot.vo.Weather;
-
 /**
  * Main database description.
  */

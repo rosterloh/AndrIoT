@@ -4,14 +4,12 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
-import com.rosterloh.andriot.repository.WeatherRepository;
+import com.rosterloh.andriot.db.WeatherRepository;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.vo.Sensors;
-import com.rosterloh.andriot.vo.Weather;
+import com.rosterloh.andriot.db.Weather;
 import com.rosterloh.andriot.AppExecutors;
 import com.rosterloh.andriot.util.NetworkUtils;
-
-import org.threeten.bp.LocalDateTime;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,14 +27,11 @@ public class DashViewModel extends ViewModel {
     private final MutableLiveData<Sensors> sensors = new MutableLiveData<>();
     private final LiveData<Weather> weather;
 
-    private LocalDateTime lastWeatherUpdate;
-
     @Inject
     DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors, SensorHub sensorHub) {
         this.appExecutors = appExecutors;
         this.sensorHub = sensorHub;
-        weather = weatherRepository.getWeather();
-        lastWeatherUpdate = LocalDateTime.now();
+        weather = weatherRepository.loadWeather();
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -51,13 +46,8 @@ public class DashViewModel extends ViewModel {
                         });
                     }
                 });
-                if (lastWeatherUpdate.isBefore(LocalDateTime.now().minusMinutes(3))) {
-                    lastWeatherUpdate = LocalDateTime.now();
-                    appExecutors.mainThread().execute(() -> weatherRepository.getWeather());
-                }
             }
         }, INIT_DELAY, POLL_RATE);
-
     }
 
     LiveData<Boolean> getMotion() {

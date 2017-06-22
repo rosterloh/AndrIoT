@@ -6,8 +6,6 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 
-import com.rosterloh.andriot.vo.Weather;
-
 /**
  * Interface for database access for Weather related operations.
  */
