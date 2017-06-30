@@ -1,9 +1,11 @@
 package com.rosterloh.andriot.cloud;
 
+import com.google.gson.Gson;
 import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.Settings;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
@@ -11,9 +13,11 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import timber.log.Timber;
 
+@Singleton
 public class MQTTPublisher implements AutoCloseable {
 
     // Indicate if this message should be a MQTT 'retained' message.
@@ -34,10 +38,15 @@ public class MQTTPublisher implements AutoCloseable {
 
         initialiseSettings();
 
-        initialiseMqttClient();
+        try {
+            initialiseMqttClient();
+        } catch (Exception e) {
+            Timber.d("Failed to initialise mqtt: " + e.getLocalizedMessage());
+        }
+
     }
 
-    public void publish(List<SensorData> data) {/*
+    public void publish(List<SensorData> data) {
         try {
             if (isReady()) {
                 if (mqttClient != null && !mqttClient.isConnected()) {
@@ -45,17 +54,17 @@ public class MQTTPublisher implements AutoCloseable {
                     // it again.
                     try {
                         initialiseMqttClient();
-                    } catch (MqttException | IOException | GeneralSecurityException e) {
+                    } catch (MqttException e) {
                         throw new IllegalArgumentException("Could not initialize MQTT", e);
                     }
                 }
                 String payload = new Gson().toJson(data); //MessagePayload.createMessagePayload(data);
-                Log.d(TAG, "Publishing: " + payload);
-                sendMessage(andrIotOptions.getTopicName(), payload.getBytes());
+                Timber.d("Publishing: " + payload);
+                sendMessage(settings.getTopicName(), payload.getBytes());
             }
         } catch (MqttException e) {
             throw new IllegalArgumentException("Could not send message", e);
-        }*/
+        }
      }
 
      public boolean isReady() {
@@ -88,24 +97,20 @@ public class MQTTPublisher implements AutoCloseable {
         Timber.d(settings.toString());
     }
 
-    private void initialiseMqttClient() {
+    private void initialiseMqttClient() throws MqttException, IllegalArgumentException {
 
-        try {
-            mqttClient = new MqttAsyncClient(settings.getBrokerUrl(),
-                    settings.getClientId(), new MemoryPersistence());
+        mqttClient = new MqttAsyncClient(settings.getBrokerUrl(),
+                settings.getClientId(), new MemoryPersistence());
 
-            //MqttConnectOptions options = new MqttConnectOptions();
-            //options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-            //options.setUserName(settings.UNUSED_ACCOUNT_NAME);
+        MqttConnectOptions options = new MqttConnectOptions();
+        options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
+        options.setUserName(settings.UNUSED_ACCOUNT_NAME);
 
-            // generate the jwt password
-            //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
+        // generate the jwt password
+        //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
 
-            mqttClient.connect(/*options*/);
-            ready.set(true);
-        } catch (Exception e) {
-            Timber.d("Failed to initialise mqtt: " + e.getLocalizedMessage());
-        }
+        mqttClient.connect(options);
+        ready.set(true);
     }
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {

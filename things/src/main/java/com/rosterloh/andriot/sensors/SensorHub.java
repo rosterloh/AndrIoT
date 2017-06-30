@@ -7,6 +7,7 @@ import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManagerService;
 import com.google.firebase.crash.FirebaseCrash;
+import com.rosterloh.things.driver.htu21d.Htu21d;
 
 import java.io.IOException;
 
@@ -21,7 +22,7 @@ public class SensorHub {
     private Gpio led;
     private Gpio button;
     private Gpio pir;
-    private HTU21D htu21d;
+    private Htu21d htu21d;
 
     public MutableLiveData<Boolean> pirData = new MutableLiveData<>();
     public MutableLiveData<Boolean> buttonData = new MutableLiveData<>();
@@ -45,7 +46,7 @@ public class SensorHub {
             pir.setActiveType(Gpio.ACTIVE_HIGH);
             pir.registerGpioCallback(pirInterrupt);
 
-            htu21d = new HTU21D("I2C1");
+            htu21d = new Htu21d("I2C1");
         } catch (IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "Error configuring GPIO pins");
             FirebaseCrash.report(e);
