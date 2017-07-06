@@ -7,6 +7,8 @@ import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.AppExecutors;
 
+import org.threeten.bp.LocalDateTime;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -48,7 +50,7 @@ public class WeatherRepository {
         weatherData.addSource(dbData, data -> {
             weatherData.removeSource(dbData);
             if (dbData.getValue() != null) {
-                weatherData.addSource(dbData, newData -> weatherData.setValue(newData));
+                weatherData.addSource(dbData, weatherData::setValue);
             } else {
                 getFromNetwork(dbData);
             }
@@ -58,8 +60,10 @@ public class WeatherRepository {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Timber.d("Refreshing weather data");
-                getFromNetwork(dbData);
+                if (dataNeedsRefresh(dbData)) {
+                    Timber.d("Refreshing weather data");
+                    getFromNetwork(dbData);
+                }
             }
         }, INIT_DELAY, POLL_RATE);
     }
@@ -78,17 +82,20 @@ public class WeatherRepository {
 
                 appExecutors.diskIO().execute(() ->  {
                     weatherDao.insert(weather);
-                    appExecutors.mainThread().execute(() -> {
-                        weatherData.addSource(weatherDao.load(), newData -> weatherData.setValue(newData));
-                    });
+                    appExecutors.mainThread().execute(() -> weatherData.addSource(weatherDao.load(), weatherData::setValue));
                 });
             }
 
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Timber.e("Failed to get weather: " + t.getMessage());
-                weatherData.addSource(dbData, newData -> weatherData.setValue(newData));
+                weatherData.addSource(dbData, weatherData::setValue);
             }
         });
+    }
+
+    private boolean dataNeedsRefresh(final LiveData<Weather> dbData) {
+        return ((dbData.getValue() == null) ||
+                (dbData.getValue().lastUpdate.isBefore(LocalDateTime.now().minusMinutes(30))));
     }
 }
