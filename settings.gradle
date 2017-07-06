@@ -1,1 +1,1 @@
-include ':things', ':mobile', ':tensorflow'
+include ':things', ':mobile'

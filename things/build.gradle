@@ -41,8 +41,6 @@ repositories {
 }
 
 dependencies {
-    compile project(':tensorflow')
-
     compileOnly "com.google.android.things:androidthings:$things_version"
     compileOnly "com.google.dagger:dagger:$dagger_version"
 
