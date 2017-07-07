@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable name="weather" type="com.rosterloh.andriot.db.Weather"/>
@@ -14,35 +14,56 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextClock
-            android:id="@+id/tc_time"
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/cv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_bold"
-            android:format12Hour="kk:mm"
-            android:format24Hour="kk:mm"
-            android:paddingBottom="24dp"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="200sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="12:00" />
+            card_view:cardCornerRadius="16dp"
+            card_view:cardElevation="4dp">
 
-        <TextClock
-            android:id="@+id/tc_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_black"
-            android:format12Hour="dd MMM yyyy"
-            android:format24Hour="dd MMM yyyy"
-            android:textColor="@color/textColorPrimary"
-            android:textSize="54sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="@+id/tc_time"
-            tools:text="01 January 2000"/>
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextClock
+                    android:id="@+id/tc_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:format12Hour="kk:mm"
+                    android:format24Hour="kk:mm"
+                    android:paddingBottom="24dp"
+                    android:paddingEnd="8dp"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="200sp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="12:00" />
+
+                <TextClock
+                    android:id="@+id/tc_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_black"
+                    android:format12Hour="dd MMM yyyy"
+                    android:format24Hour="dd MMM yyyy"
+                    android:textColor="@color/textColorPrimary"
+                    android:textSize="54sp"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/tc_time"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    tools:text="01 January 2000"/>
+
+            </android.support.constraint.ConstraintLayout>
+
+        </android.support.v7.widget.CardView>
 
         <TextView
             android:id="@+id/tv_weather_icon"

@@ -89,7 +89,7 @@ public class WeatherRepository {
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Timber.e("Failed to get weather: " + t.getMessage());
-                weatherData.addSource(dbData, weatherData::setValue);
+                //weatherData.addSource(dbData, weatherData::setValue);
             }
         });
     }

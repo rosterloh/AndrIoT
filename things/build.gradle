@@ -46,6 +46,7 @@ dependencies {
 
     implementation 'com.rosterloh.things:driver-htu21d:0.1'
     implementation "com.android.support:appcompat-v7:$support_version"
+    implementation "com.android.support:cardview-v7:$support_version"
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.google.android.gms:play-services-nearby:$play_services_version"
