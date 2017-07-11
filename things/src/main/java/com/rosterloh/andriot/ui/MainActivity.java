@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.firebase.crash.FirebaseCrash;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.ui.dash.DashFragment;
 
@@ -26,7 +27,12 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector {
 
-    private static final int PERMISSIONS_REQUEST = 1;
+    private static final int PERMISSIONS_REQUEST = 37;
+    private static final int FRAGMENT_DASH = 0;
+    private static final int FRAGMENT_TIMELINE = 1;
+    private static final int FRAGMENT_SETTINGS = 2;
+
+    private SideBar sideBar;
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
@@ -36,20 +42,57 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+        setupSideBar();
         checkPlayServices();
         if (hasPermission()) {
             if (savedInstanceState == null) {
-                navigateToDash();
+                navigateToFragment(FRAGMENT_DASH);
             }
         } else {
             requestPermission();
         }
     }
 
-    public void navigateToDash() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, new DashFragment())
-                .commitAllowingStateLoss();
+    public void navigateToFragment(int id) {
+        switch (id) {
+            case FRAGMENT_DASH:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new DashFragment())
+                        .commitAllowingStateLoss();
+                break;
+            case FRAGMENT_TIMELINE:
+                break;
+            case FRAGMENT_SETTINGS:
+                break;
+            default:
+                Timber.e("Unknown navigation target " + id);
+                break;
+        }
+    }
+
+    public void setupSideBar() {
+        sideBar = findViewById(R.id.sidebar);
+        sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_home));
+        sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_timeline));
+        sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_settings));
+
+        sideBar.addOnItemSelectedListener(new SideBar.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(SideBar.Item item) {
+                navigateToFragment(item.getPosition());
+            }
+
+            @Override
+            public void onItemUnselected(SideBar.Item item) {
+
+            }
+
+            @Override
+            public void onItemReselected(SideBar.Item item) {
+
+            }
+        });
+
     }
 
     public void checkPlayServices() {
@@ -77,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED
                         && grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-                    navigateToDash();
+                    navigateToFragment(FRAGMENT_DASH);
                 } else {
                     requestPermission();
                 }
