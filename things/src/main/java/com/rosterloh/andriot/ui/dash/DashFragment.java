@@ -21,31 +21,30 @@ import dagger.android.support.AndroidSupportInjection;
 public class DashFragment extends LifecycleFragment {
 
     @Inject
-    ViewModelProvider.Factory viewModelFactory;
+    ViewModelProvider.Factory mViewModelFactory;
 
     @Inject
-    ConnectionsServer connectionsServer;
+    ConnectionsServer mConnectionsServer;
 
-    DashFragmentBinding binding;
-
-    private DashViewModel dashViewModel;
+    private DashFragmentBinding mBinding;
+    private DashViewModel mDashViewModel;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        binding = DataBindingUtil.inflate(inflater, R.layout.dash_fragment, container, false);
-        return binding.getRoot();
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.dash_fragment, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
-        dashViewModel = ViewModelProviders.of(this, viewModelFactory).get(DashViewModel.class);
+        mDashViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DashViewModel.class);
 
-        dashViewModel.getMotion().observe(this, value -> binding.setMotion(value));
-        dashViewModel.getSensorData().observe(this, sensors -> binding.setSensors(sensors));
-        dashViewModel.getWeather().observe(this, weather -> binding.setWeather(weather));
+        mDashViewModel.getMotion().observe(this, value -> mBinding.setMotion(value));
+        mDashViewModel.getSensorData().observe(this, sensors -> mBinding.setSensors(sensors));
+        mDashViewModel.getWeather().observe(this, weather -> mBinding.setWeather(weather));
     }
 }

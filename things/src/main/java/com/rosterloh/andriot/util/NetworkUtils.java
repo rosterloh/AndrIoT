@@ -86,10 +86,10 @@ public final class NetworkUtils {
 
     public static String getIPAddress(boolean useIPv4) {
         try {
-            for (Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); ) {
+            for (Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements();) {
                 NetworkInterface ni = nis.nextElement();
                 if (!ni.isUp()) continue;
-                for (Enumeration<InetAddress> addresses = ni.getInetAddresses(); addresses.hasMoreElements(); ) {
+                for (Enumeration<InetAddress> addresses = ni.getInetAddresses(); addresses.hasMoreElements();) {
                     InetAddress inetAddress = addresses.nextElement();
                     if (!inetAddress.isLoopbackAddress()) {
                         String hostAddress = inetAddress.getHostAddress();
@@ -99,7 +99,8 @@ public final class NetworkUtils {
                         } else {
                             if (!isIPv4) {
                                 int index = hostAddress.indexOf('%');
-                                return index < 0 ? hostAddress.toUpperCase() : hostAddress.substring(0, index).toUpperCase();
+                                return index < 0 ? hostAddress.toUpperCase()
+                                        : hostAddress.substring(0, index).toUpperCase();
                             }
                         }
                     }
@@ -136,6 +137,8 @@ public final class NetworkUtils {
                                 }
                             }
                         }
+                        break;
+                    default:
                         break;
                 }
             }

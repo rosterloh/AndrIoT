@@ -17,7 +17,7 @@ import timber.log.Timber;
 public class ThingsApp extends Application implements HasActivityInjector {
 
     @Inject
-    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+    DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
 
     @Override
     public void onCreate() {
@@ -35,7 +35,7 @@ public class ThingsApp extends Application implements HasActivityInjector {
 
     @Override
     public DispatchingAndroidInjector<Activity> activityInjector() {
-        return dispatchingAndroidInjector;
+        return mDispatchingAndroidInjector;
     }
 
     /** A tree which logs important information for crash reporting. */

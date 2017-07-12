@@ -13,13 +13,25 @@ public class MotionSensor implements AutoCloseable {
         STATE_LOW
     }
 
-    public interface OnMotionDetectedEventListener {
-        void onMotionDetectedEvent(State state);
-    }
+    private Gpio mMotionDetectorGpio;
+    private OnMotionDetectedEventListener mOnMotionDetectedEventListener;
+    private boolean mLastState;
 
-    private Gpio motionDetectorGpio;
-    private OnMotionDetectedEventListener onMotionDetectedEventListener;
-    private boolean lastState;
+    private GpioCallback mInterruptCallback = new GpioCallback() {
+        @Override
+        public boolean onGpioEdge(Gpio gpio) {
+            try {
+                if (gpio.getValue() != mLastState) {
+                    mLastState = gpio.getValue();
+                    performMotionEvent(mLastState ? State.STATE_HIGH : State.STATE_LOW);
+                }
+            } catch (IOException e) {
+
+            }
+
+            return true;
+        }
+    };
 
     public MotionSensor(String pin) throws IOException {
 
@@ -29,7 +41,7 @@ public class MotionSensor implements AutoCloseable {
 
         try {
             connect(gpio);
-        } catch( IOException | RuntimeException e ) {
+        } catch (IOException e) {
             close();
             throw e;
         }
@@ -37,59 +49,42 @@ public class MotionSensor implements AutoCloseable {
 
     private void connect(Gpio gpio) throws IOException {
 
-        motionDetectorGpio = gpio;
-        motionDetectorGpio.setDirection(Gpio.DIRECTION_IN);
-        motionDetectorGpio.setEdgeTriggerType(Gpio.EDGE_BOTH);
+        mMotionDetectorGpio = gpio;
+        mMotionDetectorGpio.setDirection(Gpio.DIRECTION_IN);
+        mMotionDetectorGpio.setEdgeTriggerType(Gpio.EDGE_BOTH);
 
-        lastState = motionDetectorGpio.getValue();
+        mLastState = mMotionDetectorGpio.getValue();
 
-        motionDetectorGpio.setActiveType(lastState ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
+        mMotionDetectorGpio.setActiveType(mLastState ? Gpio.ACTIVE_HIGH : Gpio.ACTIVE_LOW);
 
-        motionDetectorGpio.registerGpioCallback(interruptCallback);
+        mMotionDetectorGpio.registerGpioCallback(mInterruptCallback);
     }
 
     private void performMotionEvent(State state) {
-
-        if( onMotionDetectedEventListener != null ) {
-            onMotionDetectedEventListener.onMotionDetectedEvent(state);
+        if (mOnMotionDetectedEventListener != null) {
+            mOnMotionDetectedEventListener.onMotionDetectedEvent(state);
         }
     }
 
-    private GpioCallback interruptCallback = new GpioCallback() {
-
-        @Override
-        public boolean onGpioEdge(Gpio gpio) {
-            try {
-
-                if( gpio.getValue() != lastState ) {
-                    lastState = gpio.getValue();
-                    performMotionEvent(lastState ? State.STATE_HIGH : State.STATE_LOW);
-                }
-
-
-            } catch( IOException e ) {
-
-            }
-
-            return true;
-        }
-    };
-
     public void setOnMotionDetectedEventListener(OnMotionDetectedEventListener listener) {
-        onMotionDetectedEventListener = listener;
+        mOnMotionDetectedEventListener = listener;
     }
 
     @Override
     public void close() throws IOException {
-        onMotionDetectedEventListener = null;
+        mOnMotionDetectedEventListener = null;
 
-        if (motionDetectorGpio != null) {
-            motionDetectorGpio.unregisterGpioCallback(interruptCallback);
+        if (mMotionDetectorGpio != null) {
+            mMotionDetectorGpio.unregisterGpioCallback(mInterruptCallback);
             try {
-                motionDetectorGpio.close();
+                mMotionDetectorGpio.close();
             } finally {
-                motionDetectorGpio = null;
+                mMotionDetectorGpio = null;
             }
         }
+    }
+
+    public interface OnMotionDetectedEventListener {
+        void onMotionDetectedEvent(State state);
     }
 }

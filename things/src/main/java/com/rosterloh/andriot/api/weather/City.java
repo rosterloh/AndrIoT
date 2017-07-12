@@ -7,68 +7,68 @@ public class City {
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer mId;
     @SerializedName("name")
     @Expose
-    private String name;
+    private String mName;
     @SerializedName("coord")
     @Expose
-    private Coord coord;
+    private Coord mCoord;
     @SerializedName("country")
     @Expose
-    private String country;
+    private String mCountry;
     @SerializedName("population")
     @Expose
-    private Integer population;
+    private Integer mPopulation;
     @SerializedName("sys")
     @Expose
-    private Sys sys;
+    private Sys mSys;
 
     public Integer getId() {
-        return id;
+        return mId;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        mId = id;
     }
 
     public String getName() {
-        return name;
+        return mName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        mName = name;
     }
 
     public Coord getCoord() {
-        return coord;
+        return mCoord;
     }
 
     public void setCoord(Coord coord) {
-        this.coord = coord;
+        mCoord = coord;
     }
 
     public String getCountry() {
-        return country;
+        return mCountry;
     }
 
     public void setCountry(String country) {
-        this.country = country;
+        mCountry = country;
     }
 
     public Integer getPopulation() {
-        return population;
+        return mPopulation;
     }
 
     public void setPopulation(Integer population) {
-        this.population = population;
+        mPopulation = population;
     }
 
     public Sys getSys() {
-        return sys;
+        return mSys;
     }
 
     public void setSys(Sys sys) {
-        this.sys = sys;
+        mSys = sys;
     }
 }

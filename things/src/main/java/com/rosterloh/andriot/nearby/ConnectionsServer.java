@@ -27,15 +27,16 @@ public class ConnectionsServer implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private final GoogleApiClient googleApiClient;
     private static final String DEVICE_NAME = "AndrIoT";
     private static final String SERVICE_ID = "com.rosterloh.andriot.service";
 
-    private final ConnectionLifecycleCallback connectionLifecycleCallback = new ConnectionLifecycleCallback() {
+    private final GoogleApiClient mGoogleApiClient;
+
+    private final ConnectionLifecycleCallback mConnectionLifecycleCallback = new ConnectionLifecycleCallback() {
         @Override
         public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
             Timber.d("Connection initiated from " + endpointId + " " + connectionInfo.getEndpointName());
-            Nearby.Connections.acceptConnection(googleApiClient, endpointId, payloadCallback);
+            Nearby.Connections.acceptConnection(mGoogleApiClient, endpointId, mPayloadCallback);
         }
 
         @Override
@@ -54,7 +55,7 @@ public class ConnectionsServer implements
         }
     };
 
-    private final PayloadCallback payloadCallback = new PayloadCallback() {
+    private final PayloadCallback mPayloadCallback = new PayloadCallback() {
         @Override
         public void onPayloadReceived(String endpointId, Payload payload) {
             Timber.d("Message from " + endpointId);
@@ -64,7 +65,8 @@ public class ConnectionsServer implements
         public void onPayloadTransferUpdate(String endpointId, PayloadTransferUpdate payloadTransferUpdate) {
             switch (payloadTransferUpdate.getStatus()) {
                 case PayloadTransferUpdate.Status.IN_PROGRESS:
-                    Timber.d("onPayloadTransferUpdate " + payloadTransferUpdate.getBytesTransferred() + " bytes transferred");
+                    Timber.d("onPayloadTransferUpdate " + payloadTransferUpdate.getBytesTransferred()
+                            + " bytes transferred");
                     break;
                 case PayloadTransferUpdate.Status.SUCCESS:
                     Timber.d("onPayloadTransferUpdate completed");
@@ -72,6 +74,8 @@ public class ConnectionsServer implements
                 case PayloadTransferUpdate.Status.FAILURE:
                     Timber.d("onPayloadTransferUpdate failed");
                     break;
+                default:
+                    Timber.w("Unknown PayloadTransferUpdate Status");
             }
         }
     };
@@ -79,20 +83,19 @@ public class ConnectionsServer implements
     @Inject
     public ConnectionsServer(Context context) {
 
-        googleApiClient = new GoogleApiClient.Builder(context)
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Nearby.CONNECTIONS_API)
                 .build();
-        googleApiClient.connect();
+        mGoogleApiClient.connect();
     }
 
     private void startAdvertising() {
 
-        AdvertisingOptions advertisingOptions = new AdvertisingOptions(Strategy.P2P_CLUSTER);
-
         Nearby.Connections
-                .startAdvertising(googleApiClient, DEVICE_NAME, SERVICE_ID, connectionLifecycleCallback, advertisingOptions)
+                .startAdvertising(mGoogleApiClient, DEVICE_NAME, SERVICE_ID,
+                        mConnectionLifecycleCallback, new AdvertisingOptions(Strategy.P2P_CLUSTER))
                 .setResultCallback((result) -> {
                     if (result.getStatus().isSuccess()) {
                         Timber.d("startAdvertising:onResult: SUCCESS");
@@ -116,7 +119,7 @@ public class ConnectionsServer implements
     @Override
     public void onConnectionSuspended(int i) {
         Timber.d("GoogleApiClient Connection Suspended");
-        googleApiClient.reconnect();
+        mGoogleApiClient.reconnect();
     }
 
     @Override
@@ -126,9 +129,9 @@ public class ConnectionsServer implements
 
     @Override
     protected void finalize() throws Throwable {
-        Nearby.Connections.stopAllEndpoints(googleApiClient);
-        if (googleApiClient != null && googleApiClient.isConnected()) {
-            googleApiClient.disconnect();
+        Nearby.Connections.stopAllEndpoints(mGoogleApiClient);
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
         }
         super.finalize();
     }

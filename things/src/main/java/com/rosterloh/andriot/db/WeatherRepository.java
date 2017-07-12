@@ -26,10 +26,6 @@ import timber.log.Timber;
 @Singleton
 public class WeatherRepository {
 
-    private final WeatherDao weatherDao;
-    private final WeatherService weatherService;
-    private final AppExecutors appExecutors;
-
     private static final String LAT = "51.621203";
     private static final String LONG = "-1.294148";
     private static final String KEY = "2e9e498e77b879ea237e3a571c57f1fa";
@@ -38,19 +34,23 @@ public class WeatherRepository {
     private static final int POLL_RATE = 30 * 60 * 1000;
     private static final int INIT_DELAY = 5 * 1000;
 
-    private final MediatorLiveData<Weather> weatherData = new MediatorLiveData<>();
+    private final WeatherDao mWeatherDao;
+    private final WeatherService mWeatherService;
+    private final AppExecutors mAppExecutors;
+
+    private final MediatorLiveData<Weather> mWeatherData = new MediatorLiveData<>();
 
     @Inject
     WeatherRepository(AppExecutors appExecutors, WeatherDao weatherDao, WeatherService weatherService) {
-        this.appExecutors = appExecutors;
-        this.weatherDao = weatherDao;
-        this.weatherService = weatherService;
+        mAppExecutors = appExecutors;
+        mWeatherDao = weatherDao;
+        mWeatherService = weatherService;
 
         LiveData<Weather> dbData = weatherDao.load();
-        weatherData.addSource(dbData, data -> {
-            weatherData.removeSource(dbData);
+        mWeatherData.addSource(dbData, data -> {
+            mWeatherData.removeSource(dbData);
             if (dbData.getValue() != null) {
-                weatherData.addSource(dbData, weatherData::setValue);
+                mWeatherData.addSource(dbData, mWeatherData::setValue);
             } else {
                 getFromNetwork(dbData);
             }
@@ -69,20 +69,21 @@ public class WeatherRepository {
     }
 
     public LiveData<Weather> loadWeather() {
-        return weatherData;
+        return mWeatherData;
     }
 
     private void getFromNetwork(final LiveData<Weather> dbData) {
-        Call<WeatherResponse> call = weatherService.getWeather(LAT, LONG, KEY, TYPE);
+        Call<WeatherResponse> call = mWeatherService.getWeather(LAT, LONG, KEY, TYPE);
         call.enqueue(new Callback<WeatherResponse>() {
 
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 Weather weather = new Weather(response.body());
 
-                appExecutors.diskIO().execute(() ->  {
-                    weatherDao.insert(weather);
-                    appExecutors.mainThread().execute(() -> weatherData.addSource(weatherDao.load(), weatherData::setValue));
+                mAppExecutors.diskIO().execute(() ->  {
+                    mWeatherDao.insert(weather);
+                    mAppExecutors.mainThread().execute(()
+                            -> mWeatherData.addSource(mWeatherDao.load(), mWeatherData::setValue));
                 });
             }
 
@@ -95,7 +96,7 @@ public class WeatherRepository {
     }
 
     private boolean dataNeedsRefresh(final LiveData<Weather> dbData) {
-        return ((dbData.getValue() == null) ||
-                (dbData.getValue().lastUpdate.isBefore(LocalDateTime.now().minusMinutes(30))));
+        return ((dbData.getValue() == null)
+                || (dbData.getValue().getLastUpdate().isBefore(LocalDateTime.now().minusMinutes(30))));
     }
 }

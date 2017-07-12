@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.firebase.crash.FirebaseCrash;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.ui.dash.DashFragment;
 
@@ -32,10 +31,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     private static final int FRAGMENT_TIMELINE = 1;
     private static final int FRAGMENT_SETTINGS = 2;
 
-    private SideBar sideBar;
-
     @Inject
-    DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
+    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     }
 
     public void setupSideBar() {
-        sideBar = findViewById(R.id.sidebar);
+        SideBar sideBar = findViewById(R.id.sidebar);
         sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_home));
         sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_timeline));
         sideBar.addItem(sideBar.newItem().setIcon(R.drawable.ic_settings));
@@ -98,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     public void checkPlayServices() {
         GoogleApiAvailability api = GoogleApiAvailability.getInstance();
         int result = api.isGooglePlayServicesAvailable(this);
-        if(result != ConnectionResult.SUCCESS) {
+        if (result != ConnectionResult.SUCCESS) {
             Timber.w("Google Play Services are not available");
             /*
             if(api.isUserResolvableError(result)) {
@@ -124,28 +121,31 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 } else {
                     requestPermission();
                 }
+                break;
             }
+            default:
+                Timber.w("Unknown permission request code " + requestCode);
         }
     }
 
     private boolean hasPermission() {
-        return checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermission() {
-        if (shouldShowRequestPermissionRationale(CAMERA) ||
-                shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE) ||
-                shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION)) {
-            Toast.makeText(MainActivity.this, "Camera, location AND storage permission are " +
-                    "required for this application", Toast.LENGTH_LONG).show();
+        if (shouldShowRequestPermissionRationale(CAMERA)
+                || shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE)
+                || shouldShowRequestPermissionRationale(ACCESS_COARSE_LOCATION)) {
+            Toast.makeText(MainActivity.this, "Camera, location AND storage permission are "
+                    + "required for this application", Toast.LENGTH_LONG).show();
         }
         requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE, ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST);
     }
 
     @Override
     public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
-        return dispatchingAndroidInjector;
+        return mDispatchingAndroidInjector;
     }
 }

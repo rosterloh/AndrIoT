@@ -76,7 +76,7 @@
             android:textSize="52sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:weatherIcon="@{weather.weatherIcon}"
+            app:weatherIcon="@{weather.getWeatherIcon}"
             tools:text="Icon"
             android:layout_marginTop="16dp"
             android:layout_marginStart="16dp" />
@@ -89,7 +89,7 @@
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_thin"
             android:gravity="center"
-            android:text="@{String.format(@string/remote_temperature_format, weather.temperature)}"
+            android:text="@{String.format(@string/remote_temperature_format, weather.getTemperature)}"
             android:textAlignment="center"
             android:textSize="70sp"
             app:layout_constraintLeft_toRightOf="@id/tv_weather_icon"
@@ -101,7 +101,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:text="@{weather.description}"
+            android:text="@{weather.getDescription}"
             app:layout_constraintTop_toBottomOf="@id/tv_temperature"
             app:layout_constraintLeft_toLeftOf="parent"
             tools:text="Clear sky"
@@ -127,10 +127,9 @@
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
             android:textSize="24sp"
-            android:text="@{String.format(@string/local_temperature_format, sensors.temperature)}"
+            android:text="@{String.format(@string/local_temperature_format, sensors.getTemperature())}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:visibleGone="@{sensors.temperature != null}"
             tools:text="15°C" />
 
         <ImageView
@@ -152,10 +151,9 @@
             android:layout_marginBottom="8dp"
             android:layout_marginStart="8dp"
             android:textSize="24sp"
-            android:text="@{String.format(@string/local_humidity_format, sensors.humidity)}"
+            android:text="@{String.format(@string/local_humidity_format, sensors.getHumidity())}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/temperature_icon"
-            app:visibleGone="@{sensors.humidity != null}"
             tools:text="50%" />
 
         <TextView
@@ -164,8 +162,8 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="@{`SSID: ` + sensors.wifi_name + ` IP: ` + sensors.wifi_ip}"
-            app:visibleGone="@{sensors.wifi_name != null}"
+            android:text="@{`SSID: ` + sensors.getWifiName() + ` IP: ` + sensors.getWifiIp()}"
+            app:visibleGone="@{sensors.getWifiName() != null}"
             app:layout_constraintBottom_toTopOf="@+id/tv_eth_info"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -179,8 +177,8 @@
             android:layout_marginBottom="8dp"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="@{`Ethernet IP: ` + sensors.eth_ip}"
-            app:visibleGone="@{sensors.eth_ip != null}"
+            android:text="@{`Ethernet IP: ` + sensors.getEthIp()}"
+            app:visibleGone="@{sensors.getEthIp() != null}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

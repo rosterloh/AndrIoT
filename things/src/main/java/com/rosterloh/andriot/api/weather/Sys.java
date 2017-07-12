@@ -7,68 +7,68 @@ public class Sys {
 
     @SerializedName("type")
     @Expose
-    private Integer type;
+    private Integer mType;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer mId;
     @SerializedName("message")
     @Expose
-    private Double message;
+    private Double mMessage;
     @SerializedName("country")
     @Expose
-    private String country;
+    private String mCountry;
     @SerializedName("sunrise")
     @Expose
-    private Integer sunrise;
+    private Integer mSunrise;
     @SerializedName("sunset")
     @Expose
-    private Integer sunset;
+    private Integer mSunset;
 
     public Integer getType() {
-        return type;
+        return mType;
     }
 
     public void setType(Integer type) {
-        this.type = type;
+        mType = type;
     }
 
     public Integer getId() {
-        return id;
+        return mId;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        mId = id;
     }
 
     public Double getMessage() {
-        return message;
+        return mMessage;
     }
 
     public void setMessage(Double message) {
-        this.message = message;
+        mMessage = message;
     }
 
     public String getCountry() {
-        return country;
+        return mCountry;
     }
 
     public void setCountry(String country) {
-        this.country = country;
+        mCountry = country;
     }
 
     public Integer getSunrise() {
-        return sunrise;
+        return mSunrise;
     }
 
     public void setSunrise(Integer sunrise) {
-        this.sunrise = sunrise;
+        mSunrise = sunrise;
     }
 
     public Integer getSunset() {
-        return sunset;
+        return mSunset;
     }
 
     public void setSunset(Integer sunset) {
-        this.sunset = sunset;
+        mSunset = sunset;
     }
 }

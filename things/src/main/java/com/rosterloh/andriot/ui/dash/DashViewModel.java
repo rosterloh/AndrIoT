@@ -21,17 +21,17 @@ public class DashViewModel extends ViewModel {
     private static final int POLL_RATE = 5 * 60 * 1000;
     private static final int INIT_DELAY = 5 * 1000;
 
-    private final AppExecutors appExecutors;
-    private final SensorHub sensorHub;
+    private final AppExecutors mAppExecutors;
+    private final SensorHub mSensorHub;
 
-    private final MutableLiveData<Sensors> sensors = new MutableLiveData<>();
-    private final LiveData<Weather> weather;
+    private final MutableLiveData<Sensors> mSensors = new MutableLiveData<>();
+    private final LiveData<Weather> mWeather;
 
     @Inject
     DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors, SensorHub sensorHub) {
-        this.appExecutors = appExecutors;
-        this.sensorHub = sensorHub;
-        weather = weatherRepository.loadWeather();
+        mAppExecutors = appExecutors;
+        mSensorHub = sensorHub;
+        mWeather = weatherRepository.loadWeather();
 
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -39,9 +39,9 @@ public class DashViewModel extends ViewModel {
             public void run() {
                 appExecutors.diskIO().execute(() -> {
                     float[] data = sensorHub.getSensorData();
-                    if(data != null) {
+                    if (data != null) {
                         appExecutors.mainThread().execute(() -> {
-                            sensors.setValue(new Sensors(data[0], data[1], null,
+                            mSensors.setValue(new Sensors(data[0], data[1], null,
                                     NetworkUtils.getIPAddress(true), null));
                         });
                     }
@@ -51,14 +51,14 @@ public class DashViewModel extends ViewModel {
     }
 
     LiveData<Boolean> getMotion() {
-        return sensorHub.pirData;
+        return mSensorHub.getPirData();
     }
 
     LiveData<Sensors> getSensorData() {
-        return sensors;
+        return mSensors;
     }
 
     LiveData<Weather> getWeather() {
-        return weather;
+        return mWeather;
     }
 }

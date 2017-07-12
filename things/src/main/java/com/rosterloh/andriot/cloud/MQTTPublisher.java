@@ -26,15 +26,15 @@ public class MQTTPublisher implements AutoCloseable {
     // Use mqttQos=1 (at least once delivery), mqttQos=0 (at most once delivery) also supported.
     private static final int MQTT_QOS = 1;
 
-    private MqttAsyncClient mqttClient = null;
-    private final SettingsDao settingsDao;
-    private Settings settings;
-    private AtomicBoolean ready = new AtomicBoolean(false);
+    private MqttAsyncClient mMqttClient = null;
+    private final SettingsDao mSettingsDao;
+    private Settings mSettings;
+    private AtomicBoolean mReady = new AtomicBoolean(false);
 
     @Inject
     public MQTTPublisher(SettingsDao settingsDao) {
 
-        this.settingsDao = settingsDao;
+        mSettingsDao = settingsDao;
 
         initialiseSettings();
 
@@ -49,7 +49,7 @@ public class MQTTPublisher implements AutoCloseable {
     public void publish(List<SensorData> data) {
         try {
             if (isReady()) {
-                if (mqttClient != null && !mqttClient.isConnected()) {
+                if (mMqttClient != null && !mMqttClient.isConnected()) {
                     // if for some reason the mqtt client has disconnected, we should try to connect
                     // it again.
                     try {
@@ -60,7 +60,7 @@ public class MQTTPublisher implements AutoCloseable {
                 }
                 String payload = new Gson().toJson(data); //MessagePayload.createMessagePayload(data);
                 Timber.d("Publishing: " + payload);
-                sendMessage(settings.getTopicName(), payload.getBytes());
+                sendMessage(mSettings.getTopicName(), payload.getBytes());
             }
         } catch (MqttException e) {
             throw new IllegalArgumentException("Could not send message", e);
@@ -68,18 +68,18 @@ public class MQTTPublisher implements AutoCloseable {
      }
 
      public boolean isReady() {
-        return ready.get();
+        return mReady.get();
     }
 
     @Override
     public void close() {
-        if (mqttClient != null) {
+        if (mMqttClient != null) {
             try {
-                mqttClient.disconnect();
-                if (mqttClient.isConnected()) {
-                    mqttClient.close(); // maybe handle separately
+                mMqttClient.disconnect();
+                if (mMqttClient.isConnected()) {
+                    mMqttClient.close(); // maybe handle separately
                 }
-                mqttClient = null;
+                mMqttClient = null;
             } catch (Exception e) {
                 Timber.d("Failed to disconnect: " + e.getLocalizedMessage());
             }
@@ -88,32 +88,32 @@ public class MQTTPublisher implements AutoCloseable {
 
     private void initialiseSettings() {
 
-        settings = settingsDao.load().getValue();
+        mSettings = mSettingsDao.load().getValue();
 
         //if (settings.deviceId == null) {
         //    settings.deviceId = MqttAsyncClient.generateClientId();
         //}
 
-        Timber.d(settings.toString());
+        Timber.d(mSettings.toString());
     }
 
     private void initialiseMqttClient() throws MqttException, IllegalArgumentException {
 
-        mqttClient = new MqttAsyncClient(settings.getBrokerUrl(),
-                settings.getClientId(), new MemoryPersistence());
+        mMqttClient = new MqttAsyncClient(mSettings.getBrokerUrl(),
+                mSettings.getClientId(), new MemoryPersistence());
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-        options.setUserName(settings.UNUSED_ACCOUNT_NAME);
+        options.setUserName(mSettings.UNUSED_ACCOUNT_NAME);
 
         // generate the jwt password
         //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
 
-        mqttClient.connect(options);
-        ready.set(true);
+        mMqttClient.connect(options);
+        mReady.set(true);
     }
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {
-        mqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
+        mMqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
     }
 }

@@ -7,24 +7,24 @@ public class Coord {
 
     @SerializedName("lon")
     @Expose
-    private Double lon;
+    private Double mLon;
     @SerializedName("lat")
     @Expose
-    private Double lat;
+    private Double mLat;
 
     public Double getLon() {
-        return lon;
+        return mLon;
     }
 
     public void setLon(Double lon) {
-        this.lon = lon;
+        mLon = lon;
     }
 
     public Double getLat() {
-        return lat;
+        return mLat;
     }
 
     public void setLat(Double lat) {
-        this.lat = lat;
+        mLat = lat;
     }
 }

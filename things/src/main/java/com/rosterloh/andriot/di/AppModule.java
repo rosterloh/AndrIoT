@@ -34,7 +34,7 @@ class AppModule {
     @Singleton
     @Provides
     ThingsDb provideDb(Application app) {
-        return Room.databaseBuilder(app, ThingsDb.class,"things.db").build();
+        return Room.databaseBuilder(app, ThingsDb.class, "things.db").build();
     }
 
     @Singleton

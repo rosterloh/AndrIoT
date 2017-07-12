@@ -17,40 +17,60 @@ import static com.rosterloh.andriot.db.Weather.TABLE_NAME;
 @TypeConverters(DateTypeConverter.class)
 public class Weather {
 
-    public static final String TABLE_NAME = "weather";
+    static final String TABLE_NAME = "weather";
 
-    public final @PrimaryKey int id;
+    private final @PrimaryKey int mId;
     @SerializedName("weather_icon")
-    public final String weatherIcon;
+    private final String mWeatherIcon;
     @SerializedName("temperature")
-    public final Double temperature;
+    private final Double mTemperature;
     @SerializedName("description")
-    public final String description;
+    private final String mDescription;
     @SerializedName("last_update")
-    public final LocalDateTime lastUpdate;
+    private final LocalDateTime mLastUpdate;
 
     public Weather(int id, String weatherIcon, Double temperature, String description, LocalDateTime lastUpdate) {
-        this.id = id;
-        this.weatherIcon = weatherIcon;
-        this.temperature = temperature;
-        this.description = description;
-        this.lastUpdate = lastUpdate;
+        mId = id;
+        mWeatherIcon = weatherIcon;
+        mTemperature = temperature;
+        mDescription = description;
+        mLastUpdate = lastUpdate;
     }
 
     public Weather(WeatherResponse response) {
-        this.id = response.getId();
-        this.weatherIcon = response.getWeather().get(0).getIcon();
-        this.temperature = response.getMain().getTemp();
-        this.description = response.getWeather().get(0).getDescription();
-        this.lastUpdate = LocalDateTime.now();
-        //this.lastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
+        mId = response.getId();
+        mWeatherIcon = response.getWeather().get(0).getIcon();
+        mTemperature = response.getMain().getTemp();
+        mDescription = response.getWeather().get(0).getDescription();
+        mLastUpdate = LocalDateTime.now();
+        //mLastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
+    }
+
+    public int getId() {
+        return mId;
+    }
+
+    public String getWeatherIcon() {
+        return mWeatherIcon;
+    }
+
+    public Double getTemperature() {
+        return mTemperature;
+    }
+
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public LocalDateTime getLastUpdate() {
+        return mLastUpdate;
     }
 
     public long getMinutesSinceUpdate() {
-        return ChronoUnit.MINUTES.between(LocalDateTime.now(), lastUpdate);
+        return ChronoUnit.MINUTES.between(LocalDateTime.now(), mLastUpdate);
     }
 
     public String getLastUpdateTime() {
-        return lastUpdate.format(DateTimeFormatter.ofPattern("HH:mm"));
+        return mLastUpdate.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

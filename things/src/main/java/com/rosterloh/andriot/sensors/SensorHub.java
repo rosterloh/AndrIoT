@@ -1,5 +1,6 @@
 package com.rosterloh.andriot.sensors;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
@@ -19,45 +20,19 @@ public class SensorHub {
     private static final String BUTTON_GPIO = "BCM17";
     private static final String PIR_GPIO = "BCM21";
 
-    private Gpio led;
-    private Gpio button;
-    private Gpio pir;
-    private Htu21d htu21d;
+    private Gpio mLed;
+    private Gpio mButton;
+    private Gpio mPir;
+    private Htu21d mHtu21d;
 
-    public MutableLiveData<Boolean> pirData = new MutableLiveData<>();
-    public MutableLiveData<Boolean> buttonData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mPirData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mButtonData = new MutableLiveData<>();
 
-    public SensorHub() {
-
-        PeripheralManagerService pioService = new PeripheralManagerService();
-        try {
-            led = pioService.openGpio(LED_GPIO);
-            led.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
-
-            button = pioService.openGpio(BUTTON_GPIO);
-            button.setDirection(Gpio.DIRECTION_IN);
-            button.setEdgeTriggerType(Gpio.EDGE_FALLING);
-            button.setActiveType(Gpio.ACTIVE_LOW);
-            button.registerGpioCallback(buttonInterrupt);
-
-            pir = pioService.openGpio(PIR_GPIO);
-            pir.setDirection(Gpio.DIRECTION_IN);
-            pir.setEdgeTriggerType(Gpio.EDGE_BOTH);
-            pir.setActiveType(Gpio.ACTIVE_HIGH);
-            pir.registerGpioCallback(pirInterrupt);
-
-            htu21d = new Htu21d("I2C1");
-        } catch (IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "Error configuring GPIO pins");
-            FirebaseCrash.report(e);
-        }
-    }
-
-    private GpioCallback buttonInterrupt = new GpioCallback() {
+    private GpioCallback mButtonInterrupt = new GpioCallback() {
         @Override
         public boolean onGpioEdge(Gpio gpio) {
             try {
-                buttonData.setValue(gpio.getValue());
+                mButtonData.setValue(gpio.getValue());
                 /*
                 if (ready.get()) {
                     setLedValue(true);
@@ -73,11 +48,11 @@ public class SensorHub {
         }
     };
 
-    private GpioCallback pirInterrupt = new GpioCallback() {
+    private GpioCallback mPirInterrupt = new GpioCallback() {
         @Override
         public boolean onGpioEdge(Gpio gpio) {
             try {
-                pirData.setValue(gpio.getValue());
+                mPirData.setValue(gpio.getValue());
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading PIR state");
                 FirebaseCrash.report(e);
@@ -87,9 +62,35 @@ public class SensorHub {
         }
     };
 
+    public SensorHub() {
+
+        PeripheralManagerService pioService = new PeripheralManagerService();
+        try {
+            mLed = pioService.openGpio(LED_GPIO);
+            mLed.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
+
+            mButton = pioService.openGpio(BUTTON_GPIO);
+            mButton.setDirection(Gpio.DIRECTION_IN);
+            mButton.setEdgeTriggerType(Gpio.EDGE_FALLING);
+            mButton.setActiveType(Gpio.ACTIVE_LOW);
+            mButton.registerGpioCallback(mButtonInterrupt);
+
+            mPir = pioService.openGpio(PIR_GPIO);
+            mPir.setDirection(Gpio.DIRECTION_IN);
+            mPir.setEdgeTriggerType(Gpio.EDGE_BOTH);
+            mPir.setActiveType(Gpio.ACTIVE_HIGH);
+            mPir.registerGpioCallback(mPirInterrupt);
+
+            mHtu21d = new Htu21d("I2C1");
+        } catch (IOException e) {
+            FirebaseCrash.logcat(Log.ERROR, TAG, "Error configuring GPIO pins");
+            FirebaseCrash.report(e);
+        }
+    }
+
     private void setLedValue(boolean value) {
         try {
-            led.setValue(value);
+            mLed.setValue(value);
         } catch (IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "Error updating GPIO value");
             FirebaseCrash.report(e);
@@ -98,7 +99,7 @@ public class SensorHub {
 
     private boolean getLedValue() {
         try {
-            return led.getValue();
+            return mLed.getValue();
         } catch (IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "Error getting GPIO value");
             FirebaseCrash.report(e);
@@ -106,10 +107,18 @@ public class SensorHub {
         }
     }
 
+    public LiveData<Boolean> getPirData() {
+        return mPirData;
+    }
+
+    public LiveData<Boolean> getButtonData() {
+        return mButtonData;
+    }
+
     public float[] getSensorData() {
         try {
-            if (htu21d != null) {
-                return htu21d.readTemperatureAndHumidity();
+            if (mHtu21d != null) {
+                return mHtu21d.readTemperatureAndHumidity();
             }
         } catch (IOException e) {
             FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading sensor data");
@@ -121,49 +130,49 @@ public class SensorHub {
     @Override
     protected void finalize() throws Throwable {
 
-        if (button != null) {
-            button.unregisterGpioCallback(buttonInterrupt);
+        if (mButton != null) {
+            mButton.unregisterGpioCallback(mButtonInterrupt);
             try {
-                button.close();
+                mButton.close();
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing BUTTON GPIO");
                 FirebaseCrash.report(e);
             } finally {
-                button = null;
+                mButton = null;
             }
         }
 
-        if (pir != null) {
-            pir.unregisterGpioCallback(pirInterrupt);
+        if (mPir != null) {
+            mPir.unregisterGpioCallback(mPirInterrupt);
             try {
-                pir.close();
+                mPir.close();
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing PIR GPIO");
                 FirebaseCrash.report(e);
             } finally {
-                pir = null;
+                mPir = null;
             }
         }
 
-        if (led != null) {
+        if (mLed != null) {
             try {
-                led.close();
+                mLed.close();
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing LED GPIO");
                 FirebaseCrash.report(e);
-            } finally{
-                led = null;
+            } finally {
+                mLed = null;
             }
         }
 
-        if (htu21d != null) {
+        if (mHtu21d != null) {
             try {
-                htu21d.close();
+                mHtu21d.close();
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing HTU21D");
                 FirebaseCrash.report(e);
-            } finally{
-                htu21d = null;
+            } finally {
+                mHtu21d = null;
             }
         }
 

@@ -29,50 +29,74 @@ public class Settings {
     private static final String BROKER_URL_FORMAT = "ssl://%s:%d";
 
     @SerializedName("project_id")
-    public final @PrimaryKey String projectId;
+    private final @PrimaryKey String mProjectId;
     @SerializedName("registry_id")
-    public final String registryId;
+    private final String mRegistryId;
     @SerializedName("device_id")
-    public final String deviceId;
+    private final String mDeviceId;
     @SerializedName("cloud_region")
-    public final String cloudRegion;
+    private final String mCloudRegion;
     @SerializedName("bridge_hostname")
-    public final String bridgeHostname;
+    private final String mBridgeHostname;
     @SerializedName("bridge_port")
-    public final short bridgePort;
+    private final short mBridgePort;
 
     public Settings(String projectId, String registryId, String deviceId, String cloudRegion,
                     String bridgeHostname, short bridgePort) {
-        this.projectId = projectId;
-        this.registryId = registryId;
-        this.deviceId = deviceId;
-        this.cloudRegion = cloudRegion;
-        this.bridgeHostname = bridgeHostname;
-        this.bridgePort = bridgePort;
+        mProjectId = projectId;
+        mRegistryId = registryId;
+        mDeviceId = deviceId;
+        mCloudRegion = cloudRegion;
+        mBridgeHostname = bridgeHostname;
+        mBridgePort = bridgePort;
+    }
+
+    public String getProjectId() {
+        return mProjectId;
+    }
+
+    public String getRegistryId() {
+        return mRegistryId;
+    }
+
+    public String getDeviceId() {
+        return mDeviceId;
+    }
+
+    public String getCloudRegion() {
+        return mCloudRegion;
+    }
+
+    public String getBridgeHostname() {
+        return mBridgeHostname;
+    }
+
+    public short getBridgePort() {
+        return mBridgePort;
     }
 
     public String getBrokerUrl() {
-        return String.format(Locale.getDefault(), BROKER_URL_FORMAT, bridgeHostname, bridgePort);
+        return String.format(Locale.getDefault(), BROKER_URL_FORMAT, mBridgeHostname, mBridgePort);
     }
 
     public String getClientId() {
         return String.format(Locale.getDefault(), MQTT_CLIENT_ID_FORMAT,
-                projectId, cloudRegion, registryId, deviceId);
+                mProjectId, mCloudRegion, mRegistryId, mDeviceId);
     }
 
     public String getTopicName() {
-        return String.format(Locale.getDefault(), MQTT_TOPIC_FORMAT, deviceId);
+        return String.format(Locale.getDefault(), MQTT_TOPIC_FORMAT, mDeviceId);
     }
 
     @Override
     public String toString() {
-        return "Settings{" +
-                "project_id= " + projectId +
-                "registry_id= " + registryId +
-                "device_id= " + deviceId +
-                "cloud_region= " + cloudRegion +
-                "bridge_hostname= " + bridgeHostname +
-                "bridge_port= " + bridgePort +
-                '}';
+        return "Settings{"
+                + "project_id= " + mProjectId
+                + "registry_id= " + mRegistryId
+                + "device_id= " + mDeviceId
+                + "cloud_region= " + mCloudRegion
+                + "bridge_hostname= " + mBridgeHostname
+                + "bridge_port= " + mBridgePort
+                + '}';
     }
 }

@@ -15,135 +15,135 @@ public class WeatherResponse {
 
     @SerializedName("coord")
     @Expose
-    private Coord coord;
+    private Coord mCoord;
     @SerializedName("weather")
     @Expose
-    private List<CurrentWeather> weather = null;
+    private List<CurrentWeather> mWeather = null;
     @SerializedName("base")
     @Expose
-    private String base;
+    private String mBase;
     @SerializedName("main")
     @Expose
-    private Main main;
+    private Main mMain;
     @SerializedName("visibility")
     @Expose
-    private Integer visibility;
+    private Integer mVisibility;
     @SerializedName("wind")
     @Expose
-    private Wind wind;
+    private Wind mWind;
     @SerializedName("clouds")
     @Expose
-    private Clouds clouds;
+    private Clouds mClouds;
     @SerializedName("dt")
     @Expose
-    private Integer dt;
+    private Integer mDt;
     @SerializedName("sys")
     @Expose
-    private Sys sys;
+    private Sys mSys;
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer mId;
     @SerializedName("name")
     @Expose
-    private String name;
+    private String mName;
     @SerializedName("cod")
     @Expose
-    private Integer cod;
+    private Integer mCod;
 
     public Coord getCoord() {
-        return coord;
+        return mCoord;
     }
 
     public void setCoord(Coord coord) {
-        this.coord = coord;
+        mCoord = coord;
     }
 
     public List<CurrentWeather> getWeather() {
-        return weather;
+        return mWeather;
     }
 
     public void setWeather(List<CurrentWeather> weather) {
-        this.weather = weather;
+        mWeather = weather;
     }
 
     public String getBase() {
-        return base;
+        return mBase;
     }
 
     public void setBase(String base) {
-        this.base = base;
+        mBase = base;
     }
 
     public Main getMain() {
-        return main;
+        return mMain;
     }
 
     public void setMain(Main main) {
-        this.main = main;
+        mMain = main;
     }
 
     public Integer getVisibility() {
-        return visibility;
+        return mVisibility;
     }
 
     public void setVisibility(Integer visibility) {
-        this.visibility = visibility;
+        mVisibility = visibility;
     }
 
     public Wind getWind() {
-        return wind;
+        return mWind;
     }
 
     public void setWind(Wind wind) {
-        this.wind = wind;
+        mWind = wind;
     }
 
     public Clouds getClouds() {
-        return clouds;
+        return mClouds;
     }
 
     public void setClouds(Clouds clouds) {
-        this.clouds = clouds;
+        mClouds = clouds;
     }
 
     public Integer getDt() {
-        return dt;
+        return mDt;
     }
 
     public void setDt(Integer dt) {
-        this.dt = dt;
+        mDt = dt;
     }
 
     public Sys getSys() {
-        return sys;
+        return mSys;
     }
 
     public void setSys(Sys sys) {
-        this.sys = sys;
+        mSys = sys;
     }
 
     public Integer getId() {
-        return id;
+        return mId;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        mId = id;
     }
 
     public String getName() {
-        return name;
+        return mName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        mName = name;
     }
 
     public Integer getCod() {
-        return cod;
+        return mCod;
     }
 
     public void setCod(Integer cod) {
-        this.cod = cod;
+        mCod = cod;
     }
 
 }

@@ -4,4 +4,8 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
+    <suppress files="BindingAdapters.java" checks="HideUtilityClassConstructor" />
+    <suppress files="DateTypeConverter.java" checks="HideUtilityClassConstructor" />
+    <suppress files="AppInjector.java" checks="HideUtilityClassConstructor" />
+    <suppress files="SideBar.java" checks="FileLength" />
 </suppressions>

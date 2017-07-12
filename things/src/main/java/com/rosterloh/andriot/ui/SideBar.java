@@ -49,35 +49,7 @@ public class SideBar extends FrameLayout {
 
     private static final int ANIMATION_DURATION = 300;
 
-    private static final Pools.Pool<Item> sItemPool = new Pools.SynchronizedPool<>(16);
-
-    /**
-     * Callback interface invoked when a item's selection state changes.
-     */
-    public interface OnItemSelectedListener {
-
-        /**
-         * Called when an item enters the selected state.
-         *
-         * @param item The item that was selected
-         */
-        public void onItemSelected(Item item);
-
-        /**
-         * Called when an item exits the selected state.
-         *
-         * @param item The item that was unselected
-         */
-        public void onItemUnselected(Item item);
-
-        /**
-         * Called when an item that is already selected is chosen again by the user. Some applications
-         * may use this action to return to the top level of a category.
-         *
-         * @param item The item that was reselected.
-         */
-        public void onItemReselected(Item item);
-    }
+    private static final Pools.Pool<Item> ITEM_POOL = new Pools.SynchronizedPool<>(16);
 
     private final ArrayList<Item> mItems = new ArrayList<>();
     private Item mSelectedItem;
@@ -152,7 +124,7 @@ public class SideBar extends FrameLayout {
      * @param setSelected True if the added tab should become the selected tab.
      */
     public void addItem(@NonNull Item item, int position, boolean setSelected) {
-        if (item.mParent != this) {
+        if (item.getParent() != this) {
             throw new IllegalArgumentException("Item belongs to a different SideBarLayout.");
         }
         configureItem(item, position);
@@ -204,12 +176,12 @@ public class SideBar extends FrameLayout {
      */
     @NonNull
     public Item newItem() {
-        Item item = sItemPool.acquire();
+        Item item = ITEM_POOL.acquire();
         if (item == null) {
             item = new Item();
         }
-        item.mParent = this;
-        item.mView = createItemView(item);
+        item.setParent(this);
+        item.setView(createItemView(item));
         return item;
     }
 
@@ -246,7 +218,7 @@ public class SideBar extends FrameLayout {
      * @param item The item to remove
      */
     public void removeItem(Item item) {
-        if (item.mParent != this) {
+        if (item.getParent() != this) {
             throw new IllegalArgumentException("Item does not belong to this SideBarLayout.");
         }
         removeItemAt(item.getPosition());
@@ -265,7 +237,7 @@ public class SideBar extends FrameLayout {
         final Item removedItem = mItems.remove(position);
         if (removedItem != null) {
             removedItem.reset();
-            sItemPool.release(removedItem);
+            ITEM_POOL.release(removedItem);
         }
 
         final int newItemCount = mItems.size();
@@ -291,7 +263,7 @@ public class SideBar extends FrameLayout {
             final Item item = i.next();
             i.remove();
             item.reset();
-            sItemPool.release(item);
+            ITEM_POOL.release(item);
         }
 
         mSelectedItem = null;
@@ -448,8 +420,8 @@ public class SideBar extends FrameLayout {
         private Drawable mIcon;
         private int mPosition = INVALID_POSITION;
 
-        SideBar mParent;
-        ItemView mView;
+        private SideBar mParent;
+        private ItemView mView;
 
         Item() {
             // Private constructor
@@ -488,7 +460,7 @@ public class SideBar extends FrameLayout {
         /**
          * Return the current position of this item in the bar.
          *
-         * @return Current position, or {@link #INVALID_POSITION} if this tab is not currently in
+         * @return Current position, or {@link #INVALID_POSITION} if this item is not currently in
          * the bar.
          */
         public int getPosition() {
@@ -524,6 +496,42 @@ public class SideBar extends FrameLayout {
                 throw new IllegalArgumentException("Item not attached to a SideBarLayout");
             }
             return setIcon(AppCompatResources.getDrawable(mParent.getContext(), resId));
+        }
+
+        /**
+         * Return the parent of this item in the bar.
+         *
+         * @return Current parent bar of this item
+         */
+        public SideBar getParent() {
+            return mParent;
+        }
+
+        /**
+         * Set the parent of this item.
+         *
+         * @param parent The bar to use as the parent
+         */
+        void setParent(SideBar parent) {
+            mParent = parent;
+        }
+
+        /**
+         * Return the current view of item in the bar.
+         *
+         * @return Current view of this item in the bar.
+         */
+        public ItemView getItem() {
+            return mView;
+        }
+
+        /**
+         * Set the view of this item.
+         *
+         * @param view The view to use for this item
+         */
+        void setView(ItemView view) {
+            mView = view;
         }
 
         /**
@@ -659,8 +667,8 @@ public class SideBar extends FrameLayout {
 
         private final Paint mSelectedIndicatorPaint;
 
-        int mSelectedPosition = -1;
-        float mSelectionOffset;
+        private int mSelectedPosition = -1;
+        private float mSelectionOffset;
 
         private int mIndicatorTop = -1;
         private int mIndicatorBottom = -1;
@@ -703,20 +711,17 @@ public class SideBar extends FrameLayout {
 
         private void updateIndicatorPosition() {
             final View selectedTitle = getChildAt(mSelectedPosition);
-            int top, bottom;
+            int top = -1;
+            int bottom = -1;
             if (selectedTitle != null && selectedTitle.getHeight() > 0) {
                 top = selectedTitle.getTop();
                 bottom = selectedTitle.getBottom();
                 if (mSelectionOffset > 0f && mSelectedPosition < getChildCount() - 1) {
                     // Draw the selection partway between the tabs
                     View nextTitle = getChildAt(mSelectedPosition + 1);
-                    top = (int) (mSelectionOffset * nextTitle.getTop() +
-                            (1.0f - mSelectionOffset) * top);
-                    bottom = (int) (mSelectionOffset * nextTitle.getBottom() +
-                            (1.0f - mSelectionOffset) * bottom);
+                    top = (int) (mSelectionOffset * nextTitle.getTop() + (1.0f - mSelectionOffset) * top);
+                    bottom = (int) (mSelectionOffset * nextTitle.getBottom() + (1.0f - mSelectionOffset) * bottom);
                 }
-            } else {
-                top = bottom = -1;
             }
             setIndicatorPosition(top, bottom);
         }
@@ -755,31 +760,33 @@ public class SideBar extends FrameLayout {
                 // Else, we'll just grow from the nearest edge
                 final int offset = dpToPx(MOTION_NON_ADJACENT_OFFSET);
                 if (position < mSelectedPosition) {
-                    startTop = startBottom = targetBottom + offset;
+                    startTop = targetBottom + offset;
+                    startBottom = targetBottom + offset;
                 } else {
-                    startTop = startBottom = targetTop - offset;
+                    startTop = targetTop - offset;
+                    startBottom = targetTop - offset;
                 }
             }
 
             if (startTop != targetTop || startBottom != targetBottom) {
-                ValueAnimator animator = mIndicatorAnimator = new ValueAnimator();
-                animator.setInterpolator(new FastOutLinearInInterpolator());
-                animator.setDuration(duration);
-                animator.setFloatValues(0, 1);
-                animator.addUpdateListener((anim) -> {
+                mIndicatorAnimator = new ValueAnimator();
+                mIndicatorAnimator.setInterpolator(new FastOutLinearInInterpolator());
+                mIndicatorAnimator.setDuration(duration);
+                mIndicatorAnimator.setFloatValues(0, 1);
+                mIndicatorAnimator.addUpdateListener((anim) -> {
                         final float fraction = anim.getAnimatedFraction();
                         setIndicatorPosition(
                                 (int) (startTop + (fraction * (targetTop - startTop))),
                                 (startBottom + Math.round(fraction * (targetBottom - startBottom))));
                 });
-                animator.addListener(new AnimatorListenerAdapter() {
+                mIndicatorAnimator.addListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         mSelectedPosition = position;
                         mSelectionOffset = 0f;
                     }
                 });
-                animator.start();
+                mIndicatorAnimator.start();
             }
         }
 
@@ -792,5 +799,33 @@ public class SideBar extends FrameLayout {
                         mIndicatorBottom, 16, 16, mSelectedIndicatorPaint);
             }
         }
+    }
+
+    /**
+     * Callback interface invoked when a item's selection state changes.
+     */
+    public interface OnItemSelectedListener {
+
+        /**
+         * Called when an item enters the selected state.
+         *
+         * @param item The item that was selected
+         */
+        public void onItemSelected(Item item);
+
+        /**
+         * Called when an item exits the selected state.
+         *
+         * @param item The item that was unselected
+         */
+        public void onItemUnselected(Item item);
+
+        /**
+         * Called when an item that is already selected is chosen again by the user. Some applications
+         * may use this action to return to the top level of a category.
+         *
+         * @param item The item that was reselected.
+         */
+        public void onItemReselected(Item item);
     }
 }

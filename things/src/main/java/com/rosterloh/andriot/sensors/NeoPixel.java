@@ -7,26 +7,24 @@ import java.io.IOException;
 
 public class NeoPixel implements AutoCloseable {
 
-    private static String TAG = NeoPixel.class.getSimpleName();
-
     public static final int MAX_BRIGHTNESS = 255;
 
     // RGB LED strip settings that have sensible defaults.
-    private int brightness = MAX_BRIGHTNESS >> 1; // default to half
+    private int mBrightness = MAX_BRIGHTNESS >> 1; // default to half
 
     // For peripherals access
-    private SpiDevice device = null;
+    private SpiDevice mDevice = null;
 
     public NeoPixel(String port) throws IOException {
 
         PeripheralManagerService pioService = new PeripheralManagerService();
-        device = pioService.openSpiDevice(port);
+        mDevice = pioService.openSpiDevice(port);
         try {
-            configure(device);
-        } catch (IOException|RuntimeException e) {
+            configure(mDevice);
+        } catch (IOException e) {
             try {
                 close();
-            } catch (IOException|RuntimeException ignored) {
+            } catch (IOException ignored) {
             }
             throw e;
         }
@@ -49,14 +47,14 @@ public class NeoPixel implements AutoCloseable {
             throw new IllegalArgumentException("Brightness needs to be between 0 and "
                     + MAX_BRIGHTNESS);
         }
-        brightness = ledBrightness;
+        mBrightness = ledBrightness;
     }
 
     /**
      * Get the current brightness level
      */
     public int getBrightness() {
-        return brightness;
+        return mBrightness;
     }
 
     /**
@@ -65,17 +63,17 @@ public class NeoPixel implements AutoCloseable {
      */
     public void setColour(int r, int g, int b) throws IOException {
 
-        if (device == null) {
+        if (mDevice == null) {
             throw new IllegalStateException("SPI device not open");
         }
 
         byte[] values = new byte[] {
-                (byte) ((r * brightness) >> 8),
-                (byte) ((g * brightness) >> 8),
-                (byte) ((b * brightness) >> 8),
+                (byte) ((r * mBrightness) >> 8),
+                (byte) ((g * mBrightness) >> 8),
+                (byte) ((b * mBrightness) >> 8),
         };
 
-        device.write(values, values.length);
+        mDevice.write(values, values.length);
     }
 
     /**
@@ -83,11 +81,11 @@ public class NeoPixel implements AutoCloseable {
      */
     @Override
     public void close() throws IOException {
-        if (device != null) {
+        if (mDevice != null) {
             try {
-                device.close();
+                mDevice.close();
             } finally {
-                device = null;
+                mDevice = null;
             }
         }
     }

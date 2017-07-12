@@ -3,20 +3,17 @@ package com.rosterloh.andriot.cloud;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 
-public class AndrIotOptions {
+import timber.log.Timber;
 
-    private static final String TAG = AndrIotOptions.class.getSimpleName();
+public final class AndrIotOptions {
 
     private static final String DEFAULT_BRIDGE_HOSTNAME = "mqtt.googleapis.com";
     private static final short DEFAULT_BRIDGE_PORT = 443;
-
-    public static final String UNUSED_ACCOUNT_NAME = "unused";
 
     /**
      * Notice that for CloudIoT the topic for telemetry events needs to have the format below.
@@ -25,87 +22,84 @@ public class AndrIotOptions {
      * forwarded to the Pub/Sub topic specified in the registry resource.
      */
     private static final String MQTT_TOPIC_FORMAT = "/devices/%s/events";
-    private static final String MQTT_CLIENT_ID_FORMAT =
-            "projects/%s/locations/%s/registries/%s/devices/%s";
+    private static final String MQTT_CLIENT_ID_FORMAT
+            = "projects/%s/locations/%s/registries/%s/devices/%s";
     private static final String BROKER_URL_FORMAT = "ssl://%s:%d";
 
-    private String projectId;
-    private String registryId;
-    private String deviceId;
-    private String cloudRegion;
-    private String bridgeHostname = DEFAULT_BRIDGE_HOSTNAME;
-    private short bridgePort = DEFAULT_BRIDGE_PORT;
+    private String mProjectId;
+    private String mRegistryId;
+    private String mDeviceId;
+    private String mCloudRegion;
+    private String mBridgeHostname = DEFAULT_BRIDGE_HOSTNAME;
+    private short mBridgePort = DEFAULT_BRIDGE_PORT;
 
 
     public String getBrokerUrl() {
-        return String.format(Locale.getDefault(), BROKER_URL_FORMAT, bridgeHostname, bridgePort);
+        return String.format(Locale.getDefault(), BROKER_URL_FORMAT, mBridgeHostname, mBridgePort);
     }
 
     public String getClientId() {
         return String.format(Locale.getDefault(), MQTT_CLIENT_ID_FORMAT,
-                projectId, cloudRegion, registryId, deviceId);
+                mProjectId, mCloudRegion, mRegistryId, mDeviceId);
     }
 
     public String getTopicName() {
-        return String.format(Locale.getDefault(), MQTT_TOPIC_FORMAT, deviceId);
+        return String.format(Locale.getDefault(), MQTT_TOPIC_FORMAT, mDeviceId);
     }
 
     public String getProjectId() {
-        return projectId;
+        return mProjectId;
     }
 
     public String getRegistryId() {
-        return registryId;
+        return mRegistryId;
     }
 
     public String getDeviceId() {
-        return deviceId;
+        return mDeviceId;
     }
 
     public String getCloudRegion() {
-        return cloudRegion;
+        return mCloudRegion;
     }
 
     public String getBridgeHostname() {
-        return bridgeHostname;
+        return mBridgeHostname;
     }
 
     public short getBridgePort() {
-        return bridgePort;
-    }
-
-    private AndrIotOptions() {
+        return mBridgePort;
     }
 
     public boolean isValid() {
-        return !TextUtils.isEmpty(projectId) &&
-                !TextUtils.isEmpty(registryId) &&
-                !TextUtils.isEmpty(deviceId) &&
-                !TextUtils.isEmpty(cloudRegion) &&
-                !TextUtils.isEmpty(bridgeHostname);
+        return !TextUtils.isEmpty(mProjectId)
+                && !TextUtils.isEmpty(mRegistryId)
+                && !TextUtils.isEmpty(mDeviceId)
+                && !TextUtils.isEmpty(mCloudRegion)
+                && !TextUtils.isEmpty(mBridgeHostname);
     }
 
     public void saveToPreferences(SharedPreferences pref) {
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString("project_id", projectId);
-        editor.putString("registry_id", registryId);
-        editor.putString("device_id", deviceId);
-        editor.putString("cloud_region", cloudRegion);
-        editor.putString("mqtt_bridge_hostname", bridgeHostname);
-        editor.putInt("mqtt_bridge_port", bridgePort);
+        editor.putString("project_id", mProjectId);
+        editor.putString("registry_id", mRegistryId);
+        editor.putString("device_id", mDeviceId);
+        editor.putString("cloud_region", mCloudRegion);
+        editor.putString("mqtt_bridge_hostname", mBridgeHostname);
+        editor.putInt("mqtt_bridge_port", mBridgePort);
         editor.apply();
     }
 
     public static AndrIotOptions from(SharedPreferences pref) {
         try {
             AndrIotOptions options = new AndrIotOptions();
-            options.projectId = pref.getString("project_id", null);
-            options.registryId = pref.getString("registry_id", null);
-            options.deviceId = pref.getString("device_id", null);
-            options.cloudRegion = pref.getString("cloud_region", null);
-            options.bridgeHostname = pref.getString("mqtt_bridge_hostname",
+            options.mProjectId = pref.getString("project_id", null);
+            options.mRegistryId = pref.getString("registry_id", null);
+            options.mDeviceId = pref.getString("device_id", null);
+            options.mCloudRegion = pref.getString("cloud_region", null);
+            options.mBridgeHostname = pref.getString("mqtt_bridge_hostname",
                     DEFAULT_BRIDGE_HOSTNAME);
-            options.bridgePort = (short) pref.getInt("mqtt_bridge_port", DEFAULT_BRIDGE_PORT);
+            options.mBridgePort = (short) pref.getInt("mqtt_bridge_port", DEFAULT_BRIDGE_PORT);
             return options;
         } catch (Exception e) {
             throw new IllegalArgumentException("While processing configuration options", e);
@@ -114,22 +108,19 @@ public class AndrIotOptions {
 
     public static AndrIotOptions reconfigure(AndrIotOptions original, Bundle bundle) {
         try {
-            if (Log.isLoggable(TAG, Log.INFO)) {
-                HashSet<String> valid = new HashSet<>(Arrays.asList(new String[] {"project_id",
-                        "registry_id", "device_id","cloud_region", "mqtt_bridge_hostname",
-                        "mqtt_bridge_port"}));
-                valid.retainAll(bundle.keySet());
-                Log.i(TAG, "Configuring options using the following intent extras: " + valid);
-            }
-
+            HashSet<String> valid = new HashSet<>(Arrays.asList(new String[] {"project_id",
+                    "registry_id", "device_id", "cloud_region", "mqtt_bridge_hostname",
+                    "mqtt_bridge_port"}));
+            valid.retainAll(bundle.keySet());
+            Timber.i("Configuring options using the following intent extras: " + valid);
             AndrIotOptions result = new AndrIotOptions();
-            result.projectId = bundle.getString("project_id", original.projectId);
-            result.registryId = bundle.getString("registry_id", original.registryId);
-            result.deviceId = bundle.getString("device_id", original.deviceId);
-            result.cloudRegion = bundle.getString("cloud_region", original.cloudRegion);
-            result.bridgeHostname = bundle.getString("mqtt_bridge_hostname",
-                    original.bridgeHostname);
-            result.bridgePort = (short) bundle.getInt("mqtt_bridge_port", original.bridgePort);
+            result.mProjectId = bundle.getString("project_id", original.mProjectId);
+            result.mRegistryId = bundle.getString("registry_id", original.mRegistryId);
+            result.mDeviceId = bundle.getString("device_id", original.mDeviceId);
+            result.mCloudRegion = bundle.getString("cloud_region", original.mCloudRegion);
+            result.mBridgeHostname = bundle.getString("mqtt_bridge_hostname",
+                    original.mBridgeHostname);
+            result.mBridgePort = (short) bundle.getInt("mqtt_bridge_port", original.mBridgePort);
             return result;
         } catch (Exception e) {
             throw new IllegalArgumentException("While processing configuration options", e);
@@ -142,11 +133,11 @@ public class AndrIotOptions {
             return false;
         }
         AndrIotOptions o = (AndrIotOptions) obj;
-        return TextUtils.equals(projectId , o.projectId)
-                && TextUtils.equals(registryId, o.registryId)
-                && TextUtils.equals(deviceId, o.deviceId)
-                && TextUtils.equals(cloudRegion, o.cloudRegion)
-                && TextUtils.equals(bridgeHostname, o.bridgeHostname)
-                && o.bridgePort == bridgePort;
+        return TextUtils.equals(mProjectId , o.mProjectId)
+                && TextUtils.equals(mRegistryId, o.mRegistryId)
+                && TextUtils.equals(mDeviceId, o.mDeviceId)
+                && TextUtils.equals(mCloudRegion, o.mCloudRegion)
+                && TextUtils.equals(mBridgeHostname, o.mBridgeHostname)
+                && o.mBridgePort == mBridgePort;
     }
 }
