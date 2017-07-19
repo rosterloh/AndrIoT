@@ -1,6 +1,5 @@
 /**
  *  Apply additional build steps to sub-projects*/
-def jacocoToolVersion = rootProject.ext.has('jacocoVersion') ? rootProject.ext.jacocoVersion : '0.7.9'
 def moduleExcludes = rootProject.ext.has('moduleExcludes') ? rootProject.ext.moduleExcludes : [:]
 def ignoredByJacoco = rootProject.ext.has('ignoredByJacoco') ? rootProject.ext.ignoredByJacoco : []
 
@@ -8,7 +7,7 @@ if (shouldApplyJacoco(project, ignoredByJacoco)) {
     apply plugin: 'jacoco'
 
     jacoco {
-        toolVersion jacocoToolVersion
+        toolVersion = "0.7.9"
     }
 
     task jacocoReport(type: JacocoReport, dependsOn: 'test') {

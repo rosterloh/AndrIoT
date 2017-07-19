@@ -3,6 +3,7 @@ package com.rosterloh.thingsclient;
 import android.app.Activity;
 import android.app.Application;
 
+import com.rosterloh.thingsclient.BuildConfig;
 import com.rosterloh.thingsclient.di.AppInjector;
 
 import javax.inject.Inject;
@@ -15,11 +16,12 @@ import timber.log.Timber;
 public class ClientApplication extends Application implements HasActivityInjector {
 
     @Inject
-    DispatchingAndroidInjector<Activity> dispatchingAndroidInjector;
+    DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
         AppInjector.init(this);
 
         if (BuildConfig.DEBUG) {
@@ -29,6 +31,6 @@ public class ClientApplication extends Application implements HasActivityInjecto
 
     @Override
     public AndroidInjector<Activity> activityInjector() {
-        return dispatchingAndroidInjector;
+        return mDispatchingAndroidInjector;
     }
 }

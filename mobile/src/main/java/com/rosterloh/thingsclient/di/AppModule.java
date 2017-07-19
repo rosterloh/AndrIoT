@@ -1,31 +1,28 @@
 package com.rosterloh.thingsclient.di;
 
 import android.app.Application;
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
 
-import com.rosterloh.thingsclient.ClientApplication;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.rosterloh.thingsclient.nearby.ConnectionsClient;
-import com.rosterloh.thingsclient.ui.interact.InteractViewModel;
-import com.rosterloh.thingsclient.viewmodel.ViewModelFactory;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 
-@Module
+@Module(includes = ViewModelModule.class)
 class AppModule {
 /*
     @Provides
     @Singleton
     ThingsDb provideDb(Application app) {
-        return Room.databaseBuilder(app, ThingsDb.class,"things.db").build();
+        return Room.databaseBuilder(app, ClientDb.class, "client.db").build();
     }
 
     @Provides
     @Singleton
-    DeviceDao provideDeviceDao(ThingsDb db) {
+    DeviceDao provideDeviceDao(ClientDb db) {
         return db.deviceDao();
     }
 */
@@ -36,12 +33,8 @@ class AppModule {
     }
 
     @Provides
-    ViewModel provideInteractViewModel(InteractViewModel viewModel) {
-        return viewModel;
-    }
-
-    @Provides
-    ViewModelProvider.Factory provideViewModelFactory(ViewModelFactory factory){
-        return factory;
+    @Singleton
+    FusedLocationProviderClient provideFusedLocationProviderClient(Application app) {
+        return LocationServices.getFusedLocationProviderClient(app);
     }
 }

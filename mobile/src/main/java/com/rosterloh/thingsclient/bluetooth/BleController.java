@@ -1,6 +1,5 @@
 package com.rosterloh.thingsclient.bluetooth;
 
-import android.arch.lifecycle.MutableLiveData;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.ScanCallback;
@@ -14,7 +13,6 @@ import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 
 import javax.inject.Inject;
 

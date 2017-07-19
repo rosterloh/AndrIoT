@@ -2,6 +2,7 @@ package com.rosterloh.andriot.db;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
+import android.arch.lifecycle.MutableLiveData;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
@@ -26,12 +27,9 @@ import timber.log.Timber;
 @Singleton
 public class WeatherRepository {
 
-    private static final String LAT = "51.621203";
-    private static final String LONG = "-1.294148";
     private static final String KEY = "2e9e498e77b879ea237e3a571c57f1fa";
     private static final String TYPE = "metric";
 
-    private static final int POLL_RATE = 30 * 60 * 1000;
     private static final int INIT_DELAY = 5 * 1000;
 
     private final WeatherDao mWeatherDao;
@@ -39,41 +37,56 @@ public class WeatherRepository {
     private final AppExecutors mAppExecutors;
 
     private final MediatorLiveData<Weather> mWeatherData = new MediatorLiveData<>();
+    private final LiveData<Weather> mDbData;
+
+    private Timer mTimer;
+    private LocalSettings mSettings;
 
     @Inject
-    WeatherRepository(AppExecutors appExecutors, WeatherDao weatherDao, WeatherService weatherService) {
+    WeatherRepository(AppExecutors appExecutors, WeatherDao weatherDao, WeatherService weatherService,
+                      SettingsRepository settingsRepository) {
         mAppExecutors = appExecutors;
         mWeatherDao = weatherDao;
         mWeatherService = weatherService;
 
-        LiveData<Weather> dbData = weatherDao.load();
-        mWeatherData.addSource(dbData, data -> {
-            mWeatherData.removeSource(dbData);
-            if (dbData.getValue() != null) {
-                mWeatherData.addSource(dbData, mWeatherData::setValue);
+        LiveData<LocalSettings> settingsData = settingsRepository.getLocalSettings();
+        mSettings = settingsData.getValue();
+        settingsData.observeForever(settings -> {
+            Timber.d("Settings changed");
+            if (mSettings != null) {
+                if (mSettings.getLatitude() != settings.getLatitude() || mSettings.getLongitude() != settings.getLongitude()) {
+                    Timber.d("Location changed. Refresh needed.");
+                }
+                if (mSettings.getRefreshRate() != settings.getRefreshRate()) {
+                    Timber.d("Refresh rate changed. Restarting timer.");
+                }
+            }
+            mSettings = settings;
+        });
+
+        mDbData = weatherDao.load();
+        mWeatherData.addSource(mDbData, data -> {
+            mWeatherData.removeSource(mDbData);
+            if (mDbData.getValue() != null) {
+                mWeatherData.addSource(mDbData, mWeatherData::setValue);
             } else {
-                getFromNetwork(dbData);
+                getFromNetwork();
             }
         });
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (dataNeedsRefresh(dbData)) {
-                    Timber.d("Refreshing weather data");
-                    getFromNetwork(dbData);
-                }
-            }
-        }, INIT_DELAY, POLL_RATE);
+        mTimer = new Timer();
+        if (mSettings != null) {
+            startDataRefresh();
+        }
     }
 
     public LiveData<Weather> loadWeather() {
         return mWeatherData;
     }
 
-    private void getFromNetwork(final LiveData<Weather> dbData) {
-        Call<WeatherResponse> call = mWeatherService.getWeather(LAT, LONG, KEY, TYPE);
+    private void getFromNetwork() {
+        Call<WeatherResponse> call = mWeatherService.getWeather(Double.toString(mSettings.getLatitude()),
+                Double.toString(mSettings.getLongitude()), KEY, TYPE);
         call.enqueue(new Callback<WeatherResponse>() {
 
             @Override
@@ -90,13 +103,26 @@ public class WeatherRepository {
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Timber.e("Failed to get weather: " + t.getMessage());
-                //weatherData.addSource(dbData, weatherData::setValue);
+                //weatherData.addSource(mDbData, weatherData::setValue);
             }
         });
     }
 
-    private boolean dataNeedsRefresh(final LiveData<Weather> dbData) {
-        return ((dbData.getValue() == null)
-                || (dbData.getValue().getLastUpdate().isBefore(LocalDateTime.now().minusMinutes(30))));
+    private boolean dataNeedsRefresh() {
+        return ((mDbData.getValue() == null)
+                || (mDbData.getValue().getLastUpdate().isBefore(LocalDateTime.now().minusMinutes(30))));
+    }
+
+    private void startDataRefresh() {
+        mTimer.cancel();
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (dataNeedsRefresh()) {
+                    Timber.d("Refreshing weather data");
+                    getFromNetwork();
+                }
+            }
+        }, INIT_DELAY, mSettings.getRefreshRate());
     }
 }

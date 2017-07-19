@@ -16,6 +16,7 @@ android {
         versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "com.rosterloh.andriot.ThingsTestRunner"
+        buildConfigField "String", "NEARBY_SERVICE_ID", "\"${rootProject.ext.nearby_service_id}\""
     }
     buildTypes {
         release {
@@ -44,6 +45,7 @@ dependencies {
     compileOnly "com.google.android.things:androidthings:$things_version"
     compileOnly "com.google.dagger:dagger:$dagger_version"
 
+    implementation project(path: ':common')
     implementation 'com.rosterloh.things:driver-htu21d:0.1'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:cardview-v7:$support_version"

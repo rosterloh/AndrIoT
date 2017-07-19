@@ -5,18 +5,26 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.rosterloh.thingsclient.R;
 import com.rosterloh.thingsclient.ui.interact.InteractFragment;
 
+import javax.inject.Inject;
+
 import dagger.android.AndroidInjection;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
-public class MainActivity extends LifecycleActivity {
+public class MainActivity extends LifecycleActivity implements HasSupportFragmentInjector {
 
     private final static int REQUEST_PERMISSION_REQ_CODE = 34;
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,5 +72,10 @@ public class MainActivity extends LifecycleActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, new InteractFragment())
                 .commit();
+    }
+
+    @Override
+    public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
+        return mDispatchingAndroidInjector;
     }
 }

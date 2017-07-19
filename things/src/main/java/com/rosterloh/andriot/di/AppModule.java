@@ -6,6 +6,7 @@ import android.arch.persistence.room.Room;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
 import com.rosterloh.andriot.db.SettingsDao;
+import com.rosterloh.andriot.db.SettingsRepository;
 import com.rosterloh.andriot.db.ThingsDb;
 import com.rosterloh.andriot.db.WeatherDao;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
@@ -57,8 +58,8 @@ class AppModule {
 
     @Singleton
     @Provides
-    ConnectionsServer provideConnectionsServer(Application app) {
-        return new ConnectionsServer(app.getApplicationContext());
+    ConnectionsServer provideConnectionsServer(Application app, SettingsRepository settingsRepository) {
+        return new ConnectionsServer(app.getApplicationContext(), settingsRepository);
     }
 
     @Singleton

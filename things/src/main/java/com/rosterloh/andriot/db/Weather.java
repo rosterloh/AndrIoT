@@ -1,10 +1,11 @@
 package com.rosterloh.andriot.db;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 
-import com.google.gson.annotations.SerializedName;
 import com.rosterloh.andriot.api.WeatherResponse;
 
 import org.threeten.bp.LocalDateTime;
@@ -19,14 +20,20 @@ public class Weather {
 
     static final String TABLE_NAME = "weather";
 
-    private final @PrimaryKey int mId;
-    @SerializedName("weather_icon")
+    @PrimaryKey
+    @ColumnInfo(name = "id")
+    private final int mId;
+
+    @ColumnInfo(name = "weather_icon")
     private final String mWeatherIcon;
-    @SerializedName("temperature")
+
+    @ColumnInfo(name = "temperature")
     private final Double mTemperature;
-    @SerializedName("description")
+
+    @ColumnInfo(name = "description")
     private final String mDescription;
-    @SerializedName("last_update")
+
+    @ColumnInfo(name = "last_update")
     private final LocalDateTime mLastUpdate;
 
     public Weather(int id, String weatherIcon, Double temperature, String description, LocalDateTime lastUpdate) {
@@ -37,6 +44,7 @@ public class Weather {
         mLastUpdate = lastUpdate;
     }
 
+    @Ignore
     public Weather(WeatherResponse response) {
         mId = response.getId();
         mWeatherIcon = response.getWeather().get(0).getIcon();

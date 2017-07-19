@@ -1,19 +1,19 @@
 package com.rosterloh.andriot.db;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.Locale;
+import java.util.UUID;
 
-import static com.rosterloh.andriot.db.Settings.TABLE_NAME;
+@Entity(tableName = "cloud_settings")
+public class CloudSettings {
 
-@Entity(tableName = TABLE_NAME)
-public class Settings {
-
-    public static final String TABLE_NAME = "settings";
-
+    public static final String DEFAULT_PROJECT_ID = "andriot-b80e9";
+    public static final String DEFAULT_REGISTRY_ID = "AndrIot";
+    public static final String DEFAULT_CLOUD_REGION = "europe-west2";
     public static final String DEFAULT_BRIDGE_HOSTNAME = "mqtt.googleapis.com";
     public static final short DEFAULT_BRIDGE_PORT = 443;
     public static final String UNUSED_ACCOUNT_NAME = "unused";
@@ -28,21 +28,37 @@ public class Settings {
     private static final String MQTT_CLIENT_ID_FORMAT = "projects/%s/locations/%s/registries/%s/devices/%s";
     private static final String BROKER_URL_FORMAT = "ssl://%s:%d";
 
-    @SerializedName("project_id")
-    private final @PrimaryKey String mProjectId;
-    @SerializedName("registry_id")
+    @PrimaryKey
+    @ColumnInfo(name = "project_id")
+    private final String mProjectId;
+
+    @ColumnInfo(name = "registry_id")
     private final String mRegistryId;
-    @SerializedName("device_id")
+
+    @ColumnInfo(name = "device_id")
     private final String mDeviceId;
-    @SerializedName("cloud_region")
+
+    @ColumnInfo(name = "cloud_region")
     private final String mCloudRegion;
-    @SerializedName("bridge_hostname")
+
+    @ColumnInfo(name = "bridge_hostname")
     private final String mBridgeHostname;
-    @SerializedName("bridge_port")
+
+    @ColumnInfo(name = "bridge_port")
     private final short mBridgePort;
 
-    public Settings(String projectId, String registryId, String deviceId, String cloudRegion,
-                    String bridgeHostname, short bridgePort) {
+    @Ignore
+    public CloudSettings() {
+        mProjectId = DEFAULT_PROJECT_ID;
+        mRegistryId = DEFAULT_REGISTRY_ID;
+        mDeviceId = UUID.randomUUID().toString();
+        mCloudRegion = DEFAULT_CLOUD_REGION;
+        mBridgeHostname = DEFAULT_BRIDGE_HOSTNAME;
+        mBridgePort = DEFAULT_BRIDGE_PORT;
+    }
+
+    public CloudSettings(String projectId, String registryId, String deviceId, String cloudRegion,
+                         String bridgeHostname, short bridgePort) {
         mProjectId = projectId;
         mRegistryId = registryId;
         mDeviceId = deviceId;
@@ -90,7 +106,7 @@ public class Settings {
 
     @Override
     public String toString() {
-        return "Settings{"
+        return "CloudSettings{"
                 + "project_id= " + mProjectId
                 + "registry_id= " + mRegistryId
                 + "device_id= " + mDeviceId

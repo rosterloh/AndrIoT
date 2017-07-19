@@ -24,6 +24,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:cardUseCompatPadding="true"
             card_view:cardCornerRadius="16dp"
             card_view:cardElevation="4dp">
 

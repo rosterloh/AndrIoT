@@ -1,25 +1,54 @@
 package com.rosterloh.thingsclient.ui.interact;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.location.Location;
 
-import java.util.Objects;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.rosterloh.andriot.common.nearby.BaseNearby.NearbyStatus;
+import com.rosterloh.thingsclient.nearby.ConnectionsClient;
+import com.rosterloh.andriot.common.nearby.MessagePayload;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public class InteractViewModel extends ViewModel {
 
-    private final MutableLiveData<String> device = new MutableLiveData<>();
+    private ConnectionsClient mConnectionsClient;
+    private FusedLocationProviderClient mFusedLocationClient;
+
+    final MutableLiveData<Location> location;
 
     @Inject
-    InteractViewModel(/*DeviceRepository deviceRepository*/) {
+    InteractViewModel(ConnectionsClient connectionsClient,
+                      FusedLocationProviderClient fusedLocationProviderClient) {
+        mConnectionsClient = connectionsClient;
+        mFusedLocationClient = fusedLocationProviderClient;
 
+        location = new MutableLiveData<>();
     }
 
-    void setDevice(String device) {
-        if (Objects.equals(this.device.getValue(), device)) {
-            return;
-        }
-        this.device.setValue(device);
+    LiveData<NearbyStatus> getStatus() {
+        return mConnectionsClient.observeStatus();
+    }
+
+    LiveData<Location> getLocation() {
+        return location;
+    }
+
+    @SuppressWarnings("MissingPermission")
+    void setLocation() {
+        mFusedLocationClient.getLastLocation()
+                .addOnCompleteListener((task) -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        location.setValue(task.getResult());
+                        MessagePayload msg = new MessagePayload(location.getValue());
+                        mConnectionsClient.sendMessage(MessagePayload.marshall(msg));
+                    } else {
+                        Timber.e("getLastLocation:exception", task.getException());
+                    }
+                });
     }
 }

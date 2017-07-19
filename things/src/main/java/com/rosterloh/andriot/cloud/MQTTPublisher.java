@@ -1,8 +1,9 @@
 package com.rosterloh.andriot.cloud;
 
 import com.google.gson.Gson;
+import com.rosterloh.andriot.db.CloudSettings;
 import com.rosterloh.andriot.db.SettingsDao;
-import com.rosterloh.andriot.db.Settings;
+import com.rosterloh.andriot.db.SettingsRepository;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -27,16 +28,13 @@ public class MQTTPublisher implements AutoCloseable {
     private static final int MQTT_QOS = 1;
 
     private MqttAsyncClient mMqttClient = null;
-    private final SettingsDao mSettingsDao;
-    private Settings mSettings;
+    private CloudSettings mSettings;
     private AtomicBoolean mReady = new AtomicBoolean(false);
 
     @Inject
-    public MQTTPublisher(SettingsDao settingsDao) {
+    public MQTTPublisher(SettingsRepository settingsRepository) {
 
-        mSettingsDao = settingsDao;
-
-        initialiseSettings();
+        mSettings = settingsRepository.getCloudSettings().getValue();
 
         try {
             initialiseMqttClient();
@@ -84,17 +82,6 @@ public class MQTTPublisher implements AutoCloseable {
                 Timber.d("Failed to disconnect: " + e.getLocalizedMessage());
             }
         }
-    }
-
-    private void initialiseSettings() {
-
-        mSettings = mSettingsDao.load().getValue();
-
-        //if (settings.deviceId == null) {
-        //    settings.deviceId = MqttAsyncClient.generateClientId();
-        //}
-
-        Timber.d(mSettings.toString());
     }
 
     private void initialiseMqttClient() throws MqttException, IllegalArgumentException {
