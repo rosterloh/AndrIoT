@@ -107,12 +107,12 @@ public class CloudSettings {
     @Override
     public String toString() {
         return "CloudSettings{"
-                + "project_id= " + mProjectId
-                + "registry_id= " + mRegistryId
-                + "device_id= " + mDeviceId
-                + "cloud_region= " + mCloudRegion
-                + "bridge_hostname= " + mBridgeHostname
-                + "bridge_port= " + mBridgePort
+                + "project_id=" + mProjectId
+                + ", registry_id=" + mRegistryId
+                + ", device_id=" + mDeviceId
+                + ", cloud_region=" + mCloudRegion
+                + ", bridge_hostname=" + mBridgeHostname
+                + ", bridge_port=" + mBridgePort
                 + '}';
     }
 }

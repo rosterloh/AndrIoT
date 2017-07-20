@@ -36,12 +36,17 @@ public class Weather {
     @ColumnInfo(name = "last_update")
     private final LocalDateTime mLastUpdate;
 
-    public Weather(int id, String weatherIcon, Double temperature, String description, LocalDateTime lastUpdate) {
+    @ColumnInfo(name = "location_name")
+    private final String mLocationName;
+
+    public Weather(int id, String weatherIcon, Double temperature, String description, LocalDateTime lastUpdate,
+                   String locationName) {
         mId = id;
         mWeatherIcon = weatherIcon;
         mTemperature = temperature;
         mDescription = description;
         mLastUpdate = lastUpdate;
+        mLocationName = locationName;
     }
 
     @Ignore
@@ -51,6 +56,7 @@ public class Weather {
         mTemperature = response.getMain().getTemp();
         mDescription = response.getWeather().get(0).getDescription();
         mLastUpdate = LocalDateTime.now();
+        mLocationName = response.getName() + ", " + response.getSys().getCountry();
         //mLastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
     }
 
@@ -72,6 +78,10 @@ public class Weather {
 
     public LocalDateTime getLastUpdate() {
         return mLastUpdate;
+    }
+
+    public String getLocationName() {
+        return mLocationName;
     }
 
     public long getMinutesSinceUpdate() {

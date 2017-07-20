@@ -6,6 +6,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -25,7 +27,6 @@ import android.widget.LinearLayout;
 import com.rosterloh.andriot.R;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * SideBar provides a vertical layout to display items.
@@ -76,9 +77,6 @@ public class SideBar extends FrameLayout {
         mItemStrip = new ItemStrip(context);
         super.addView(mItemStrip, 0, new LinearLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-        //mItemStrip.setSelectedIndicatorHeight(0);
-        mItemStrip.setSelectedIndicatorColor(R.color.colorBackground);
 
         ViewCompat.setPaddingRelative(mItemStrip, 0, 0, 0, 0);
         mItemStrip.setGravity(Gravity.CENTER_VERTICAL);
@@ -247,31 +245,6 @@ public class SideBar extends FrameLayout {
 
         if (selectedItemPosition == position) {
             selectItem(mItems.isEmpty() ? null : mItems.get(Math.max(0, position - 1)));
-        }
-    }
-
-    /**
-     * Remove all items from the bar and deselect the current item.
-     */
-    public void removeAllItems() {
-        // Remove all the views
-        for (int i = mItemStrip.getChildCount() - 1; i >= 0; i--) {
-            removeItemViewAt(i);
-        }
-
-        for (final Iterator<Item> i = mItems.iterator(); i.hasNext();) {
-            final Item item = i.next();
-            i.remove();
-            item.reset();
-            ITEM_POOL.release(item);
-        }
-
-        mSelectedItem = null;
-    }
-
-    private void updateAllItems() {
-        for (int i = 0, z = mItems.size(); i < z; i++) {
-            mItems.get(i).updateView();
         }
     }
 
@@ -595,8 +568,6 @@ public class SideBar extends FrameLayout {
 
         @Override
         public void setSelected(boolean selected) {
-            final boolean changed = isSelected() != selected;
-
             super.setSelected(selected);
 
             // Always dispatch this to the child views, regardless of whether the value has
@@ -680,13 +651,8 @@ public class SideBar extends FrameLayout {
             setWillNotDraw(false);
             setOrientation(LinearLayout.VERTICAL);
             mSelectedIndicatorPaint = new Paint();
-        }
-
-        void setSelectedIndicatorColor(int color) {
-            if (mSelectedIndicatorPaint.getColor() != color) {
-                mSelectedIndicatorPaint.setColor(color);
-                ViewCompat.postInvalidateOnAnimation(this);
-            }
+            mSelectedIndicatorPaint.setColor(getContext().getColor(R.color.cardview_dark_background));
+            mSelectedIndicatorPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SCREEN));
         }
 
         float getIndicatorPosition() {
@@ -793,10 +759,10 @@ public class SideBar extends FrameLayout {
         @Override
         public void draw(Canvas canvas) {
             super.draw(canvas);
-            // Thick colored underline below the current selection
+            // Rounded rectangle surrounding the current selection
             if (mIndicatorTop >= 0 && mIndicatorBottom > mIndicatorTop) {
-                canvas.drawRoundRect(4, mIndicatorTop, getWidth() - 4,
-                        mIndicatorBottom, 16, 16, mSelectedIndicatorPaint);
+                canvas.drawRoundRect(4, mIndicatorTop + 8, getWidth() - 4,
+                        mIndicatorBottom - 8, 16, 16, mSelectedIndicatorPaint);
             }
         }
     }

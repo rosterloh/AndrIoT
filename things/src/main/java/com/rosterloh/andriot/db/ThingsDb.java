@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 /**
  * Main database description.
  */
-@Database(entities = {Weather.class, CloudSettings.class, LocalSettings.class}, version = 1, exportSchema = false)
+@Database(entities = {Weather.class, CloudSettings.class, LocalSettings.class}, version = 2, exportSchema = false)
 public abstract class ThingsDb extends RoomDatabase {
 
     public abstract WeatherDao weatherDao();

@@ -3,7 +3,7 @@ apply from: "$rootProject.projectDir/quality/quality.gradle"
 
 def versionMajor = 0
 def versionMinor = 3
-def versionPatch = 0
+def versionPatch = 1
 
 android {
     compileSdkVersion rootProject.ext.compile_sdk_version

@@ -2,7 +2,6 @@ package com.rosterloh.andriot.cloud;
 
 import com.google.gson.Gson;
 import com.rosterloh.andriot.db.CloudSettings;
-import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.SettingsRepository;
 
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;

@@ -1,7 +1,6 @@
 package com.rosterloh.andriot.db;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 
 import com.rosterloh.andriot.AppExecutors;
 
@@ -28,20 +27,24 @@ public class SettingsRepository {
         mSettingsDao = settingsDao;
 
         mLocalSettings = mSettingsDao.loadLocalSettings();
-        if (mLocalSettings.getValue() == null) {
-            Timber.d("Creating default local settings");
-            mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new LocalSettings()));
-        } else {
-            Timber.d(mLocalSettings.getValue().toString());
-        }
+        mLocalSettings.observeForever(settings -> {
+            if (settings == null) {
+                Timber.d("Creating default local settings");
+                mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new LocalSettings()));
+            } else {
+                Timber.d(mLocalSettings.getValue().toString());
+            }
+        });
 
         mCloudSettings = mSettingsDao.loadCloudSettings();
-        if(mCloudSettings.getValue() == null) {
-            Timber.d("Creating default cloud settings");
-            mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new CloudSettings()));
-        } else {
-            Timber.d(mCloudSettings.getValue().toString());
-        }
+        mCloudSettings.observeForever(settings -> {
+            if (settings == null) {
+                Timber.d("Creating default cloud settings");
+                mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new CloudSettings()));
+            } else {
+                Timber.d(mCloudSettings.getValue().toString());
+            }
+        });
     }
 
     public LiveData<LocalSettings> getLocalSettings() {

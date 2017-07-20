@@ -91,11 +91,11 @@ public class LocalSettings {
     @Override
     public String toString() {
         return "LocalSettings{"
-                + "device_id= " + mDeviceId
-                + "ip_address= " + mIpAddress
-                + "refresh_rate= " + mRefreshRate
-                + "latitude= " + mLatitude
-                + "longitude= " + mLongitude
+                + "device_id=" + mDeviceId
+                + ", ip_address=" + mIpAddress
+                + ", refresh_rate=" + mRefreshRate
+                + ", latitude=" + mLatitude
+                + ", longitude=" + mLongitude
                 + '}';
     }
 }
