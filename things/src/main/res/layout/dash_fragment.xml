@@ -176,7 +176,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="24sp"
-            android:text="@{String.format(@string/quality_eco2_format, sensors.getEco2())}"
+            android:text="@{String.format(@string/quality_eco2_format, sensors.getECO2())}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@id/iv_quality_icon"
             tools:text="8192 ppm"/>
@@ -200,7 +200,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="24sp"
-            android:text="@{String.format(@string/quality_tvoc_format, sensors.getTvoc())}"
+            android:text="@{String.format(@string/quality_tvoc_format, sensors.getTVOC())}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             tools:text="1187 ppb"/>

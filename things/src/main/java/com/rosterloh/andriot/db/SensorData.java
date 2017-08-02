@@ -22,25 +22,37 @@ public class SensorData {
     @ColumnInfo(name = "humidity")
     private final float mHumidity;
 
+    @ColumnInfo(name = "pressure")
+    private final float mPressure;
+
     @ColumnInfo(name = "eco2")
     private final int mECO2;
 
     @ColumnInfo(name = "tvoc")
     private final int mTVOC;
 
-    public SensorData(LocalDateTime time, float temperature, float humdity, int eco2, int tvoc) {
+    public SensorData(LocalDateTime time, float temperature, float humidity, float pressure,
+                      int eCO2, int tVOC) {
         mTime = time;
         mTemperature = temperature;
-        mHumidity = humdity;
-        mECO2 = eco2;
-        mTVOC = tvoc;
+        mHumidity = humidity;
+        mPressure = pressure;
+        mECO2 = eCO2;
+        mTVOC = tVOC;
     }
 
     @Ignore
     public SensorData(float[] th, int[] aq) {
         mTime = LocalDateTime.now();
-        mTemperature = th[0];
-        mHumidity = th[1];
+        if (th.length > 2) {
+            mTemperature = th[0];
+            mHumidity = th[1];
+            mPressure = th[2];
+        } else {
+            mTemperature = th[0];
+            mHumidity = th[1];
+            mPressure = 0;
+        }
         // Check if data is valid
         if ((aq[2] & (1 << 3)) != 0) {
             mECO2 = aq[0];
@@ -63,11 +75,27 @@ public class SensorData {
         return mHumidity;
     }
 
-    public int getEco2() {
+    public float getPressure() {
+        return mPressure;
+    }
+
+    public int getECO2() {
         return mECO2;
     }
 
-    public int getTvoc() {
+    public int getTVOC() {
         return mTVOC;
+    }
+
+    @Override
+    public String toString() {
+        return "SensorData{"
+                + "time=" + mTime
+                + ", temperature=" + mTemperature
+                + ", humidity=" + mHumidity
+                + ", pressure=" + mPressure
+                + ", eco2=" + mECO2
+                + ", tvoc=" + mTVOC
+                + '}';
     }
 }

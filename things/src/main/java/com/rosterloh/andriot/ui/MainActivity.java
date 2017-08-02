@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.rosterloh.andriot.R;
+import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.dash.DashFragment;
 
 import javax.inject.Inject;
@@ -33,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Inject
     DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
+
+    @Inject
+    SensorHub mSensorHub;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,5 +151,10 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Override
     public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
         return mDispatchingAndroidInjector;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

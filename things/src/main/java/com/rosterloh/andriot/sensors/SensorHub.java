@@ -10,6 +10,7 @@ import com.google.android.things.pio.PeripheralManagerService;
 import com.google.firebase.crash.FirebaseCrash;
 import com.rosterloh.andriot.db.SensorData;
 import com.rosterloh.things.driver.bmx280.Bmx280;
+import com.rosterloh.things.driver.bmx280.Bmx280SensorDriver;
 import com.rosterloh.things.driver.ccs811.Ccs811;
 import com.rosterloh.things.driver.htu21d.Htu21d;
 
@@ -31,6 +32,7 @@ public class SensorHub {
     private Gpio mPir;
     private Htu21d mHtu21d;
     private Bmx280 mBmx280;
+    private Bmx280SensorDriver mBmxSensorDriver;
     private Ccs811 mCcs811;
 
     private MutableLiveData<Boolean> mPirData = new MutableLiveData<>();
@@ -109,9 +111,14 @@ public class SensorHub {
             }
             mBmx280.setTemperatureOversampling(Bmx280.OVERSAMPLING_1X);
             mBmx280.setPressureOversampling(Bmx280.OVERSAMPLING_1X);
-            mBmx280.setMode(Bmx280.MODE_NORMAL);
+            mBmx280.setMode(Bmx280.MODE_NORMAL);/*
+            mBmxSensorDriver = new Bmx280SensorDriver(I2C_BUS, 0x76);
+            mBmxSensorDriver.registerTemperatureSensor();
+            mBmxSensorDriver.registerPressureSensor();
+            mBmxSensorDriver.registerHumiditySensor();*/
         } catch (IOException e) {
             mBmx280 = null;
+            mBmxSensorDriver = null;
             Timber.w("BME280 failed to start or is not present for this device");
         }
 

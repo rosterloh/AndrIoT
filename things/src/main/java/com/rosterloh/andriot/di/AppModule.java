@@ -2,9 +2,12 @@ package com.rosterloh.andriot.di;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.hardware.SensorManager;
 
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
+import com.rosterloh.andriot.db.SensorDao;
 import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.SettingsRepository;
 import com.rosterloh.andriot.db.ThingsDb;
@@ -35,7 +38,9 @@ class AppModule {
     @Singleton
     @Provides
     ThingsDb provideDb(Application app) {
-        return Room.databaseBuilder(app, ThingsDb.class, "things.db").build();
+        return Room.databaseBuilder(app, ThingsDb.class, "things.db")
+                .addMigrations(ThingsDb.MIGRATION_2_3)
+                .build();
     }
 
     @Singleton
@@ -48,6 +53,18 @@ class AppModule {
     @Provides
     SettingsDao provideSettingsDao(ThingsDb db) {
         return db.settingsDao();
+    }
+
+    @Singleton
+    @Provides
+    SensorDao provideSensorDao(ThingsDb db) {
+        return db.sensorDao();
+    }
+
+    @Singleton
+    @Provides
+    SensorManager provideSensorManager(Application app) {
+        return (SensorManager) app.getSystemService(Context.SENSOR_SERVICE);
     }
 
     @Singleton

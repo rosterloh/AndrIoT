@@ -5,6 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.rosterloh.andriot.db.SensorData;
+import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.db.WeatherRepository;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.db.Weather;
@@ -21,15 +22,19 @@ public class DashViewModel extends ViewModel {
     private static final int INIT_DELAY = 5 * 1000;
 
     private final AppExecutors mAppExecutors;
-    private final SensorHub mSensorHub;
+    private final SensorsRepository mSensorsRepository;
+
+    @Inject
+    SensorHub mSensorHub;
 
     private final MutableLiveData<SensorData> mSensors = new MutableLiveData<>();
     private final LiveData<Weather> mWeather;
 
     @Inject
-    DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors, SensorHub sensorHub) {
+    DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors,
+                  SensorsRepository sensorsRepository) {
         mAppExecutors = appExecutors;
-        mSensorHub = sensorHub;
+        mSensorsRepository = sensorsRepository;
         mWeather = weatherRepository.loadWeather();
 
         Timer timer = new Timer();
@@ -37,7 +42,7 @@ public class DashViewModel extends ViewModel {
             @Override
             public void run() {
                 appExecutors.diskIO().execute(() -> {
-                    SensorData data = sensorHub.getSensorData();
+                    SensorData data = mSensorHub.getSensorData();
                     if (data != null) {
                         appExecutors.mainThread().execute(() -> mSensors.setValue(data));
                     }
