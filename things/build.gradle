@@ -47,6 +47,8 @@ dependencies {
 
     implementation project(path: ':common')
     implementation 'com.rosterloh.things:driver-htu21d:0.1'
+    implementation 'com.rosterloh.things:driver-bmx280:0.1'
+    implementation 'com.rosterloh.things:driver-ccs811:0.1'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:cardview-v7:$support_version"
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"

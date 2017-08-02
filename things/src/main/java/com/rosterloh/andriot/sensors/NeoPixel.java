@@ -1,5 +1,7 @@
 package com.rosterloh.andriot.sensors;
 
+import android.graphics.Color;
+
 import com.google.android.things.pio.PeripheralManagerService;
 import com.google.android.things.pio.SpiDevice;
 
@@ -7,16 +9,58 @@ import java.io.IOException;
 
 public class NeoPixel implements AutoCloseable {
 
-    public static final int MAX_BRIGHTNESS = 255;
+    /**
+     * Color ordering for the RGB LED messages; the most common modes are BGR and RGB.
+     */
+    public enum Mode {
+        RGB,
+        RBG,
+        GRB,
+        GBR,
+        BRG,
+        BGR
+    }
 
-    // RGB LED strip settings that have sensible defaults.
-    private int mBrightness = MAX_BRIGHTNESS >> 1; // default to half
+    public enum Direction {
+        NORMAL,
+        REVERSED,
+    }
+
+    // RGB LED strip configuration that must be provided by the caller.
+    private Mode mMode;
+
+    // Direction of the led strip;
+    private Direction mDirection;
+
+    // Device SPI Configuration constants
+    private static final int PACKET_LENGTH = 3;
+    private static final int SPI_BPW = 8; // Bits per word
+    private static final int SPI_FREQUENCY = 1000000; // 1 MHz
+    private static final int SPI_MODE = SpiDevice.MODE0; // Low clock, leading edge transfer
 
     // For peripherals access
     private SpiDevice mDevice = null;
 
-    public NeoPixel(String port) throws IOException {
+    /**
+     * Create a new NeoPixel driver.
+     *
+     * @param port Name of the SPI bus
+     * @param mode The {@link Mode} indicating the red/green/blue byte ordering for the device.
+     */
+    public NeoPixel(String port, Mode mode) throws IOException {
+        this(port, mode, Direction.NORMAL);
+    }
 
+    /**
+     * Create a new NeoPixel driver.
+     *
+     * @param port      Name of the SPI bus
+     * @param mode      The {@link Mode} indicating the red/green/blue byte ordering for the device.
+     * @param direction The {@link Direction} or the led strip.
+     */
+    public NeoPixel(String port, Mode mode, Direction direction) throws IOException {
+        mMode = mode;
+        mDirection = direction;
         PeripheralManagerService pioService = new PeripheralManagerService();
         mDevice = pioService.openSpiDevice(port);
         try {
@@ -30,50 +74,78 @@ public class NeoPixel implements AutoCloseable {
         }
     }
 
+    /**
+     * Create a new Ws2801 driver.
+     *
+     * @param device The {@link SpiDevice} where the LED strip is attached to.
+     * @param mode   The {@link Mode} indicating the red/green/blue byte ordering for the device.
+     */
+    /*package*/ NeoPixel(SpiDevice device, Mode mode, Direction direction) throws IOException {
+        mMode = mode;
+        mDirection = direction;
+        mDevice = device;
+        configure(mDevice);
+    }
+
     private void configure(SpiDevice device) throws IOException {
-
-        device.setMode(SpiDevice.MODE0);    // Low clock, leading edge transfer
-        device.setFrequency(6000000);       // 6 MHz
-        device.setBitsPerWord(8);           // 8 BPW
-        device.setBitJustification(false);  // MSB first
+        // Note: You may need to set bit justification for your board.
+        //device.setBitJustification(false);  // MSB first
+        device.setFrequency(SPI_FREQUENCY);
+        device.setMode(SPI_MODE);
+        device.setBitsPerWord(SPI_BPW);
     }
 
     /**
-     * Sets the brightness for all LEDs in the strip.
-     * @param ledBrightness The brightness of the LED strip, between 0 and {@link #MAX_BRIGHTNESS}.
+     * Returns an WS2801 packet corresponding to the current brightness and given {@link Color}.
+     *
+     * @param color The {@link Color} to retrieve the protocol packet for.
+     * @return WS2801 packet corresponding to the current brightness and given {@link Color}.
      */
-    public void setBrightness(int ledBrightness) {
-        if (ledBrightness < 0 || ledBrightness > MAX_BRIGHTNESS) {
-            throw new IllegalArgumentException("Brightness needs to be between 0 and "
-                    + MAX_BRIGHTNESS);
+    private byte[] getColourData(int color) {
+        int r = Color.red(color);
+        int g = Color.green(color);
+        int b = Color.blue(color);
+
+        switch (mMode) {
+            case RBG:
+                return new byte[]{(byte) r, (byte) b, (byte) g};
+            case BGR:
+                return new byte[]{(byte) b, (byte) g, (byte) r};
+            case BRG:
+                return new byte[]{(byte) b, (byte) r, (byte) g};
+            case GRB:
+                return new byte[]{(byte) g, (byte) r, (byte) b};
+            case GBR:
+                return new byte[]{(byte) g, (byte) b, (byte) r};
+            default:
+                // RGB
+                return new byte[]{(byte) r, (byte) g, (byte) b};
         }
-        mBrightness = ledBrightness;
-    }
-
-    /**
-     * Get the current brightness level
-     */
-    public int getBrightness() {
-        return mBrightness;
     }
 
     /**
      * Writes the current RGB Led data to the peripheral bus.
-     * @throws IOException
+     *
+     * @param colours An array of integers corresponding to a {@link Color}.
+     * @throws IOException if write fails
+     * @throws IllegalStateException if SPI bus is not open
      */
-    public void setColour(int r, int g, int b) throws IOException {
+    public void setColour(int[] colours) throws IOException, IllegalStateException {
 
         if (mDevice == null) {
             throw new IllegalStateException("SPI device not open");
         }
 
-        byte[] values = new byte[] {
-                (byte) ((r * mBrightness) >> 8),
-                (byte) ((g * mBrightness) >> 8),
-                (byte) ((b * mBrightness) >> 8),
-        };
+        byte[] ledData = new byte[PACKET_LENGTH * colours.length];
 
-        mDevice.write(values, values.length);
+        // Compute the packets to send.
+        for (int i = 0; i < colours.length; i++) {
+            int outputPosition = i * PACKET_LENGTH;
+            int di = mDirection == Direction.NORMAL ? i : colours.length - i - 1;
+            System.arraycopy(getColourData(colours[di]), 0, ledData, outputPosition, PACKET_LENGTH);
+        }
+
+        mDevice.write(ledData, ledData.length);
     }
 
     /**

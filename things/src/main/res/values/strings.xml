@@ -29,6 +29,9 @@
     <string name="remote_temperature_format">%.0f°</string>
     <string name="local_temperature_format">%.1f°C</string>
     <string name="local_humidity_format">%.1f%%</string>
-    <string name="temperate_description">Thermometer with lines</string>
+    <string name="quality_eco2_format">%d ppm</string>
+    <string name="quality_tvoc_format">%d ppb</string>
+    <string name="temperate_description">Temperature icon</string>
     <string name="motion_description">Motion icon</string>
+    <string name="quality_description">Air quality icon</string>
 </resources>

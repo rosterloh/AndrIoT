@@ -6,7 +6,7 @@
 
     <data>
         <variable name="weather" type="com.rosterloh.andriot.db.Weather"/>
-        <variable name="sensors" type="com.rosterloh.andriot.vo.Sensors"/>
+        <variable name="sensors" type="com.rosterloh.andriot.db.SensorData"/>
         <variable name="motion" type="Boolean"/>
     </data>
 
@@ -134,7 +134,7 @@
             android:layout_marginTop="8dp" />
 
         <TextView
-            android:id="@+id/local_temperature"
+            android:id="@+id/tv_local_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -146,7 +146,7 @@
             tools:text="15°C" />
 
         <ImageView
-            android:id="@+id/temperature_icon"
+            android:id="@+id/iv_temperature_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginBottom="8dp"
@@ -154,11 +154,11 @@
             android:adjustViewBounds="false"
             android:contentDescription="@string/temperate_description"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/local_temperature"
+            app:layout_constraintLeft_toRightOf="@id/tv_local_temperature"
             app:srcCompat="@drawable/ic_thermometer"/>
 
         <TextView
-            android:id="@+id/local_humidity"
+            android:id="@+id/tv_local_humidity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -166,9 +166,45 @@
             android:textSize="24sp"
             android:text="@{String.format(@string/local_humidity_format, sensors.getHumidity())}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toRightOf="@id/temperature_icon"
+            app:layout_constraintLeft_toRightOf="@id/iv_temperature_icon"
             tools:text="50%" />
 
+        <TextView
+            android:id="@+id/tv_quality_eco2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="24sp"
+            android:text="@{String.format(@string/quality_eco2_format, sensors.getEco2())}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/iv_quality_icon"
+            tools:text="8192 ppm"/>
+
+        <ImageView
+            android:id="@+id/iv_quality_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="false"
+            android:contentDescription="@string/quality_description"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tv_quality_tvoc"
+            app:srcCompat="@drawable/ic_quality"/>
+
+        <TextView
+            android:id="@+id/tv_quality_tvoc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="24sp"
+            android:text="@{String.format(@string/quality_tvoc_format, sensors.getTvoc())}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="1187 ppb"/>
+<!--
         <TextView
             android:id="@+id/tv_wifi_info"
             android:layout_width="wrap_content"
@@ -196,17 +232,17 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             tools:text="Ethernet IP: 192.168.1.2" />
-
+-->
         <ImageView
             android:id="@+id/motion_icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:adjustViewBounds="false"
             android:contentDescription="@string/motion_description"
             app:visibleGone="@{safeUnbox(motion)}"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:srcCompat="@drawable/ic_motion"/>
 

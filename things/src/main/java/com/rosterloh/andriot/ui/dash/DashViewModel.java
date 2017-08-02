@@ -4,12 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.rosterloh.andriot.db.SensorData;
 import com.rosterloh.andriot.db.WeatherRepository;
 import com.rosterloh.andriot.sensors.SensorHub;
-import com.rosterloh.andriot.vo.Sensors;
 import com.rosterloh.andriot.db.Weather;
 import com.rosterloh.andriot.AppExecutors;
-import com.rosterloh.andriot.util.NetworkUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,7 +23,7 @@ public class DashViewModel extends ViewModel {
     private final AppExecutors mAppExecutors;
     private final SensorHub mSensorHub;
 
-    private final MutableLiveData<Sensors> mSensors = new MutableLiveData<>();
+    private final MutableLiveData<SensorData> mSensors = new MutableLiveData<>();
     private final LiveData<Weather> mWeather;
 
     @Inject
@@ -38,12 +37,9 @@ public class DashViewModel extends ViewModel {
             @Override
             public void run() {
                 appExecutors.diskIO().execute(() -> {
-                    float[] data = sensorHub.getSensorData();
+                    SensorData data = sensorHub.getSensorData();
                     if (data != null) {
-                        appExecutors.mainThread().execute(() -> {
-                            mSensors.setValue(new Sensors(data[0], data[1], null,
-                                    NetworkUtils.getIPAddress(true), null));
-                        });
+                        appExecutors.mainThread().execute(() -> mSensors.setValue(data));
                     }
                 });
             }
@@ -54,7 +50,7 @@ public class DashViewModel extends ViewModel {
         return mSensorHub.getPirData();
     }
 
-    LiveData<Sensors> getSensorData() {
+    LiveData<SensorData> getSensorData() {
         return mSensors;
     }
 

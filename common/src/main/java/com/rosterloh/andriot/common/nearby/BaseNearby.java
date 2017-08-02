@@ -20,6 +20,12 @@ import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import static com.rosterloh.andriot.common.BuildConfig.NEARBY_SERVICE_ID;
 
 public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
@@ -41,10 +47,15 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
     private final GoogleApiClient mGoogleApiClient;
     private final String mDeviceName;
     private NearbyStatus mStatus;
+    private final Map<String, Endpoint> mDiscoveredEndpoints = new HashMap<>();
+    private final Map<String, Endpoint> mPendingConnections = new HashMap<>();
+    private final Map<String, Endpoint> mEstablishedConnections = new HashMap<>();
 
     private final EndpointDiscoveryCallback mEndpointDiscoveryCallback = new EndpointDiscoveryCallback() {
         @Override
         public void onEndpointFound(String endpointId, DiscoveredEndpointInfo discoveredEndpointInfo) {
+            Endpoint endpoint = new Endpoint(endpointId, discoveredEndpointInfo.getEndpointName());
+            mDiscoveredEndpoints.put(endpointId, endpoint);
             onNearbyConnectionEndpointFound(endpointId, discoveredEndpointInfo.getEndpointName());
             sendConnectionRequest(endpointId);
         }
@@ -60,6 +71,8 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void onConnectionInitiated(String endpointId, ConnectionInfo connectionInfo) {
             mStatus = NearbyStatus.REQUESTING;
+            Endpoint endpoint = new Endpoint(endpointId, connectionInfo.getEndpointName());
+            mPendingConnections.put(endpointId, endpoint);
             Nearby.Connections.acceptConnection(mGoogleApiClient, endpointId, mPayloadCallback);
         }
 
@@ -67,6 +80,8 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
         public void onConnectionResult(String endpointId, ConnectionResolution connectionResolution) {
             if (connectionResolution.getStatus().isSuccess()) {
                 mStatus = NearbyStatus.CONNECTED;
+                Endpoint endpoint = mPendingConnections.remove(endpointId);
+                mEstablishedConnections.put(endpoint.getId(), endpoint);
                 onNearbyConnectionEndpointConnected(endpointId);
             } else {
                 mStatus = NearbyStatus.REJECTED;
@@ -76,6 +91,7 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
         @Override
         public void onDisconnected(String endpointId) {
             mStatus = NearbyStatus.DISCONNECTED;
+            mEstablishedConnections.remove(endpointId);
             onNearbyConnectionEndpointDisconnected(endpointId);
         }
     };
@@ -110,8 +126,8 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
         mStatus = NearbyStatus.CONNECTING;
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
                 .addApi(Nearby.CONNECTIONS_API)
+                .addOnConnectionFailedListener(this)
                 .build();
         mGoogleApiClient.connect();
     }
@@ -121,6 +137,10 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
     }
 
     protected void disconnectNearbyConnection() {
+        for (Endpoint endpoint : mEstablishedConnections.values()) {
+            Nearby.Connections.disconnectFromEndpoint(mGoogleApiClient, endpoint.getId());
+        }
+        mEstablishedConnections.clear();
         Nearby.Connections.stopAllEndpoints(mGoogleApiClient);
         if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
@@ -175,6 +195,16 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
                 });
     }
 
+    protected void send(byte[] data) {
+        Set<String> endpoints = mEstablishedConnections.keySet();
+        Nearby.Connections
+                .sendPayload(mGoogleApiClient, new ArrayList<>(endpoints), Payload.fromBytes(data))
+                .setResultCallback(status -> {
+                    if (!status.isSuccess())
+                        onNearbyConnectionTransferError(null);
+                });
+    }
+
     protected void sendPayload(String endpointId, byte[] data) {
         Nearby.Connections
                 .sendPayload(mGoogleApiClient, endpointId, Payload.fromBytes(data))
@@ -182,6 +212,18 @@ public abstract class BaseNearby implements GoogleApiClient.ConnectionCallbacks,
                     if (!status.isSuccess())
                         onNearbyConnectionTransferError(endpointId);
                 });
+    }
+
+    protected Set<Endpoint> getDiscoveredEndpoints() {
+        Set<Endpoint> endpoints = new HashSet<>();
+        endpoints.addAll(mDiscoveredEndpoints.values());
+        return endpoints;
+    }
+
+    protected Set<Endpoint> getConnectedEndpoints() {
+        Set<Endpoint> endpoints = new HashSet<>();
+        endpoints.addAll(mEstablishedConnections.values());
+        return endpoints;
     }
 
     @Override
