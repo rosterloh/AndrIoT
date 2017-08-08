@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.hardware.SensorManager;
 
+import com.rosterloh.andriot.ThingsApp;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
 import com.rosterloh.andriot.db.SensorDao;
@@ -24,6 +25,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module(includes = ViewModelModule.class)
 class AppModule {
+
+    @Provides
+    Context provideContext(ThingsApp application) {
+        return application.getApplicationContext();
+    }
 
     @Singleton
     @Provides
@@ -75,14 +81,14 @@ class AppModule {
 
     @Singleton
     @Provides
-    ConnectionsServer provideConnectionsServer(Application app, SettingsRepository settingsRepository) {
-        return new ConnectionsServer(app.getApplicationContext(), settingsRepository);
+    ConnectionsServer provideConnectionsServer(Context context, SettingsRepository settingsRepository) {
+        return new ConnectionsServer(context, settingsRepository);
     }
 
     @Singleton
     @Provides
-    GattServer provideGattServer(Application app) {
-        return new GattServer(app.getApplicationContext());
+    GattServer provideGattServer(Context context) {
+        return new GattServer(context);
     }
 
     /*

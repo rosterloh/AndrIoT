@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.jakewharton.threetenabp.AndroidThreeTen;
-import com.rosterloh.andriot.di.AppInjector;
+import com.rosterloh.andriot.di.DaggerAppComponent;
 
 import javax.inject.Inject;
 
@@ -23,14 +23,17 @@ public class ThingsApp extends Application implements HasActivityInjector {
     public void onCreate() {
         super.onCreate();
 
-        AppInjector.init(this);
-
         AndroidThreeTen.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new CrashReportingTree());
         }
+
+        DaggerAppComponent.builder()
+                .application(this)
+                .build()
+                .inject(this);
     }
 
     @Override

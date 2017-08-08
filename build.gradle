@@ -28,7 +28,7 @@ ext {
     dagger_version = "2.11"
     retrofit_version = "2.3.0"
     okhttp_version = "3.8.0"
-    mqtt_version = "1.1.2-LOCAL"
+    mqtt_version = "1.2.1-LOCAL"
     timber_version = "4.5.1"
     threetenabp_version = "1.0.5"
     junit_version = "4.12"
