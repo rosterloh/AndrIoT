@@ -5,7 +5,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-alpha9'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta1'
         classpath 'com.google.gms:google-services:3.1.0'
     }
 }
@@ -21,10 +21,10 @@ ext {
     target_sdk_version = 26
     nearby_service_id = "com.rosterloh.andriot.service"
     arch_version = "1.0.0-alpha8"
-    support_version = "26.0.0"
+    support_version = "26.0.1"
     constraint_layout_version = "1.1.0-beta1"
     play_services_version = "11.0.4"
-    things_version = "0.4.1-devpreview"
+    things_version = "0.5-devpreview"
     dagger_version = "2.11"
     retrofit_version = "2.3.0"
     okhttp_version = "3.8.0"

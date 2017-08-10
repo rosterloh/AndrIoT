@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 class AppModule {
 
     @Provides
-    Context provideContext(ThingsApp application) {
+    Context provideContext(Application application) {
         return application.getApplicationContext();
     }
 
