@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 
+import com.google.android.things.AndroidThings;
 import com.google.firebase.crash.FirebaseCrash;
 import com.rosterloh.andriot.di.DaggerAppComponent;
 
@@ -27,6 +28,8 @@ public class ThingsApp extends Application implements HasActivityInjector {
         } else {
             Timber.plant(new CrashReportingTree());
         }
+
+        Timber.i("Built with Things Version: " + AndroidThings.getVersionString());
 
         DaggerAppComponent.builder()
                 .application(this)

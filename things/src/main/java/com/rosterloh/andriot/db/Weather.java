@@ -14,8 +14,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import timber.log.Timber;
-
 import static com.rosterloh.andriot.db.Weather.TABLE_NAME;
 
 @Entity(tableName = TABLE_NAME)
@@ -59,10 +57,8 @@ public class Weather {
         mWeatherIcon = response.getWeather().get(0).getIcon();
         mTemperature = response.getMain().getTemp();
         mDescription = response.getWeather().get(0).getDescription();
-        mLastUpdate = LocalDateTime.now();
         mLocationName = response.getName() + ", " + response.getSys().getCountry();
-        //mLastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
-        Timber.d("LastUpdate " + LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC));
+        mLastUpdate = LocalDateTime.ofInstant(Instant.ofEpochSecond(response.getDt()), ZoneOffset.UTC);
     }
 
     public int getId() {
