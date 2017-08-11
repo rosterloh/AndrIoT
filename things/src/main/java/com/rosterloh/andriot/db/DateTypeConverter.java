@@ -2,8 +2,8 @@ package com.rosterloh.andriot.db;
 
 import android.arch.persistence.room.TypeConverter;
 
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateTypeConverter {
 

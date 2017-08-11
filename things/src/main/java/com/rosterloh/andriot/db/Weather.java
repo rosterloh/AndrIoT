@@ -8,9 +8,13 @@ import android.arch.persistence.room.TypeConverters;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 
-import org.threeten.bp.LocalDateTime;
-import org.threeten.bp.format.DateTimeFormatter;
-import org.threeten.bp.temporal.ChronoUnit;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
+import timber.log.Timber;
 
 import static com.rosterloh.andriot.db.Weather.TABLE_NAME;
 
@@ -58,6 +62,7 @@ public class Weather {
         mLastUpdate = LocalDateTime.now();
         mLocationName = response.getName() + ", " + response.getSys().getCountry();
         //mLastUpdate = LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC);
+        Timber.d("LastUpdate " + LocalDateTime.ofInstant(Instant.ofEpochMilli(response.getDt()), ZoneOffset.UTC));
     }
 
     public int getId() {

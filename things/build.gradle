@@ -1,9 +1,8 @@
 apply plugin: 'com.android.application'
-apply from: "$rootProject.projectDir/quality/quality.gradle"
 
 def versionMajor = 0
-def versionMinor = 3
-def versionPatch = 1
+def versionMinor = 5
+def versionPatch = 0
 
 android {
     compileSdkVersion rootProject.ext.compile_sdk_version
@@ -64,7 +63,6 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
-    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
     implementation 'io.jsonwebtoken:jjwt:0.7.0'
 
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"

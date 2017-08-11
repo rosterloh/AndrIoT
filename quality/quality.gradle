@@ -4,10 +4,10 @@ apply plugin: 'findbugs'
 def isJava = plugins.hasPlugin('java')
 // Add checkstyle, findbugs and lint to the check task.
 // Comment it if already set in root project's build.gradle.
-check.dependsOn 'checkstyle', 'findbugs'
-if (!isJava) {
-    check.dependsOn 'lint'
-}
+//check.dependsOn 'checkstyle', 'findbugs'
+//if (!isJava) {
+//    check.dependsOn 'lint'
+//}
 
 checkstyle {
     toolVersion '7.8.2'
@@ -63,7 +63,8 @@ task findbugs(type: FindBugs, dependsOn: "assemble", group: 'verification') {
     classpath = files()
 }
 
-if (!isJava) {
+afterEvaluate {
+//if (!isJava) {
     android {
         lintOptions {
             disable 'NewApi' // gradle build will compile code use `Objects.requireNonNull()` for lambda

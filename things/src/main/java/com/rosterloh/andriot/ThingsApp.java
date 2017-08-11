@@ -5,7 +5,6 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
-import com.jakewharton.threetenabp.AndroidThreeTen;
 import com.rosterloh.andriot.di.DaggerAppComponent;
 
 import javax.inject.Inject;
@@ -23,7 +22,6 @@ public class ThingsApp extends Application implements HasActivityInjector {
     public void onCreate() {
         super.onCreate();
 
-        AndroidThreeTen.init(this);
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {

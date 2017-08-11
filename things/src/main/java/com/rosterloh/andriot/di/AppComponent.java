@@ -8,11 +8,11 @@ import javax.inject.Singleton;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import dagger.android.AndroidInjectionModule;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 @Singleton
 @Component(modules = {
-        AndroidInjectionModule.class,
+        AndroidSupportInjectionModule.class,
         AppModule.class,
         MainActivityModule.class
 })

@@ -17,7 +17,7 @@ plugins {
 ext {
     compile_sdk_version = 26
     build_tools_version = "26.0.1"
-    min_sdk_version = 24
+    min_sdk_version = 26
     target_sdk_version = 26
     nearby_service_id = "com.rosterloh.andriot.service"
     arch_version = "1.0.0-alpha8"
@@ -30,7 +30,6 @@ ext {
     okhttp_version = "3.8.0"
     mqtt_version = "1.2.1-LOCAL"
     timber_version = "4.5.1"
-    threetenabp_version = "1.0.5"
     junit_version = "4.12"
     hamcrest_version = "1.3"
     espresso_version = "3.0.0"
@@ -42,6 +41,14 @@ allprojects {
         google()
         jcenter()
         mavenLocal()
+    }
+}
+
+subprojects {
+    apply from: "$rootProject.projectDir/quality/quality.gradle"
+
+    afterEvaluate {
+        check.dependsOn 'checkstyle', 'findbugs'/*, 'pmd'*/, 'lint'
     }
 }
 

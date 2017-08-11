@@ -7,8 +7,7 @@ import com.rosterloh.andriot.api.WeatherResponse;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.AppExecutors;
 
-import org.threeten.bp.LocalDateTime;
-
+import java.time.LocalDateTime;
 import java.util.Timer;
 import java.util.TimerTask;
 

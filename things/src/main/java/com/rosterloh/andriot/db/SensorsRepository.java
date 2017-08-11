@@ -1,7 +1,6 @@
 package com.rosterloh.andriot.db;
 
 import android.arch.lifecycle.LiveData;
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
