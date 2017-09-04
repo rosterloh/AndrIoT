@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <uses-feature android:name="android.hardware.bluetooth_le"/>
     <uses-feature android:name="android.hardware.camera" />
@@ -20,6 +21,7 @@
     <application
         android:name=".ThingsApp"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:icon="@android:drawable/sym_def_app_icon"
         android:label="@string/app_name"
         android:supportsRtl="true"
@@ -44,6 +46,11 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".scheduler.IpJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"/>
 
         <meta-data
             android:name="preloaded_fonts"

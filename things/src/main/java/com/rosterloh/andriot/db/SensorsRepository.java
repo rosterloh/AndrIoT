@@ -7,8 +7,14 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.rosterloh.andriot.AppExecutors;
+import com.rosterloh.andriot.cloud.MQTTPublisher;
+import com.rosterloh.andriot.sensors.LiveDataBus;
+import com.rosterloh.andriot.sensors.MqttEvent;
+import com.rosterloh.andriot.sensors.SensorHub;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,11 +24,18 @@ import timber.log.Timber;
 @Singleton
 public class SensorsRepository {
 
+    private static final int POLL_RATE = 5 * 60 * 1000;
+    private static final int INIT_DELAY = 5 * 1000;
+
     private final AppExecutors mAppExecutors;
     private final SensorDao mSensorDao;
     private final SensorManager mSensorManager;
+    private final SensorHub mSensorHub;
+    private final MQTTPublisher mMQTTPublisher;
 
     private LiveData<List<SensorData>> mSensorData;
+    private int mECO2 = 0;
+    private int mTVOC = 0;
 
     private SensorEventListener mListener = new SensorEventListener() {
         @Override
@@ -51,10 +64,13 @@ public class SensorsRepository {
     };
 
     @Inject
-    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorManager sensorManager) {
+    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorManager sensorManager,
+                      SensorHub sensorHub, MQTTPublisher mqttPublisher) {
         mAppExecutors = appExecutors;
         mSensorDao = sensorDao;
         mSensorManager = sensorManager;
+        mSensorHub = sensorHub;
+        mMQTTPublisher = mqttPublisher;
 
         mSensorData = mSensorDao.load();
         mSensorData.observeForever(data -> {
@@ -76,10 +92,44 @@ public class SensorsRepository {
                 if (sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE
                         || sensor.getType() == Sensor.TYPE_PRESSURE
                         || sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY) {
-                    mSensorManager.registerListener(mListener, sensor,
-                            SensorManager.SENSOR_DELAY_NORMAL);
+                    mSensorManager.registerListener(mListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 }
             }
         });
+
+        LiveDataBus.subscribe(LiveDataBus.SUBJECT_MQTT_DATA, (data) -> {
+            MqttEvent event = (MqttEvent) data;
+            switch (event.getTopic()) {
+                case "/weather/co2":
+                    mECO2 = Integer.parseInt(event.getMessage());
+                    break;
+                case "/weather/tvoc":
+                    mTVOC = Integer.parseInt(event.getMessage());
+                    break;
+                case "/weather/temperature":
+                    break;
+                default:
+                    Timber.w("Unknown topic " + event.getTopic());
+            }
+        });
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                appExecutors.diskIO().execute(() -> {
+                    SensorData data = mSensorHub.getSensorData();
+                    data.setECO2(mECO2);
+                    data.setTVOC(mTVOC);
+                    if (data != null) {
+                        appExecutors.mainThread().execute(() -> mSensorData.getValue().add(data));
+                    }
+                });
+            }
+        }, INIT_DELAY, POLL_RATE);
+    }
+
+    public LiveData<List<SensorData>> loadValues() {
+        return mSensorData;
     }
 }

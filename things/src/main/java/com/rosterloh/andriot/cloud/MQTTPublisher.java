@@ -2,13 +2,21 @@ package com.rosterloh.andriot.cloud;
 
 import com.google.gson.Gson;
 import com.rosterloh.andriot.db.CloudSettings;
+import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.db.SettingsRepository;
+import com.rosterloh.andriot.sensors.LiveDataBus;
+import com.rosterloh.andriot.sensors.MqttEvent;
 
+import org.eclipse.paho.client.mqttv3.IMqttActionListener;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
+import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -28,19 +36,23 @@ public class MQTTPublisher implements AutoCloseable {
 
     private MqttAsyncClient mMqttClient = null;
     private CloudSettings mSettings;
+    private MessageListener mListener = new MessageListener();
     private AtomicBoolean mReady = new AtomicBoolean(false);
 
     @Inject
     public MQTTPublisher(SettingsRepository settingsRepository) {
 
-        mSettings = settingsRepository.getCloudSettings().getValue();
-
-        try {
-            initialiseMqttClient();
-        } catch (Exception e) {
-            Timber.d("Failed to initialise mqtt: " + e.getLocalizedMessage());
-        }
-
+        settingsRepository.getCloudSettings().observeForever(settings -> {
+            if (settings != null) {
+                mSettings = settings;
+                try {
+                    close();
+                    initialiseMqttClient();
+                } catch (Exception e) {
+                    Timber.d("Failed to initialise mqtt: " + e.getLocalizedMessage());
+                }
+            }
+        });
     }
 
     public void publish(List<SensorData> data) {
@@ -85,7 +97,7 @@ public class MQTTPublisher implements AutoCloseable {
 
     private void initialiseMqttClient() throws MqttException, IllegalArgumentException {
 
-        mMqttClient = new MqttAsyncClient(mSettings.getBrokerUrl(),
+        mMqttClient = new MqttAsyncClient(/*mSettings.getBrokerUrl(),*/"tcp://192.168.86.77:1883",
                 mSettings.getClientId(), new MemoryPersistence());
 
         MqttConnectOptions options = new MqttConnectOptions();
@@ -95,11 +107,40 @@ public class MQTTPublisher implements AutoCloseable {
         // generate the jwt password
         //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
 
-        mMqttClient.connect(options);
+        mMqttClient.connect(options, new IMqttActionListener() {
+            @Override
+            public void onSuccess(IMqttToken asyncActionToken) {
+                Timber.d("MQTT client connected.");
+                try {
+                    asyncActionToken.getClient().subscribe("/weather/#", MQTT_QOS, null, null, mListener);
+                } catch (Exception e) {
+                    Timber.w("Failed to subscribe");
+                }
+            }
+
+            @Override
+            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                Timber.w("Failed to connect to MQTT e:" + exception.getMessage());
+            }
+        });
         mReady.set(true);
     }
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {
         mMqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
+    }
+
+    class MessageListener implements IMqttMessageListener {
+
+        public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+            String msg = new String(message.getPayload());
+            Timber.d("Message arrived: '" + msg + "' " + this.hashCode() + " "
+                    + (message.isDuplicate() ? "duplicate" : ""));
+
+            if (!message.isDuplicate()) {
+                LiveDataBus.publish(LiveDataBus.SUBJECT_MQTT_DATA, new MqttEvent(topic, msg));
+            }
+        }
     }
 }

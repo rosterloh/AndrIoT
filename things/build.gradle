@@ -2,12 +2,11 @@ apply plugin: 'com.android.application'
 
 def versionMajor = 0
 def versionMinor = 5
-def versionPatch = 0
+def versionPatch = 1
 
 android {
     compileSdkVersion rootProject.ext.compile_sdk_version
     buildToolsVersion rootProject.ext.build_tools_version
-
     defaultConfig {
         applicationId "com.rosterloh.andriot"
         minSdkVersion rootProject.ext.min_sdk_version
@@ -17,7 +16,21 @@ android {
         testInstrumentationRunner "com.rosterloh.andriot.ThingsTestRunner"
         buildConfigField "String", "NEARBY_SERVICE_ID", "\"${rootProject.ext.nearby_service_id}\""
     }
+    signingConfigs {
+        debug {
+            keyAlias 'thingsdebugkey'
+            keyPassword 'android'
+            storeFile file('../debug.keystore')
+            storePassword 'android'
+        }
+    }
     buildTypes {
+        debug {
+            versionNameSuffix = '.d'
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             crunchPngs true
             minifyEnabled true
@@ -43,7 +56,6 @@ repositories {
 dependencies {
     compileOnly "com.google.android.things:androidthings:$things_version"
     compileOnly "com.google.dagger:dagger:$dagger_version"
-
     implementation project(path: ':common')
     implementation 'com.rosterloh.things:driver-htu21d:0.1'
     implementation 'com.rosterloh.things:driver-bmx280:0.1'
@@ -64,12 +76,10 @@ dependencies {
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
     implementation 'io.jsonwebtoken:jjwt:0.7.0'
-
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
     annotationProcessor "android.arch.persistence.room:compiler:$arch_version"
     annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
-
     testImplementation "junit:junit:$junit_version"
     testImplementation "org.hamcrest:hamcrest-library:$hamcrest_version"
     androidTestImplementation "com.android.support:appcompat-v7:$support_version"

@@ -26,10 +26,10 @@ public class SensorData {
     private final float mPressure;
 
     @ColumnInfo(name = "eco2")
-    private final int mECO2;
+    private int mECO2;
 
     @ColumnInfo(name = "tvoc")
-    private final int mTVOC;
+    private int mTVOC;
 
     public SensorData(LocalDateTime time, float temperature, float humidity, float pressure,
                       int eCO2, int tVOC) {
@@ -83,8 +83,16 @@ public class SensorData {
         return mECO2;
     }
 
+    public void setECO2(int eco2) {
+        mECO2 = eco2;
+    }
+
     public int getTVOC() {
         return mTVOC;
+    }
+
+    public void setTVOC(int tvoc) {
+        mTVOC = tvoc;
     }
 
     @Override

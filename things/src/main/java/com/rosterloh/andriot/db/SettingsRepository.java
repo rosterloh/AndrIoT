@@ -61,4 +61,13 @@ public class SettingsRepository {
     public LiveData<CloudSettings> getCloudSettings() {
         return mCloudSettings;
     }
+
+    public void setIpAddress(String ip) {
+        Timber.d("IP changed to " + ip);
+        LocalSettings settings = mLocalSettings.getValue();
+        if (settings != null) {
+            settings.setIpAddress(ip);
+            mAppExecutors.diskIO().execute(() -> mSettingsDao.update(settings));
+        }
+    }
 }

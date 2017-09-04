@@ -2,12 +2,14 @@ package com.rosterloh.andriot.di;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.hardware.SensorManager;
 
 import com.rosterloh.andriot.ThingsApp;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
+import com.rosterloh.andriot.cloud.MQTTPublisher;
 import com.rosterloh.andriot.db.SensorDao;
 import com.rosterloh.andriot.db.SettingsDao;
 import com.rosterloh.andriot.db.SettingsRepository;
@@ -29,6 +31,11 @@ class AppModule {
     @Provides
     Context provideContext(Application application) {
         return application.getApplicationContext();
+    }
+
+    @Provides
+    ContentResolver provideContentResolver(Application application) {
+        return application.getContentResolver();
     }
 
     @Singleton
@@ -90,15 +97,6 @@ class AppModule {
     GattServer provideGattServer(Context context) {
         return new GattServer(context);
     }
-
-    /*
-    @Singleton
-    @Provides
-    MQTTPublisher provideMqttPublisher(SettingsDao settingsDao) {
-        return new MQTTPublisher(settingsDao);
-    }
-    */
-
     /*
     @Singleton
     @Provides

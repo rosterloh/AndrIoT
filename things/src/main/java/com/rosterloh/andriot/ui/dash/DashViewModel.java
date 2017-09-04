@@ -11,6 +11,7 @@ import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.db.Weather;
 import com.rosterloh.andriot.AppExecutors;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,45 +19,24 @@ import javax.inject.Inject;
 
 public class DashViewModel extends ViewModel {
 
-    private static final int POLL_RATE = 5 * 60 * 1000;
-    private static final int INIT_DELAY = 5 * 1000;
-
-    private final AppExecutors mAppExecutors;
-    private final SensorsRepository mSensorsRepository;
-
     @Inject
     SensorHub mSensorHub;
 
-    private final MutableLiveData<SensorData> mSensors = new MutableLiveData<>();
+    private final LiveData<List<SensorData>> mSensorData;
     private final LiveData<Weather> mWeather;
 
     @Inject
-    DashViewModel(WeatherRepository weatherRepository, AppExecutors appExecutors,
-                  SensorsRepository sensorsRepository) {
-        mAppExecutors = appExecutors;
-        mSensorsRepository = sensorsRepository;
+    DashViewModel(WeatherRepository weatherRepository, SensorsRepository sensorsRepository) {
         mWeather = weatherRepository.loadWeather();
-
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                appExecutors.diskIO().execute(() -> {
-                    SensorData data = mSensorHub.getSensorData();
-                    if (data != null) {
-                        appExecutors.mainThread().execute(() -> mSensors.setValue(data));
-                    }
-                });
-            }
-        }, INIT_DELAY, POLL_RATE);
+        mSensorData = sensorsRepository.loadValues();
     }
 
     LiveData<Boolean> getMotion() {
         return mSensorHub.getPirData();
     }
 
-    LiveData<SensorData> getSensorData() {
-        return mSensors;
+    LiveData<List<SensorData>> getSensorData() {
+        return mSensorData;
     }
 
     LiveData<Weather> getWeather() {

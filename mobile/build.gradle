@@ -18,7 +18,21 @@ android {
         resValue "string", "maps_api_key", "$System.env.MAPS_API_KEY"
         buildConfigField "String", "NEARBY_SERVICE_ID", "\"${rootProject.ext.nearby_service_id}\""
     }
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file('../debug.keystore')
+            storePassword 'android'
+        }
+    }
     buildTypes {
+        debug {
+            versionNameSuffix = '.d'
+            shrinkResources false
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
             crunchPngs true
             minifyEnabled true
