@@ -11,8 +11,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.rosterloh.andriot.R;
+import com.rosterloh.andriot.db.FirebaseAdapter;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.dash.DashFragment;
+import com.rosterloh.andriot.ui.dash.GraphFragment;
 
 import javax.inject.Inject;
 
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
     @Inject
     SensorHub mSensorHub;
 
+    @Inject
+    FirebaseAdapter mFirebase;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         AndroidInjection.inject(this);
@@ -62,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                         .commitAllowingStateLoss();
                 break;
             case FRAGMENT_TIMELINE:
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new GraphFragment())
+                        .commitAllowingStateLoss();
                 break;
             case FRAGMENT_SETTINGS:
                 break;
@@ -106,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                 api.getErrorDialog(this, result, GOOGLE_PLAY_SERVICES_REQUEST).show();
             }
             */
+        } else {
+            mFirebase.onStart();
         }
     }
 
@@ -155,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onDestroy() {
+        mFirebase.onStop();
         super.onDestroy();
     }
 }

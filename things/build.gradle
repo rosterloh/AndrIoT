@@ -65,7 +65,9 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
     implementation "com.android.support:design:$support_version"
     implementation "com.google.android.gms:play-services-nearby:$play_services_version"
+    implementation "com.google.firebase:firebase-auth:$play_services_version"
     implementation "com.google.firebase:firebase-crash:$play_services_version"
+    implementation "com.google.firebase:firebase-database:$play_services_version"
     implementation "android.arch.persistence.room:runtime:$arch_version"
     implementation "android.arch.lifecycle:runtime:$arch_version"
     implementation "android.arch.lifecycle:extensions:$arch_version"
@@ -76,6 +78,7 @@ dependencies {
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:$mqtt_version"
     implementation "com.jakewharton.timber:timber:$timber_version"
     implementation 'io.jsonwebtoken:jjwt:0.7.0'
+    implementation "com.github.PhilJay:MPAndroidChart:$mpchart_version"
     annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
     annotationProcessor "android.arch.persistence.room:compiler:$arch_version"

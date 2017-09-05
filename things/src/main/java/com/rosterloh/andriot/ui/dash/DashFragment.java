@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.databinding.DashFragmentBinding;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
+import com.rosterloh.andriot.sensors.LiveDataBus;
 
 import javax.inject.Inject;
 
@@ -61,11 +62,12 @@ public class DashFragment extends LifecycleFragment {
             Timber.e("Could find SCREEN_BRIGHTNESS_MODE setting");
         }
 
-        mDashViewModel.getMotion().observe(this, value -> {
-            mBinding.setMotion(value);
+        LiveDataBus.subscribe(LiveDataBus.SUBJECT_MOTION_DATA, this, value -> {
             if (value != null) {
+                boolean currentValue = (boolean) value;
+                mBinding.setMotion(currentValue);
                 try {
-                    if (value)
+                    if (currentValue)
                         Settings.System.putInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS, 255);
                     else
                         Settings.System.putInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS, 1);
@@ -78,15 +80,9 @@ public class DashFragment extends LifecycleFragment {
                 } catch (Settings.SettingNotFoundException e) {
                     Timber.w("Could not set SCREEN_BRIGHTNESS");
                 }
-            } else {
-                Timber.w("NULL");
             }
         });
-        mDashViewModel.getSensorData().observe(this, sensors -> {
-            if (sensors.size() > 0) {
-                mBinding.setSensors(sensors.get(sensors.size()));
-            }
-        });
+        mDashViewModel.getSensorData().observe(this, sensors -> mBinding.setSensors(sensors));
         mDashViewModel.getWeather().observe(this, weather -> mBinding.setWeather(weather));
     }
 }

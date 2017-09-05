@@ -16,8 +16,12 @@ import com.rosterloh.things.driver.htu21d.Htu21d;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import timber.log.Timber;
 
+@Singleton
 public class SensorHub {
 
     private static final String TAG = SensorHub.class.getSimpleName();
@@ -35,7 +39,6 @@ public class SensorHub {
     private Bmx280SensorDriver mBmxSensorDriver;
     private Ccs811 mCcs811;
 
-    private MutableLiveData<Boolean> mPirData = new MutableLiveData<>();
     private MutableLiveData<Boolean> mButtonData = new MutableLiveData<>();
 
     private GpioCallback mButtonInterrupt = new GpioCallback() {
@@ -43,6 +46,7 @@ public class SensorHub {
         public boolean onGpioEdge(Gpio gpio) {
             try {
                 mButtonData.setValue(gpio.getValue());
+
                 /*
                 if (ready.get()) {
                     setLedValue(true);
@@ -62,7 +66,7 @@ public class SensorHub {
         @Override
         public boolean onGpioEdge(Gpio gpio) {
             try {
-                mPirData.setValue(gpio.getValue());
+                LiveDataBus.publish(LiveDataBus.SUBJECT_MOTION_DATA, gpio.getValue());
             } catch (IOException e) {
                 FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading PIR state");
                 FirebaseCrash.report(e);
@@ -72,6 +76,7 @@ public class SensorHub {
         }
     };
 
+    @Inject
     public SensorHub() {
 
         PeripheralManagerService pioService = new PeripheralManagerService();
@@ -149,10 +154,6 @@ public class SensorHub {
             FirebaseCrash.report(e);
             return false;
         }
-    }
-
-    public LiveData<Boolean> getPirData() {
-        return mPirData;
     }
 
     public LiveData<Boolean> getButtonData() {

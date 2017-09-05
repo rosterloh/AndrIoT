@@ -15,10 +15,10 @@ public class LiveDataBus {
     private static SparseArray<EventLiveData> sSubjectMap = new SparseArray<>();
 
     public static final int SUBJECT_MQTT_DATA = 0;
-    public static final int SUBJECT_DOWNLOAD_COMPLETE = 1;
+    public static final int SUBJECT_MOTION_DATA = 1;
 
     @Retention(SOURCE)
-    @IntDef({SUBJECT_MQTT_DATA, SUBJECT_DOWNLOAD_COMPLETE})
+    @IntDef({SUBJECT_MQTT_DATA, SUBJECT_MOTION_DATA})
     @interface Subject {
     }
 

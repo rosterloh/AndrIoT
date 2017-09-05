@@ -17,13 +17,13 @@ public class SensorData {
     private final LocalDateTime mTime;
 
     @ColumnInfo(name = "temperature")
-    private final float mTemperature;
+    private float mTemperature;
 
     @ColumnInfo(name = "humidity")
-    private final float mHumidity;
+    private float mHumidity;
 
     @ColumnInfo(name = "pressure")
-    private final float mPressure;
+    private float mPressure;
 
     @ColumnInfo(name = "eco2")
     private int mECO2;
@@ -71,12 +71,24 @@ public class SensorData {
         return mTemperature;
     }
 
+    public void setTemperature(float mTemperature) {
+        this.mTemperature = mTemperature;
+    }
+
     public float getHumidity() {
         return mHumidity;
     }
 
+    public void setHumidity(float mHumidity) {
+        this.mHumidity = mHumidity;
+    }
+
     public float getPressure() {
         return mPressure;
+    }
+
+    public void setPressure(float mPressure) {
+        this.mPressure = mPressure;
     }
 
     public int getECO2() {
