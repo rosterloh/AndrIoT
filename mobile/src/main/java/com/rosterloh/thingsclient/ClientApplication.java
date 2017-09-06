@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 
 import com.rosterloh.thingsclient.BuildConfig;
-import com.rosterloh.thingsclient.di.AppInjector;
+import com.rosterloh.thingsclient.di.DaggerAppComponent;
 
 import javax.inject.Inject;
 
@@ -22,11 +22,15 @@ public class ClientApplication extends Application implements HasActivityInjecto
     public void onCreate() {
         super.onCreate();
 
-        AppInjector.init(this);
-
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
+
+        DaggerAppComponent
+                .builder()
+                .application(this)
+                .build()
+                .inject(this);
     }
 
     @Override

@@ -5,9 +5,10 @@ import android.location.Location;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.rosterloh.thingsclient.R;
+import com.rosterloh.thingsclient.nearby.ConnectionsClient;
 import com.rosterloh.thingsclient.ui.SingleFragmentActivity;
-import com.rosterloh.thingsclient.util.ViewModelUtil;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,10 +37,12 @@ public class InteractFragmentTest {
     public void init() {
         interactFragment = new InteractFragment();
         viewModel = mock(InteractViewModel.class);
+        ConnectionsClient client = mock(ConnectionsClient.class);
+        FusedLocationProviderClient locationProvider = mock(FusedLocationProviderClient.class);
 
         when(viewModel.getLocation()).thenReturn(location);
 
-        interactFragment.mViewModelFactory = ViewModelUtil.createFor(viewModel);
+        interactFragment.mViewModelFactory = new InteractViewModelFactory(client, locationProvider);
 
         activityRule.getActivity().setFragment(interactFragment);
     }

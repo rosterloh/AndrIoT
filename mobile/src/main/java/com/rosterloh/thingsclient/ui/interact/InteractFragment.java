@@ -3,6 +3,7 @@ package com.rosterloh.thingsclient.ui.interact;
 import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,24 +26,19 @@ import dagger.android.support.AndroidSupportInjection;
 public class InteractFragment extends LifecycleFragment {
 
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
+    InteractViewModelFactory mViewModelFactory;
 
     InteractFragmentBinding mBinding;
-    InteractViewModel mInteractViewModel;
+    InteractViewModel mViewModel;
 
     private GoogleMap mGoogleMap;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.interact_fragment,container, false);
-        mBinding.setCallback(() -> mInteractViewModel.setLocation());
+        mBinding.setCallback(() -> mViewModel.setLocation());
         mBinding.mapView.onCreate(savedInstanceState);
         mBinding.mapView.getMapAsync(map -> mGoogleMap = map);
         return mBinding.getRoot();
@@ -52,11 +48,11 @@ public class InteractFragment extends LifecycleFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
-        mInteractViewModel = ViewModelProviders.of(this, mViewModelFactory)
+        mViewModel = ViewModelProviders.of(this, mViewModelFactory)
                 .get(InteractViewModel.class);
 
-        mInteractViewModel.getStatus().observe(this, status -> mBinding.setStatus(status));
-        mInteractViewModel.getLocation().observe(this, location -> {
+        mViewModel.getStatus().observe(this, status -> mBinding.setStatus(status));
+        mViewModel.getLocation().observe(this, location -> {
             Double lat = location.getLatitude();
             Double lon = location.getLongitude();
 

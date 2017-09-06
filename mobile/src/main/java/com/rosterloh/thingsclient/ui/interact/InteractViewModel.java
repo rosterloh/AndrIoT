@@ -16,17 +16,14 @@ import timber.log.Timber;
 
 public class InteractViewModel extends ViewModel {
 
-    private ConnectionsClient mConnectionsClient;
-    private FusedLocationProviderClient mFusedLocationClient;
+    private final ConnectionsClient mConnectionsClient;
+    private final FusedLocationProviderClient mFusedLocationClient;
 
     final MutableLiveData<Location> location;
 
-    @Inject
-    InteractViewModel(ConnectionsClient connectionsClient,
-                      FusedLocationProviderClient fusedLocationProviderClient) {
+    InteractViewModel(ConnectionsClient connectionsClient, FusedLocationProviderClient fusedLocationProviderClient) {
         mConnectionsClient = connectionsClient;
         mFusedLocationClient = fusedLocationProviderClient;
-
         location = new MutableLiveData<>();
     }
 

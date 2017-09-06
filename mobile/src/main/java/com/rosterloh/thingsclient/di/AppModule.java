@@ -1,9 +1,11 @@
 package com.rosterloh.thingsclient.di;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.rosterloh.thingsclient.ClientApplication;
 import com.rosterloh.thingsclient.nearby.ConnectionsClient;
 
 import javax.inject.Singleton;
@@ -11,21 +13,19 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-@Module(includes = ViewModelModule.class)
+@Module
 class AppModule {
-/*
+
     @Provides
-    @Singleton
-    ThingsDb provideDb(Application app) {
-        return Room.databaseBuilder(app, ClientDb.class, "client.db").build();
+    Context provideContext(ClientApplication application) {
+        return application.getApplicationContext();
     }
 
     @Provides
-    @Singleton
-    DeviceDao provideDeviceDao(ClientDb db) {
-        return db.deviceDao();
+    Application provideApplication(ClientApplication application) {
+        return application;
     }
-*/
+
     @Provides
     @Singleton
     ConnectionsClient provideConnectionsClient(Application app) {
