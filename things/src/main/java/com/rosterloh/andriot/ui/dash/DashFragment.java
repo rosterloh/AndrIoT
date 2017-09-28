@@ -1,6 +1,5 @@
 package com.rosterloh.andriot.ui.dash;
 
-import android.arch.lifecycle.LifecycleFragment;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentResolver;
@@ -8,6 +7,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import dagger.android.support.AndroidSupportInjection;
 import timber.log.Timber;
 
-public class DashFragment extends LifecycleFragment {
+public class DashFragment extends Fragment {
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;

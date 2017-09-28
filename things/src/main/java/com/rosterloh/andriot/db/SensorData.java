@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @TypeConverters(DateTypeConverter.class)
 public class SensorData {
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "time")
     private final LocalDateTime mTime;
@@ -31,7 +33,7 @@ public class SensorData {
     @ColumnInfo(name = "tvoc")
     private int mTVOC;
 
-    public SensorData(LocalDateTime time, float temperature, float humidity, float pressure,
+    public SensorData(@NonNull LocalDateTime time, float temperature, float humidity, float pressure,
                       int eCO2, int tVOC) {
         mTime = time;
         mTemperature = temperature;

@@ -1,6 +1,6 @@
 package com.rosterloh.andriot.sensors;
 
-import android.arch.lifecycle.LifecycleRegistryOwner;
+import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.Observer;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
@@ -43,7 +43,7 @@ public class LiveDataBus {
     /**
      * Subscribe to the specified subject and listen for updates on that subject.
      */
-    public static void subscribe(@Subject int subject, @NonNull LifecycleRegistryOwner lifecycle, @NonNull Observer<Object> action) {
+    public static void subscribe(@Subject int subject, @NonNull LifecycleOwner lifecycle, @NonNull Observer<Object> action) {
         getLiveData(subject).observe(lifecycle, action);
     }
 

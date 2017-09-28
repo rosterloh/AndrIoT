@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
 
 import com.rosterloh.andriot.api.WeatherResponse;
 
@@ -22,6 +23,7 @@ public class Weather {
 
     static final String TABLE_NAME = "weather";
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "id")
     private final int mId;

@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 import java.util.concurrent.TimeUnit;
 
@@ -15,6 +16,7 @@ public class LocalSettings {
     private static final double DEFAULT_LATITUDE = 51.5069949;
     private static final double DEFAULT_LONGITUDE = -0.1317992;
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "device_id")
     private String mDeviceId;
@@ -31,7 +33,8 @@ public class LocalSettings {
     @ColumnInfo(name = "longitude")
     private double mLongitude;
 
-    public LocalSettings(String deviceId, String ipAddress, long refreshRate, double latitude, double longitude) {
+    public LocalSettings(@NonNull String deviceId, String ipAddress, long refreshRate,
+                         double latitude, double longitude) {
         mDeviceId = deviceId;
         mIpAddress = ipAddress;
         mRefreshRate = refreshRate;

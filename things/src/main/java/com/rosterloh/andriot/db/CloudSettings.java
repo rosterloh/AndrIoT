@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class CloudSettings {
     private static final String MQTT_CLIENT_ID_FORMAT = "projects/%s/locations/%s/registries/%s/devices/%s";
     private static final String BROKER_URL_FORMAT = "ssl://%s:%d";
 
+    @NonNull
     @PrimaryKey
     @ColumnInfo(name = "project_id")
     private final String mProjectId;
@@ -57,8 +59,8 @@ public class CloudSettings {
         mBridgePort = DEFAULT_BRIDGE_PORT;
     }
 
-    public CloudSettings(String projectId, String registryId, String deviceId, String cloudRegion,
-                         String bridgeHostname, short bridgePort) {
+    public CloudSettings(@NonNull String projectId, String registryId, String deviceId,
+                         String cloudRegion, String bridgeHostname, short bridgePort) {
         mProjectId = projectId;
         mRegistryId = registryId;
         mDeviceId = deviceId;
