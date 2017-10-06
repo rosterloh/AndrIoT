@@ -49,7 +49,7 @@ class AppModule {
     @Provides
     ThingsDb provideDb(Application app) {
         return Room.databaseBuilder(app, ThingsDb.class, "things.db")
-                .addMigrations(ThingsDb.MIGRATION_2_3)
+                .addMigrations(ThingsDb.MIGRATION_2_3, ThingsDb.MIGRATION_3_4)
                 .build();
     }
 

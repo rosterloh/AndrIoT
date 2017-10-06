@@ -142,7 +142,7 @@ public class SensorsRepository {
                         }
                         mSensorDao.insert(data);
 
-                        mFirebase.uploadSensorData(data);
+                        //mFirebase.uploadSensorData(data);
                     }
                 });
             }

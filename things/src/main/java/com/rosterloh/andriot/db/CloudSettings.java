@@ -13,10 +13,10 @@ import java.util.UUID;
 public class CloudSettings {
 
     public static final String DEFAULT_PROJECT_ID = "andriot-b80e9";
-    public static final String DEFAULT_REGISTRY_ID = "AndrIot";
-    public static final String DEFAULT_CLOUD_REGION = "europe-west2";
+    public static final String DEFAULT_REGISTRY_ID = "andriot";
+    public static final String DEFAULT_CLOUD_REGION = "europe-west1";
     public static final String DEFAULT_BRIDGE_HOSTNAME = "mqtt.googleapis.com";
-    public static final short DEFAULT_BRIDGE_PORT = 443;
+    public static final short DEFAULT_BRIDGE_PORT = 8883;
     public static final String UNUSED_ACCOUNT_NAME = "unused";
 
     /**

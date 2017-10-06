@@ -2,7 +2,6 @@ package com.rosterloh.andriot.cloud;
 
 import com.google.gson.Gson;
 import com.rosterloh.andriot.db.CloudSettings;
-import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.db.SettingsRepository;
 import com.rosterloh.andriot.sensors.LiveDataBus;
 import com.rosterloh.andriot.sensors.MqttEvent;
@@ -16,14 +15,23 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.security.PrivateKey;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
 import timber.log.Timber;
+
+import static com.rosterloh.andriot.db.CloudSettings.UNUSED_ACCOUNT_NAME;
 
 @Singleton
 public class MQTTPublisher implements AutoCloseable {
@@ -97,15 +105,13 @@ public class MQTTPublisher implements AutoCloseable {
 
     private void initialiseMqttClient() throws MqttException, IllegalArgumentException {
 
-        mMqttClient = new MqttAsyncClient(/*mSettings.getBrokerUrl(),*/"tcp://192.168.86.77:1883",
-                mSettings.getClientId(), new MemoryPersistence());
+        mMqttClient = new MqttAsyncClient(mSettings.getBrokerUrl(), mSettings.getClientId(), new MemoryPersistence());
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-        options.setUserName(mSettings.UNUSED_ACCOUNT_NAME);
-
-        // generate the jwt password
-        //options.setPassword(mqttAuth.createJwt(settings.getProjectId()));
+        options.setUserName(UNUSED_ACCOUNT_NAME);
+        options.setPassword(createJwt().toCharArray());
+        options.setSSLProperties(new Properties());
 
         mMqttClient.connect(options, new IMqttActionListener() {
             @Override
@@ -128,6 +134,17 @@ public class MQTTPublisher implements AutoCloseable {
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {
         mMqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
+    }
+
+    private String createJwt() {
+        LocalDateTime now = LocalDateTime.now();
+
+        JwtBuilder jwtBuilder = Jwts.builder()
+                .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(now.plusMinutes(20).atZone(ZoneId.systemDefault()).toInstant()))
+                .setAudience(mSettings.getProjectId());
+
+        return "Nope"; //jwtBuilder.signWith().compact();
     }
 
     class MessageListener implements IMqttMessageListener {
