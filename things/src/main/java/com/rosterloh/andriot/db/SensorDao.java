@@ -18,7 +18,7 @@ public interface SensorDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(SensorData data);
 
-    @Query("SELECT * FROM sensor_data")
+    @Query("SELECT * FROM sensor_data ORDER BY datetime(time)")
     LiveData<List<SensorData>> load();
 
     @Query("SELECT COUNT(*) FROM sensor_data")

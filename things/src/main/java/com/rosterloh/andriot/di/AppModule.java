@@ -15,6 +15,8 @@ import com.rosterloh.andriot.db.ThingsDb;
 import com.rosterloh.andriot.db.WeatherDao;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
 
+import java.io.InputStream;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -33,6 +35,12 @@ class AppModule {
     @Provides
     ContentResolver provideContentResolver(Application application) {
         return application.getContentResolver();
+    }
+
+    @Provides
+    InputStream provideInputStream(Context context) {
+        return context.getResources().openRawResource(context.
+                getResources().getIdentifier("rsa_private_pkcs8", "raw", context.getPackageName()));
     }
 
     @Singleton

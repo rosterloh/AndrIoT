@@ -3,40 +3,42 @@ buildscript {
         google()
         jcenter()
         mavenLocal()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0-rc1'
-        classpath 'com.google.gms:google-services:3.1.1'
-        classpath 'com.google.firebase:firebase-plugins:1.1.1'
+        classpath 'com.android.tools.build:gradle:3.1.0-alpha04'
+        classpath 'com.google.gms:google-services:3.1.2'
+        classpath 'com.google.firebase:firebase-plugins:1.1.5'
+        classpath 'io.fabric.tools:gradle:1.25.0'
     }
 }
 
 plugins {
-    id 'com.github.ben-manes.versions' version '0.15.0'
+    id 'com.github.ben-manes.versions' version '0.17.0'
     id "net.ltgt.errorprone" version "0.0.13"
 }
 
 ext {
-    compile_sdk_version = 26
-    build_tools_version = "26.0.2"
+    compile_sdk_version = 27
+    build_tools_version = "27.0.1"
     min_sdk_version = 26
-    target_sdk_version = 26
+    target_sdk_version = 27
     nearby_service_id = "com.rosterloh.andriot.service"
-    arch_version = "1.0.0-beta2"
-    support_version = "26.1.0"
+    arch_version = "1.0.0"
+    support_version = "27.0.2"
     constraint_layout_version = "1.1.0-beta3"
-    play_services_version = "11.0.4" //"11.4.2"
-    things_version = "0.5.1-devpreview"
-    dagger_version = "2.12"
+    play_services_version = "11.6.2"
+    things_version = "0.6-devpreview"
+    dagger_version = "2.13"
     retrofit_version = "2.3.0"
     okhttp_version = "3.8.0"
-    mqtt_version = "1.2.1-SNAPSHOT"
-    timber_version = "4.5.1"
-    mpchart_version = "v3.0.2"
+    mqtt_version = "1.2.1-LOCAL"
+    timber_version = "4.6.0"
+    mpchart_version = "v3.0.3"
     junit_version = "4.12"
     hamcrest_version = "1.3"
     espresso_version = "3.0.1"
-    mockito_version = "2.11.0"
+    mockito_version = "2.12.0"
 }
 
 allprojects {
@@ -45,6 +47,7 @@ allprojects {
         jcenter()
         mavenLocal()
         maven { url "https://jitpack.io" }
+        maven { url 'https://maven.fabric.io/public' }
     }
 }
 

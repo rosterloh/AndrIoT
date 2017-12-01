@@ -4,10 +4,10 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManagerService;
-import com.google.firebase.crash.FirebaseCrash;
 import com.rosterloh.andriot.db.SensorData;
 import com.rosterloh.things.driver.bmx280.Bmx280;
 import com.rosterloh.things.driver.bmx280.Bmx280SensorDriver;
@@ -54,8 +54,8 @@ public class SensorHub {
                     camera.takePicture();
                 }*/
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading button state");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error reading button state");
+                Crashlytics.getInstance().core.log(e.getMessage());
             }
 
             return true;
@@ -68,8 +68,8 @@ public class SensorHub {
             try {
                 LiveDataBus.publish(LiveDataBus.SUBJECT_MOTION_DATA, gpio.getValue());
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading PIR state");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error reading PIR state");
+                Crashlytics.getInstance().core.log(e.getMessage());
             }
 
             return true;
@@ -96,8 +96,8 @@ public class SensorHub {
             mPir.setActiveType(Gpio.ACTIVE_HIGH);
             mPir.registerGpioCallback(mPirInterrupt);
         } catch (IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "Error configuring sensors");
-            FirebaseCrash.report(e);
+            Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error configuring sensors");
+            Crashlytics.getInstance().core.log(e.getMessage());
         }
 
         try {
@@ -141,8 +141,8 @@ public class SensorHub {
         try {
             mLed.setValue(value);
         } catch (IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "Error updating GPIO value");
-            FirebaseCrash.report(e);
+            Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error updating GPIO value");
+            Crashlytics.getInstance().core.log(e.getMessage());
         }
     }
 
@@ -150,8 +150,8 @@ public class SensorHub {
         try {
             return mLed.getValue();
         } catch (IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "Error getting GPIO value");
-            FirebaseCrash.report(e);
+            Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error getting GPIO value");
+            Crashlytics.getInstance().core.log(e.getMessage());
             return false;
         }
     }
@@ -176,8 +176,8 @@ public class SensorHub {
             }
             return new SensorData(val1, val2);
         } catch (IOException e) {
-            FirebaseCrash.logcat(Log.ERROR, TAG, "Error reading sensor data");
-            FirebaseCrash.report(e);
+            Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error reading sensor data");
+            Crashlytics.getInstance().core.log(e.getMessage());
         }
         return null;
     }
@@ -190,8 +190,8 @@ public class SensorHub {
             try {
                 mButton.close();
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing BUTTON GPIO");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error closing BUTTON GPIO");
+                Crashlytics.getInstance().core.log(e.getMessage());
             } finally {
                 mButton = null;
             }
@@ -202,8 +202,8 @@ public class SensorHub {
             try {
                 mPir.close();
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing PIR GPIO");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error closing PIR GPIO");
+                Crashlytics.getInstance().core.log(e.getMessage());
             } finally {
                 mPir = null;
             }
@@ -213,8 +213,8 @@ public class SensorHub {
             try {
                 mLed.close();
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing LED GPIO");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error closing LED GPIO");
+                Crashlytics.getInstance().core.log(e.getMessage());
             } finally {
                 mLed = null;
             }
@@ -224,8 +224,8 @@ public class SensorHub {
             try {
                 mHtu21d.close();
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing HTU21D");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error closing HTU21D");
+                Crashlytics.getInstance().core.log(e.getMessage());
             } finally {
                 mHtu21d = null;
             }
@@ -235,8 +235,8 @@ public class SensorHub {
             try {
                 mCcs811.close();
             } catch (IOException e) {
-                FirebaseCrash.logcat(Log.ERROR, TAG, "Error closing CCS811");
-                FirebaseCrash.report(e);
+                Crashlytics.getInstance().core.log(Log.ERROR, TAG, "Error closing CCS811");
+                Crashlytics.getInstance().core.log(e.getMessage());
             } finally {
                 mCcs811 = null;
             }

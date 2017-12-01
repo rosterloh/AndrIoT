@@ -15,13 +15,13 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.io.File;
-import java.security.PrivateKey;
+import java.io.InputStream;
+import java.security.KeyFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -29,6 +29,7 @@ import javax.inject.Singleton;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import timber.log.Timber;
 
 import static com.rosterloh.andriot.db.CloudSettings.UNUSED_ACCOUNT_NAME;
@@ -46,9 +47,16 @@ public class MQTTPublisher implements AutoCloseable {
     private CloudSettings mSettings;
     private MessageListener mListener = new MessageListener();
     private AtomicBoolean mReady = new AtomicBoolean(false);
+    byte[] keyBytes = new byte[16384];
 
     @Inject
-    public MQTTPublisher(SettingsRepository settingsRepository) {
+    public MQTTPublisher(SettingsRepository settingsRepository, InputStream inputStream) {
+
+        try {
+            inputStream.read(keyBytes);
+        } catch (Exception e) {
+            Timber.e("Unable to open keyfile");
+        }
 
         settingsRepository.getCloudSettings().observeForever(settings -> {
             if (settings != null) {
@@ -107,36 +115,40 @@ public class MQTTPublisher implements AutoCloseable {
 
         mMqttClient = new MqttAsyncClient(mSettings.getBrokerUrl(), mSettings.getClientId(), new MemoryPersistence());
 
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
-        options.setUserName(UNUSED_ACCOUNT_NAME);
-        options.setPassword(createJwt().toCharArray());
-        options.setSSLProperties(new Properties());
+        try {
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
+            options.setUserName(UNUSED_ACCOUNT_NAME);
+            options.setPassword(createJwt().toCharArray());
+            //options.setSSLProperties(new Properties());
 
-        mMqttClient.connect(options, new IMqttActionListener() {
-            @Override
-            public void onSuccess(IMqttToken asyncActionToken) {
-                Timber.d("MQTT client connected.");
-                try {
-                    asyncActionToken.getClient().subscribe("/weather/#", MQTT_QOS, null, null, mListener);
-                } catch (Exception e) {
-                    Timber.w("Failed to subscribe");
+            mMqttClient.connect(options, new IMqttActionListener() {
+                @Override
+                public void onSuccess(IMqttToken asyncActionToken) {
+                    Timber.d("MQTT client connected.");
+                    try {
+                        asyncActionToken.getClient().subscribe("/weather/#", MQTT_QOS, null, null, mListener);
+                    } catch (Exception e) {
+                        Timber.w("Failed to subscribe");
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                Timber.w("Failed to connect to MQTT e:" + exception.getMessage());
-            }
-        });
-        mReady.set(true);
+                @Override
+                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                    Timber.w("Failed to connect to MQTT e:" + exception.getMessage());
+                }
+            });
+            mReady.set(true);
+        } catch (Exception e) {
+            Timber.e(e.getMessage());
+        }
     }
 
     private void sendMessage(String mqttTopic, byte[] mqttMessage) throws MqttException {
         mMqttClient.publish(mqttTopic, mqttMessage, MQTT_QOS, SHOULD_RETAIN);
     }
 
-    private String createJwt() {
+    private String createJwt() throws Exception {
         LocalDateTime now = LocalDateTime.now();
 
         JwtBuilder jwtBuilder = Jwts.builder()
@@ -144,7 +156,10 @@ public class MQTTPublisher implements AutoCloseable {
                 .setExpiration(Date.from(now.plusMinutes(20).atZone(ZoneId.systemDefault()).toInstant()))
                 .setAudience(mSettings.getProjectId());
 
-        return "Nope"; //jwtBuilder.signWith().compact();
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+
+        return jwtBuilder.signWith(SignatureAlgorithm.RS256, kf.generatePrivate(spec)).compact();
     }
 
     class MessageListener implements IMqttMessageListener {
