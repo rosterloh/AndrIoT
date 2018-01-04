@@ -4,11 +4,10 @@ apply plugin: 'com.google.firebase.firebase-perf'
 
 def versionMajor = 0
 def versionMinor = 6
-def versionPatch = 0
+def versionPatch = 1
 
 android {
     compileSdkVersion rootProject.ext.compile_sdk_version
-    buildToolsVersion rootProject.ext.build_tools_version
     defaultConfig {
         applicationId "com.rosterloh.andriot"
         minSdkVersion rootProject.ext.min_sdk_version

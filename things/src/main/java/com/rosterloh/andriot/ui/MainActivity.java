@@ -4,8 +4,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -18,24 +16,19 @@ import com.rosterloh.andriot.ui.dash.GraphFragment;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.support.HasSupportFragmentInjector;
+import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class MainActivity extends AppCompatActivity implements HasSupportFragmentInjector {
+public class MainActivity extends DaggerAppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST = 37;
     private static final int FRAGMENT_DASH = 0;
     private static final int FRAGMENT_TIMELINE = 1;
     private static final int FRAGMENT_SETTINGS = 2;
-
-    @Inject
-    DispatchingAndroidInjector<Fragment> mDispatchingAndroidInjector;
 
     @Inject
     SensorHub mSensorHub;
@@ -45,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         setupSideBar();
@@ -156,11 +148,6 @@ public class MainActivity extends AppCompatActivity implements HasSupportFragmen
                     + "required for this application", Toast.LENGTH_LONG).show();
         }
         requestPermissions(new String[]{CAMERA, WRITE_EXTERNAL_STORAGE, ACCESS_COARSE_LOCATION}, PERMISSIONS_REQUEST);
-    }
-
-    @Override
-    public DispatchingAndroidInjector<Fragment> supportFragmentInjector() {
-        return mDispatchingAndroidInjector;
     }
 
     @Override

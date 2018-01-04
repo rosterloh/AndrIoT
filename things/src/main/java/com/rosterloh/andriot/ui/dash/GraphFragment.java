@@ -6,7 +6,6 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,9 +32,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
+import dagger.android.support.DaggerFragment;
 
-public class GraphFragment extends Fragment {
+public class GraphFragment extends DaggerFragment {
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -55,7 +54,6 @@ public class GraphFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
         mDashViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DashViewModel.class);
 

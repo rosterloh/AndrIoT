@@ -1,21 +1,23 @@
 package com.rosterloh.andriot;
 
-import android.app.Activity;
-import android.app.Application;
-
 import com.google.android.things.AndroidThings;
+import com.rosterloh.andriot.di.AppComponent;
 import com.rosterloh.andriot.di.DaggerAppComponent;
 
-import javax.inject.Inject;
-
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
+import dagger.android.AndroidInjector;
+import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
-public class ThingsApp extends Application implements HasActivityInjector {
+public class ThingsApp extends DaggerApplication {
 
-    @Inject
-    DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
+
+        appComponent.inject(this);
+
+        return appComponent;
+    }
 
     @Override
     public void onCreate() {
@@ -26,15 +28,5 @@ public class ThingsApp extends Application implements HasActivityInjector {
         }
 
         Timber.i("Built with Things Version: " + AndroidThings.getVersionString());
-
-        DaggerAppComponent.builder()
-                .application(this)
-                .build()
-                .inject(this);
-    }
-
-    @Override
-    public DispatchingAndroidInjector<Activity> activityInjector() {
-        return mDispatchingAndroidInjector;
     }
 }

@@ -7,7 +7,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,10 +19,10 @@ import com.rosterloh.andriot.sensors.LiveDataBus;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
+import dagger.android.support.DaggerFragment;
 import timber.log.Timber;
 
-public class DashFragment extends Fragment {
+public class DashFragment extends DaggerFragment {
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -47,7 +46,6 @@ public class DashFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
         mDashViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DashViewModel.class);
 

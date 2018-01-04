@@ -6,8 +6,6 @@ def versionPatch = 2
 
 android {
     compileSdkVersion rootProject.ext.compile_sdk_version
-    buildToolsVersion rootProject.ext.build_tools_version
-
     defaultConfig {
         applicationId "com.rosterloh.thingsclient"
         minSdkVersion rootProject.ext.min_sdk_version
@@ -52,7 +50,7 @@ dependencies {
     compileOnly "com.google.dagger:dagger:$dagger_version"
 
     implementation project(path: ':common')
-    implementation "android.arch.lifecycle:runtime:$arch_version"
+    implementation "android.arch.lifecycle:runtime:1.0.3" //$arch_version"
     implementation "android.arch.lifecycle:extensions:$arch_version"
     implementation "android.arch.persistence.room:runtime:$arch_version"
     implementation "com.android.support:appcompat-v7:$support_version"
