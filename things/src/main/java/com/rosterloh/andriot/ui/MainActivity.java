@@ -32,10 +32,10 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     @Inject
     SensorHub mSensorHub;
-
+/*
     @Inject
     FirebaseAdapter mFirebase;
-
+*/
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,9 +106,9 @@ public class MainActivity extends DaggerAppCompatActivity {
                 api.getErrorDialog(this, result, GOOGLE_PLAY_SERVICES_REQUEST).show();
             }
             */
-        } else {
+        }/* else {
             mFirebase.onStart();
-        }
+        }*/
     }
 
     // Permission-related methods. This is not needed for Android Things, where permissions are
@@ -152,7 +152,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        mFirebase.onStop();
+        //mFirebase.onStop();
         super.onDestroy();
     }
 }

@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'com.google.firebase.firebase-perf'
+//apply plugin: 'com.google.firebase.firebase-perf'
 
 def versionMajor = 0
 def versionMinor = 6
@@ -58,9 +58,7 @@ dependencies {
     compileOnly "com.google.android.things:androidthings:$things_version"
     compileOnly "com.google.dagger:dagger:$dagger_version"
     implementation project(path: ':common')
-    implementation 'com.rosterloh.things:driver-htu21d:0.1'
-    implementation 'com.rosterloh.things:driver-bmx280:0.1'
-    implementation 'com.rosterloh.things:driver-ccs811:0.1'
+    implementation 'com.github.knobtviker:bme680:1.0.4'
     implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:cardview-v7:$support_version"
     implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
@@ -72,7 +70,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:$play_services_version"
     implementation "com.google.firebase:firebase-auth:$play_services_version"
     implementation "com.google.firebase:firebase-database:$play_services_version"
-    implementation "com.google.firebase:firebase-perf:$play_services_version"
+    //implementation "com.google.firebase:firebase-perf:$play_services_version"
     implementation "android.arch.persistence.room:runtime:$arch_version"
     implementation "android.arch.lifecycle:runtime:1.0.3" //$arch_version"
     implementation "android.arch.lifecycle:extensions:$arch_version"

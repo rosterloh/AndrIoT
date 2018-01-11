@@ -1,6 +1,5 @@
 package com.rosterloh.andriot.ui.dash;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
@@ -37,7 +36,7 @@ import dagger.android.support.DaggerFragment;
 public class GraphFragment extends DaggerFragment {
 
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
+    DashViewModelFactory mViewModelFactory;
 
     private GraphFragmentBinding mBinding;
     private DashViewModel mDashViewModel;

@@ -16,11 +16,14 @@ import dagger.android.support.DaggerApplication;
 @Component(modules = {
         AndroidSupportInjectionModule.class,
         AppModule.class,
-        MainActivityModule.class
+        BuildersModule.class
 })
 public interface AppComponent extends AndroidInjector<DaggerApplication> {
 
     void inject(ThingsApp thingsApp);
+
+    @Override
+    void inject(DaggerApplication instance);
 
     @Component.Builder
     interface Builder {

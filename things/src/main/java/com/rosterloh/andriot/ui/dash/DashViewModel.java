@@ -10,15 +10,12 @@ import com.rosterloh.andriot.db.Weather;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 public class DashViewModel extends ViewModel {
 
     private final LiveData<Weather> mWeather;
     private final LiveData<SensorData> mSensorData;
     private final LiveData<List<SensorData>> mSensorDataList;
 
-    @Inject
     DashViewModel(WeatherRepository weatherRepository, SensorsRepository sensorsRepository) {
         mWeather = weatherRepository.loadWeather();
         mSensorData = sensorsRepository.getCurrentValue();

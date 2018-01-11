@@ -33,8 +33,8 @@ public class SensorsRepository {
     private final SensorDao mSensorDao;
     private final SensorManager mSensorManager;
     private final SensorHub mSensorHub;
-    private final MQTTPublisher mMQTTPublisher;
-    private final FirebaseAdapter mFirebase;
+    //private final MQTTPublisher mMQTTPublisher;
+    //private final FirebaseAdapter mFirebase;
 
     private LiveData<List<SensorData>> mSensorData;
     private MutableLiveData<SensorData> mCurrentData = new MutableLiveData<>();
@@ -60,6 +60,9 @@ public class SensorsRepository {
                     current.setHumidity(sensorEvent.values[0]);
                     mCurrentData.setValue(current);
                     break;
+                case 65536:
+                    Timber.d("New gas resistance " + sensorEvent.values[0] + " and air quality " + sensorEvent.values[1]);
+                    break;
                 default:
                     Timber.w("Unknown sensor changed " + sensorEvent);
                     break;
@@ -74,13 +77,13 @@ public class SensorsRepository {
 
     @Inject
     SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorManager sensorManager,
-                      SensorHub sensorHub, MQTTPublisher mqttPublisher, FirebaseAdapter firebaseAdapter) {
+                      SensorHub sensorHub/*, MQTTPublisher mqttPublisher, FirebaseAdapter firebaseAdapter*/) {
         mAppExecutors = appExecutors;
         mSensorDao = sensorDao;
         mSensorManager = sensorManager;
         mSensorHub = sensorHub;
-        mMQTTPublisher = mqttPublisher;
-        mFirebase = firebaseAdapter;
+        //mMQTTPublisher = mqttPublisher;
+        //mFirebase = firebaseAdapter;
 
         mSensorData = mSensorDao.load();
         mSensorData.observeForever(data -> {
@@ -103,8 +106,11 @@ public class SensorsRepository {
             public void onDynamicSensorConnected(Sensor sensor) {
                 if (sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE
                         || sensor.getType() == Sensor.TYPE_PRESSURE
-                        || sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY) {
+                        || sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY
+                        || sensor.getType() == 65536) {
                     mSensorManager.registerListener(mListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                } else {
+                    Timber.w("Sensor type " + sensor.getType() + " not registered");
                 }
             }
         });
@@ -127,7 +133,7 @@ public class SensorsRepository {
                     Timber.w("Unknown topic " + event.getTopic());
             }
         });
-
+/*
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -146,7 +152,7 @@ public class SensorsRepository {
                     }
                 });
             }
-        }, INIT_DELAY, POLL_RATE);
+        }, INIT_DELAY, POLL_RATE);*/
     }
 
     public LiveData<List<SensorData>> loadValues() {

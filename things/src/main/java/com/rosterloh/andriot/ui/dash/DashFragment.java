@@ -1,17 +1,14 @@
 package com.rosterloh.andriot.ui.dash;
 
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ContentResolver;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
+import com.google.android.things.device.ScreenManager;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.databinding.DashFragmentBinding;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
@@ -25,13 +22,13 @@ import timber.log.Timber;
 public class DashFragment extends DaggerFragment {
 
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
+    DashViewModelFactory mViewModelFactory;
 
     @Inject
     ConnectionsServer mConnectionsServer;
 
     @Inject
-    ContentResolver mContentResolver;
+    ScreenManager mScreenManager;
 
     private DashFragmentBinding mBinding;
     private DashViewModel mDashViewModel;
@@ -49,35 +46,11 @@ public class DashFragment extends DaggerFragment {
         super.onActivityCreated(savedInstanceState);
         mDashViewModel = ViewModelProviders.of(this, mViewModelFactory).get(DashViewModel.class);
 
-        try {
-            int mode = Settings.System.getInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE);
-            if (mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                Timber.d("Setting SCREEN_BRIGHTNESS_MODE to MANUAL");
-                Settings.System.putInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS_MODE,
-                        Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-            }
-        } catch (Settings.SettingNotFoundException e) {
-            Timber.e("Could find SCREEN_BRIGHTNESS_MODE setting");
-        }
-
         LiveDataBus.subscribe(LiveDataBus.SUBJECT_MOTION_DATA, this, value -> {
             if (value != null) {
                 boolean currentValue = (boolean) value;
                 mBinding.setMotion(currentValue);
-                try {
-                    if (currentValue)
-                        Settings.System.putInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS, 255);
-                    else
-                        Settings.System.putInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS, 1);
-
-                    int brightness = Settings.System.getInt(mContentResolver, Settings.System.SCREEN_BRIGHTNESS);
-                    Timber.d("Screen brightness set to " + brightness);
-                    WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
-                    lp.screenBrightness = (float) brightness / 255;
-                    getActivity().getWindow().setAttributes(lp);
-                } catch (Settings.SettingNotFoundException e) {
-                    Timber.w("Could not set SCREEN_BRIGHTNESS");
-                }
+                mScreenManager.setBrightness(currentValue ? 255 : 1);
             }
         });
         mDashViewModel.getSensorData().observe(this, sensors -> mBinding.setSensors(sensors));

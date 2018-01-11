@@ -24,17 +24,12 @@ import dagger.Provides;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-@Module(includes = ViewModelModule.class)
+@Module
 class AppModule {
 
     @Provides
     Context provideContext(Application application) {
         return application.getApplicationContext();
-    }
-
-    @Provides
-    ContentResolver provideContentResolver(Application application) {
-        return application.getContentResolver();
     }
 
     @Provides
