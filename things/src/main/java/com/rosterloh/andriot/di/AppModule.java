@@ -14,6 +14,7 @@ import com.rosterloh.andriot.db.SettingsRepository;
 import com.rosterloh.andriot.db.ThingsDb;
 import com.rosterloh.andriot.db.WeatherDao;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
+import com.rosterloh.andriot.scheduler.ThingsScheduler;
 
 import java.io.InputStream;
 
@@ -38,8 +39,7 @@ class AppModule {
                 getResources().getIdentifier("rsa_private_pkcs8", "raw", context.getPackageName()));
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     WeatherService provideWeatherService() {
         return new Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org/data/2.5/")
@@ -48,53 +48,49 @@ class AppModule {
                 .create(WeatherService.class);
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     ThingsDb provideDb(Application app) {
         return Room.databaseBuilder(app, ThingsDb.class, "things.db")
-                .addMigrations(ThingsDb.MIGRATION_2_3, ThingsDb.MIGRATION_3_4)
+                .addMigrations(ThingsDb.MIGRATION_2_3, ThingsDb.MIGRATION_3_4, ThingsDb.MIGRATION_4_5)
                 .build();
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     WeatherDao provideWeatherDao(ThingsDb db) {
         return db.weatherDao();
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     SettingsDao provideSettingsDao(ThingsDb db) {
         return db.settingsDao();
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     SensorDao provideSensorDao(ThingsDb db) {
         return db.sensorDao();
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     SensorManager provideSensorManager(Application app) {
         return (SensorManager) app.getSystemService(Context.SENSOR_SERVICE);
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     ConnectionsServer provideConnectionsServer(Context context, SettingsRepository settingsRepository) {
         return new ConnectionsServer(context, settingsRepository);
     }
 
-    @Singleton
-    @Provides
+    @Provides @Singleton
     GattServer provideGattServer(Context context) {
         return new GattServer(context);
     }
 
+    @Provides @Singleton
+    ThingsScheduler provideScheduler(Context context) {
+        return new ThingsScheduler(context);
+    }
     /*
-    @Singleton
-    @Provides
+    @Provides @Singleton
     CameraController provideCameraController(Application app, SensorHub hub) {
         return new CameraController(app, hub);
     }*/

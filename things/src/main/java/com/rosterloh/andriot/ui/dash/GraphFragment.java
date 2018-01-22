@@ -100,8 +100,8 @@ public class GraphFragment extends DaggerFragment {
         YAxis leftAxis = mChart.getAxisLeft();
         //leftAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         leftAxis.setTextColor(textColour);
-        //leftAxis.setAxisMaximum(1500f);
-        //leftAxis.setAxisMinimum(0f);
+        leftAxis.setAxisMaximum(500f);
+        leftAxis.setAxisMinimum(0f);
         leftAxis.setDrawGridLines(false);
 
         YAxis rightAxis = mChart.getAxisRight();
@@ -114,8 +114,7 @@ public class GraphFragment extends DaggerFragment {
 
     private void drawGraph(List<SensorData> data) {
 
-        ArrayList<Entry> co2Values = new ArrayList<Entry>();
-        ArrayList<Entry> tvocValues = new ArrayList<Entry>();
+        ArrayList<Entry> airQualityValues = new ArrayList<Entry>();
         ArrayList<Entry> temperatureValues = new ArrayList<Entry>();
         ArrayList<Entry> humidityValues = new ArrayList<Entry>();
 
@@ -123,47 +122,34 @@ public class GraphFragment extends DaggerFragment {
 
             long millis = d.getTime().atZone(ZoneId.systemDefault()).toEpochSecond();
 
-            co2Values.add(new Entry(millis, d.getECO2()));
-            tvocValues.add(new Entry(millis, d.getTVOC()));
+            airQualityValues.add(new Entry(millis, d.getAirQuality()));
             temperatureValues.add(new Entry(millis, d.getTemperature()));
             humidityValues.add(new Entry(millis, d.getHumidity()));
         }
 
-        LineDataSet co2Set = new LineDataSet(co2Values, "eCO2");
-        co2Set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        co2Set.setColor(ColorTemplate.MATERIAL_COLORS[0]);
-        //co2Set.setValueTextColor(ColorTemplate.getHoloBlue());
-        co2Set.setLineWidth(1.5f);
-        co2Set.setDrawCircles(false);
-        co2Set.setDrawValues(false);
-        co2Set.setFillColor(ColorTemplate.MATERIAL_COLORS[0]);
-        co2Set.setHighLightColor(Color.rgb(244, 117, 117));
-        co2Set.setDrawCircleHole(false);
-
-        LineDataSet tvocSet = new LineDataSet(tvocValues, "TVOC");
-        tvocSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
-        tvocSet.setColor(ColorTemplate.MATERIAL_COLORS[1]);
-        //tvocSet.setValueTextColor(ColorTemplate.getHoloBlue());
-        tvocSet.setLineWidth(1.5f);
-        tvocSet.setDrawCircles(false);
-        tvocSet.setDrawValues(false);
-        tvocSet.setFillColor(ColorTemplate.MATERIAL_COLORS[1]);
-        tvocSet.setHighLightColor(Color.rgb(244, 117, 117));
-        tvocSet.setDrawCircleHole(false);
+        LineDataSet aqSet = new LineDataSet(airQualityValues, "Air Quality");
+        aqSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        aqSet.setColor(ColorTemplate.MATERIAL_COLORS[0]);
+        //aqSet.setValueTextColor(ColorTemplate.getHoloBlue());
+        aqSet.setLineWidth(1.5f);
+        aqSet.setDrawCircles(false);
+        aqSet.setDrawValues(false);
+        aqSet.setFillColor(ColorTemplate.MATERIAL_COLORS[0]);
+        aqSet.setHighLightColor(Color.rgb(244, 117, 117));
+        aqSet.setDrawCircleHole(false);
 
         LineDataSet temperatureSet = new LineDataSet(temperatureValues, "Temperature");
-        temperatureSet.setColor(ColorTemplate.MATERIAL_COLORS[2]);
+        temperatureSet.setColor(ColorTemplate.MATERIAL_COLORS[1]);
         temperatureSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
         temperatureSet.setDrawCircles(false);
 
         LineDataSet humiditySet = new LineDataSet(humidityValues, "Humidity");
-        humiditySet.setColor(ColorTemplate.MATERIAL_COLORS[3]);
+        humiditySet.setColor(ColorTemplate.MATERIAL_COLORS[2]);
         humiditySet.setAxisDependency(YAxis.AxisDependency.RIGHT);
         humiditySet.setDrawCircles(false);
 
         LineData d = new LineData();
-        d.addDataSet(co2Set);
-        d.addDataSet(tvocSet);
+        d.addDataSet(aqSet);
         d.addDataSet(temperatureSet);
         d.addDataSet(humiditySet);
 

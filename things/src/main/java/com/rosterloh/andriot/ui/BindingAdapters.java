@@ -1,4 +1,4 @@
-package com.rosterloh.andriot.binding;
+package com.rosterloh.andriot.ui;
 
 import android.databinding.BindingAdapter;
 import android.view.View;

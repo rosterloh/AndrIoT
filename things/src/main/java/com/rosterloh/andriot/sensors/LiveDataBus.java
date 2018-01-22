@@ -16,9 +16,10 @@ public class LiveDataBus {
 
     public static final int SUBJECT_MQTT_DATA = 0;
     public static final int SUBJECT_MOTION_DATA = 1;
+    public static final int SUBJECT_SENSOR_DATA = 2;
 
     @Retention(SOURCE)
-    @IntDef({SUBJECT_MQTT_DATA, SUBJECT_MOTION_DATA})
+    @IntDef({SUBJECT_MQTT_DATA, SUBJECT_MOTION_DATA, SUBJECT_SENSOR_DATA})
     @interface Subject {
     }
 

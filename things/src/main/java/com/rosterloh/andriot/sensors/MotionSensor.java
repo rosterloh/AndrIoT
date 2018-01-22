@@ -1,17 +1,22 @@
 package com.rosterloh.andriot.sensors;
 
+import android.support.annotation.IntDef;
+
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManagerService;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class MotionSensor implements AutoCloseable {
 
-    public enum State {
-        STATE_HIGH,
-        STATE_LOW
-    }
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({STATE_LOW, STATE_HIGH})
+    public @interface State {}
+    private static final int STATE_LOW = 0;
+    private static final int STATE_HIGH = 1;
 
     private Gpio mMotionDetectorGpio;
     private OnMotionDetectedEventListener mOnMotionDetectedEventListener;
@@ -23,7 +28,7 @@ public class MotionSensor implements AutoCloseable {
             try {
                 if (gpio.getValue() != mLastState) {
                     mLastState = gpio.getValue();
-                    performMotionEvent(mLastState ? State.STATE_HIGH : State.STATE_LOW);
+                    performMotionEvent(mLastState ? STATE_HIGH : STATE_LOW);
                 }
             } catch (IOException e) {
 
@@ -60,7 +65,7 @@ public class MotionSensor implements AutoCloseable {
         mMotionDetectorGpio.registerGpioCallback(mInterruptCallback);
     }
 
-    private void performMotionEvent(State state) {
+    private void performMotionEvent(@State int state) {
         if (mOnMotionDetectedEventListener != null) {
             mOnMotionDetectedEventListener.onMotionDetectedEvent(state);
         }
@@ -85,6 +90,6 @@ public class MotionSensor implements AutoCloseable {
     }
 
     public interface OnMotionDetectedEventListener {
-        void onMotionDetectedEvent(State state);
+        void onMotionDetectedEvent(@State int state);
     }
 }

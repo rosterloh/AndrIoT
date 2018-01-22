@@ -17,7 +17,6 @@ import com.rosterloh.andriot.sensors.LiveDataBus;
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
-import timber.log.Timber;
 
 public class DashFragment extends DaggerFragment {
 

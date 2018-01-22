@@ -27,41 +27,31 @@ public class SensorData {
     @ColumnInfo(name = "pressure")
     private float mPressure;
 
-    @ColumnInfo(name = "eco2")
-    private int mECO2;
-
-    @ColumnInfo(name = "tvoc")
-    private int mTVOC;
+    @ColumnInfo(name = "air_quality")
+    private float mAirQuality;
 
     public SensorData(@NonNull LocalDateTime time, float temperature, float humidity, float pressure,
-                      int eCO2, int tVOC) {
+                      float airQuality) {
         mTime = time;
         mTemperature = temperature;
         mHumidity = humidity;
         mPressure = pressure;
-        mECO2 = eCO2;
-        mTVOC = tVOC;
+        mAirQuality = airQuality;
     }
 
     @Ignore
-    public SensorData(float[] th, int[] aq) {
+    public SensorData(float[] values) {
         mTime = LocalDateTime.now();
-        if (th.length > 2) {
-            mTemperature = th[0];
-            mHumidity = th[1];
-            mPressure = th[2];
+        if (values.length > 3) {
+            mTemperature = values[0];
+            mHumidity = values[1];
+            mPressure = values[2];
+            mAirQuality = values[3];
         } else {
-            mTemperature = th[0];
-            mHumidity = th[1];
+            mTemperature = 0;
+            mHumidity = 0;
             mPressure = 0;
-        }
-        // Check if data is valid
-        if ((aq[2] & (1 << 3)) != 0) {
-            mECO2 = aq[0];
-            mTVOC = aq[1];
-        } else {
-            mECO2 = 0;
-            mTVOC = 0;
+            mAirQuality = 0;
         }
     }
 
@@ -93,20 +83,12 @@ public class SensorData {
         this.mPressure = mPressure;
     }
 
-    public int getECO2() {
-        return mECO2;
+    public float getAirQuality() {
+        return mAirQuality;
     }
 
-    public void setECO2(int eco2) {
-        mECO2 = eco2;
-    }
-
-    public int getTVOC() {
-        return mTVOC;
-    }
-
-    public void setTVOC(int tvoc) {
-        mTVOC = tvoc;
+    public void setAirQuality(float aq) {
+        mAirQuality = aq;
     }
 
     @Override
@@ -116,8 +98,7 @@ public class SensorData {
                 + ", temperature=" + mTemperature
                 + ", humidity=" + mHumidity
                 + ", pressure=" + mPressure
-                + ", eco2=" + mECO2
-                + ", tvoc=" + mTVOC
+                + ", air_quality=" + mAirQuality
                 + '}';
     }
 }

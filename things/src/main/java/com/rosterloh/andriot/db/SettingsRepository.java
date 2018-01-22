@@ -1,8 +1,12 @@
 package com.rosterloh.andriot.db;
 
+import android.app.job.JobInfo;
 import android.arch.lifecycle.LiveData;
+import android.content.ComponentName;
 
 import com.rosterloh.andriot.AppExecutors;
+import com.rosterloh.andriot.scheduler.IpJobService;
+import com.rosterloh.andriot.scheduler.ThingsScheduler;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,14 +21,16 @@ public class SettingsRepository {
 
     private final AppExecutors mAppExecutors;
     private final SettingsDao mSettingsDao;
+    private final ThingsScheduler mScheduler;
 
     private LiveData<LocalSettings> mLocalSettings;
     private LiveData<CloudSettings> mCloudSettings;
 
     @Inject
-    SettingsRepository(AppExecutors appExecutors, SettingsDao settingsDao) {
+    SettingsRepository(AppExecutors appExecutors, SettingsDao settingsDao, ThingsScheduler scheduler) {
         mAppExecutors = appExecutors;
         mSettingsDao = settingsDao;
+        mScheduler = scheduler;
 
         mLocalSettings = mSettingsDao.loadLocalSettings();
         mLocalSettings.observeForever(settings -> {
@@ -33,6 +39,7 @@ public class SettingsRepository {
                 mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new LocalSettings()));
             } else {
                 Timber.d(mLocalSettings.getValue().toString());
+                mScheduler.scheduleIpAddressService();
             }
         });
 
@@ -63,11 +70,13 @@ public class SettingsRepository {
     }
 
     public void setIpAddress(String ip) {
-        Timber.d("IP changed to " + ip);
         LocalSettings settings = mLocalSettings.getValue();
         if (settings != null) {
-            settings.setIpAddress(ip);
-            mAppExecutors.diskIO().execute(() -> mSettingsDao.update(settings));
+            if (!settings.getIpAddress().equals(ip)) {
+                Timber.d("IP changed to " + ip);
+                settings.setIpAddress(ip);
+                mAppExecutors.diskIO().execute(() -> mSettingsDao.update(settings));
+            }
         }
     }
 }

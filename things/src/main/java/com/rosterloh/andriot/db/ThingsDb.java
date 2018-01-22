@@ -4,12 +4,13 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.migration.Migration;
+import android.support.annotation.NonNull;
 
 /**
  * Main database description.
  */
 @Database(entities = {Weather.class, CloudSettings.class, LocalSettings.class, SensorData.class},
-        version = 4, exportSchema = false)
+        version = 5, exportSchema = false)
 public abstract class ThingsDb extends RoomDatabase {
 
     public abstract WeatherDao weatherDao();
@@ -77,6 +78,20 @@ public abstract class ThingsDb extends RoomDatabase {
                     + " SELECT * FROM sensor_data");
             database.execSQL("DROP TABLE sensor_data");
             database.execSQL("ALTER TABLE sensor_data_new RENAME TO sensor_data");
+        }
+    };
+
+    public static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP TABLE sensor_data");
+            database.execSQL("CREATE TABLE sensor_data ("
+                    + "time TEXT NOT NULL, "
+                    + "temperature REAL NOT NULL, "
+                    + "humidity REAL NOT NULL, "
+                    + "pressure REAL NOT NULL, "
+                    + "air_quality REAL NOT NULL, "
+                    + " PRIMARY KEY(time))");
         }
     };
 }

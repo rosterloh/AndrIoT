@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.rosterloh.andriot.R;
-import com.rosterloh.andriot.db.FirebaseAdapter;
 import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.dash.DashFragment;
 import com.rosterloh.andriot.ui.dash.GraphFragment;
@@ -32,16 +31,12 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     @Inject
     SensorHub mSensorHub;
-/*
-    @Inject
-    FirebaseAdapter mFirebase;
-*/
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         setupSideBar();
-        checkPlayServices();
         if (hasPermission()) {
             if (savedInstanceState == null) {
                 navigateToFragment(FRAGMENT_DASH);
@@ -49,6 +44,12 @@ public class MainActivity extends DaggerAppCompatActivity {
         } else {
             requestPermission();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkPlayServices();
     }
 
     public void navigateToFragment(int id) {
@@ -98,6 +99,7 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     public void checkPlayServices() {
         GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        //Crashlytics.log("PlayServices version " + api.GOOGLE_PLAY_SERVICES_VERSION_CODE);
         int result = api.isGooglePlayServicesAvailable(this);
         if (result != ConnectionResult.SUCCESS) {
             Timber.w("Google Play Services are not available");
@@ -106,9 +108,7 @@ public class MainActivity extends DaggerAppCompatActivity {
                 api.getErrorDialog(this, result, GOOGLE_PLAY_SERVICES_REQUEST).show();
             }
             */
-        }/* else {
-            mFirebase.onStart();
-        }*/
+        }
     }
 
     // Permission-related methods. This is not needed for Android Things, where permissions are
@@ -152,7 +152,6 @@ public class MainActivity extends DaggerAppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        //mFirebase.onStop();
         super.onDestroy();
     }
 }

@@ -3,19 +3,13 @@ package com.rosterloh.andriot.db;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 
 import com.rosterloh.andriot.AppExecutors;
-import com.rosterloh.andriot.cloud.MQTTPublisher;
 import com.rosterloh.andriot.sensors.LiveDataBus;
 import com.rosterloh.andriot.sensors.MqttEvent;
 import com.rosterloh.andriot.sensors.SensorHub;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -31,7 +25,6 @@ public class SensorsRepository {
 
     private final AppExecutors mAppExecutors;
     private final SensorDao mSensorDao;
-    private final SensorManager mSensorManager;
     private final SensorHub mSensorHub;
     //private final MQTTPublisher mMQTTPublisher;
     //private final FirebaseAdapter mFirebase;
@@ -39,48 +32,11 @@ public class SensorsRepository {
     private LiveData<List<SensorData>> mSensorData;
     private MutableLiveData<SensorData> mCurrentData = new MutableLiveData<>();
 
-    private SensorEventListener mListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            Timber.d(sensorEvent.values.length + " new sensor values");
-            SensorData current = mCurrentData.getValue();
-            switch (sensorEvent.sensor.getType()) {
-                case Sensor.TYPE_AMBIENT_TEMPERATURE:
-                    Timber.d("New temperature " + sensorEvent.values[0]);
-                    current.setTemperature(sensorEvent.values[0]);
-                    mCurrentData.setValue(current);
-                    break;
-                case Sensor.TYPE_PRESSURE:
-                    Timber.d("New pressure " + sensorEvent.values[0]);
-                    current.setPressure(sensorEvent.values[0]);
-                    mCurrentData.setValue(current);
-                    break;
-                case Sensor.TYPE_RELATIVE_HUMIDITY:
-                    Timber.d("New humidity " + sensorEvent.values[0]);
-                    current.setHumidity(sensorEvent.values[0]);
-                    mCurrentData.setValue(current);
-                    break;
-                case 65536:
-                    Timber.d("New gas resistance " + sensorEvent.values[0] + " and air quality " + sensorEvent.values[1]);
-                    break;
-                default:
-                    Timber.w("Unknown sensor changed " + sensorEvent);
-                    break;
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            Timber.d("Sensor accuracy changed to " + accuracy);
-        }
-    };
-
     @Inject
-    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorManager sensorManager,
-                      SensorHub sensorHub/*, MQTTPublisher mqttPublisher, FirebaseAdapter firebaseAdapter*/) {
+    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorHub sensorHub
+            /*, MQTTPublisher mqttPublisher, FirebaseAdapter firebaseAdapter*/) {
         mAppExecutors = appExecutors;
         mSensorDao = sensorDao;
-        mSensorManager = sensorManager;
         mSensorHub = sensorHub;
         //mMQTTPublisher = mqttPublisher;
         //mFirebase = firebaseAdapter;
@@ -94,23 +50,11 @@ public class SensorsRepository {
                 Timber.d("New data " + data.toString());
                 if(data.size() > 0) {
                     mCurrentData.setValue(data.get(data.size() - 1));
+                } else {
+                    mCurrentData.setValue(new SensorData(new float[]{0, 0, 0 ,0}));
                 }
                 if (mSensorData.getValue().size() > 100) {
                     mAppExecutors.diskIO().execute(() -> mSensorDao.delete(mSensorData.getValue().get(0)));
-                }
-            }
-        });
-
-        mSensorManager.registerDynamicSensorCallback(new SensorManager.DynamicSensorCallback() {
-            @Override
-            public void onDynamicSensorConnected(Sensor sensor) {
-                if (sensor.getType() == Sensor.TYPE_AMBIENT_TEMPERATURE
-                        || sensor.getType() == Sensor.TYPE_PRESSURE
-                        || sensor.getType() == Sensor.TYPE_RELATIVE_HUMIDITY
-                        || sensor.getType() == 65536) {
-                    mSensorManager.registerListener(mListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-                } else {
-                    Timber.w("Sensor type " + sensor.getType() + " not registered");
                 }
             }
         });
@@ -120,11 +64,11 @@ public class SensorsRepository {
             SensorData current = mCurrentData.getValue();
             switch (event.getTopic()) {
                 case "/weather/co2":
-                    current.setECO2(Integer.parseInt(event.getMessage()));
+                    //current.setECO2(Integer.parseInt(event.getMessage()));
                     mCurrentData.setValue(current);
                     break;
                 case "/weather/tvoc":
-                    current.setTVOC(Integer.parseInt(event.getMessage()));
+                    //current.setTVOC(Integer.parseInt(event.getMessage()));
                     mCurrentData.setValue(current);
                     break;
                 case "/weather/temperature":
@@ -161,5 +105,26 @@ public class SensorsRepository {
 
     public LiveData<SensorData> getCurrentValue() {
         return mCurrentData;
+    }
+
+    public void setSensorValue(int type, float value) {
+        SensorData current = mCurrentData.getValue();
+        if (current != null) {
+            switch (type) {
+                case Sensor.TYPE_AMBIENT_TEMPERATURE:
+                    current.setTemperature(value);
+                    break;
+                case Sensor.TYPE_RELATIVE_HUMIDITY:
+                    current.setHumidity(value);
+                    break;
+                case Sensor.TYPE_PRESSURE:
+                    current.setPressure(value);
+                    break;
+                case Sensor.TYPE_DEVICE_PRIVATE_BASE:
+                    current.setAirQuality(value);
+                    break;
+            }
+            mCurrentData.setValue(current);
+        }
     }
 }
