@@ -4,14 +4,14 @@ def versionMajor = 0
 def versionMinor = 1
 
 android {
-    compileSdkVersion rootProject.ext.compile_sdk_version
+    compileSdkVersion build_versions.target_sdk
     defaultConfig {
-        minSdkVersion rootProject.ext.min_sdk_version
-        targetSdkVersion rootProject.ext.target_sdk_version
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode versionMajor * 10 + versionMinor
         versionName "${versionMajor}.${versionMinor}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "NEARBY_SERVICE_ID", "\"${rootProject.ext.nearby_service_id}\""
+        buildConfigField "String", "NEARBY_SERVICE_ID", "\"${deps.nearby_service_id}\""
     }
     buildTypes {
         release {
@@ -26,11 +26,12 @@ android {
 }
 
 dependencies {
-    implementation "com.android.support:appcompat-v7:$support_version"
-    implementation "com.google.android.gms:play-services-nearby:$play_services_version"
-    testImplementation "junit:junit:$junit_version"
-    testImplementation "org.mockito:mockito-core:$mockito_version"
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$espresso_version", {
+    implementation deps.support.app_compat
+    implementation deps.play_services.nearby
+    testImplementation deps.junit
+    androidTestImplementation deps.mockito.core
+    androidTestImplementation(deps.espresso.core, {
         exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
 }

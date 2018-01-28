@@ -5,16 +5,16 @@ def versionMinor = 0
 def versionPatch = 2
 
 android {
-    compileSdkVersion rootProject.ext.compile_sdk_version
+    compileSdkVersion build_versions.target_sdk
     defaultConfig {
         applicationId "com.rosterloh.thingsclient"
-        minSdkVersion rootProject.ext.min_sdk_version
-        targetSdkVersion rootProject.ext.target_sdk_version
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode versionMajor * 1000 + versionMinor * 100 + versionPatch
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
         testInstrumentationRunner "com.rosterloh.thingsclient.ClientTestRunner"
         resValue "string", "maps_api_key", "$System.env.MAPS_API_KEY"
-        buildConfigField "String", "NEARBY_SERVICE_ID", "\"${rootProject.ext.nearby_service_id}\""
+        buildConfigField "String", "NEARBY_SERVICE_ID", "\"${deps.nearby_service_id}\""
     }
     signingConfigs {
         debug {
@@ -47,48 +47,56 @@ android {
 }
 
 dependencies {
-    compileOnly "com.google.dagger:dagger:$dagger_version"
-
     implementation project(path: ':common')
-    implementation "android.arch.lifecycle:runtime:1.0.3" //$arch_version"
-    implementation "android.arch.lifecycle:extensions:$arch_version"
-    implementation "android.arch.persistence.room:runtime:$arch_version"
-    implementation "com.android.support:appcompat-v7:$support_version"
-    implementation "com.android.support:cardview-v7:$support_version"
-    implementation "com.android.support.constraint:constraint-layout:$constraint_layout_version"
-    implementation "com.android.support:design:$support_version"
-    implementation "com.android.support:recyclerview-v7:$support_version"
-    implementation "com.google.dagger:dagger-android:$dagger_version"
-    implementation "com.google.dagger:dagger-android-support:$dagger_version"
-    implementation "com.google.android.gms:play-services-location:$play_services_version"
-    implementation "com.google.android.gms:play-services-maps:$play_services_version"
-    implementation "com.google.android.gms:play-services-nearby:$play_services_version"
-    implementation "com.jakewharton.timber:timber:$timber_version"
+    // Support
+    implementation deps.support.app_compat
+    implementation deps.support.cardview
+    implementation deps.support.design
+    implementation deps.support.recyclerview
+    implementation deps.constraint_layout
+    // Play Services
+    implementation(deps.play_services.crashlytics) { transitive = true }
+    implementation deps.play_services.location
+    implementation deps.play_services.maps
+    implementation deps.play_services.nearby
+    implementation deps.play_services.firebase
+    // Architecture components
+    implementation deps.room.runtime
+    annotationProcessor deps.room.compiler
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.extensions
+    implementation deps.lifecycle.java8
+    annotationProcessor deps.lifecycle.compiler
+    // Dagger
+    implementation deps.dagger.runtime
+    implementation deps.dagger.android
+    implementation deps.dagger.android_support
+    annotationProcessor deps.dagger.android_support_compiler
+    annotationProcessor deps.dagger.compiler
 
-    annotationProcessor "android.arch.lifecycle:compiler:$arch_version"
-    annotationProcessor "android.arch.persistence.room:compiler:$arch_version"
-    annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
-    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
-
-    testImplementation "junit:junit:$junit_version"
-    testImplementation ("android.arch.core:core-testing:$arch_version", {
+    implementation deps.timber
+    // Testing
+    testImplementation deps.junit
+    testImplementation (deps.arch_core.testing, {
         exclude group: 'com.android.support', module: 'support-compat'
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.android.support', module: 'support-core-utils'
     })
 
-    androidTestImplementation "com.android.support:appcompat-v7:$support_version"
-    androidTestImplementation "com.android.support:support-v4:$support_version"
-    androidTestImplementation "com.android.support:design:$support_version"
-    androidTestImplementation("com.android.support.test.espresso:espresso-core:$espresso_version", {
+    androidTestImplementation deps.support.app_compat
+    androidTestImplementation deps.support.recyclerview
+    androidTestImplementation deps.support.cardview
+    androidTestImplementation deps.support.design
+    androidTestImplementation(deps.espresso.core, {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
-    androidTestImplementation("com.android.support.test.espresso:espresso-contrib:$espresso_version", {
+    androidTestImplementation(deps.espresso.contrib, {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.code.findbugs', module: 'jsr305'
     })
-    androidTestImplementation "android.arch.core:core-testing:$arch_version"
-    androidTestImplementation "org.hamcrest:hamcrest-library:$hamcrest_version"
-    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
+    androidTestImplementation(deps.arch_core.testing, {
+    })
+    androidTestImplementation deps.hamcrest.library
+    androidTestImplementation deps.mockito.core, { exclude group: 'net.bytebuddy' }
 }

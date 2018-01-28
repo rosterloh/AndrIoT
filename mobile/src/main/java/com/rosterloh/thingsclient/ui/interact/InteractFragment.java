@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +18,9 @@ import com.rosterloh.thingsclient.databinding.InteractFragmentBinding;
 
 import javax.inject.Inject;
 
-import dagger.android.support.AndroidSupportInjection;
+import dagger.android.support.DaggerFragment;
 
-public class InteractFragment extends Fragment {
+public class InteractFragment extends DaggerFragment {
 
     @Inject
     InteractViewModelFactory mViewModelFactory;
@@ -44,7 +43,6 @@ public class InteractFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        AndroidSupportInjection.inject(this);
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(this, mViewModelFactory)
                 .get(InteractViewModel.class);

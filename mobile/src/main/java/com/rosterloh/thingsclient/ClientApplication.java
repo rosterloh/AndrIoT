@@ -1,22 +1,20 @@
 package com.rosterloh.thingsclient;
 
-import android.app.Activity;
-import android.app.Application;
-
-import com.rosterloh.thingsclient.BuildConfig;
+import com.rosterloh.thingsclient.di.AppComponent;
 import com.rosterloh.thingsclient.di.DaggerAppComponent;
 
-import javax.inject.Inject;
-
 import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
+import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
-public class ClientApplication extends Application implements HasActivityInjector {
+public class ClientApplication extends DaggerApplication {
 
-    @Inject
-    DispatchingAndroidInjector<Activity> mDispatchingAndroidInjector;
+    @Override
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        AppComponent appComponent =  DaggerAppComponent.builder().application(this).build();
+        appComponent.inject(this);
+        return appComponent;
+    }
 
     @Override
     public void onCreate() {
@@ -25,16 +23,5 @@ public class ClientApplication extends Application implements HasActivityInjecto
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-
-        DaggerAppComponent
-                .builder()
-                .application(this)
-                .build()
-                .inject(this);
-    }
-
-    @Override
-    public AndroidInjector<Activity> activityInjector() {
-        return mDispatchingAndroidInjector;
     }
 }
