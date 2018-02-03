@@ -1,6 +1,7 @@
 package com.rosterloh.andriot.ui;
 
 import android.databinding.BindingAdapter;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,7 +19,6 @@ public class BindingAdapters {
 
     @BindingAdapter("weatherIcon")
     public static void convertIcon(TextView textView, String iconId) {
-
         if (iconId != null) {
             int res;
 
@@ -83,5 +83,41 @@ public class BindingAdapters {
 
             textView.setText(res);
         }
+    }
+
+    @BindingAdapter("airQuality")
+    public static void displayIaq(TextView textView, float iaq) {
+        String msg = String.format("%2.0f: ", iaq);
+        //  IAQ classification and color-coding
+        //  0 - 50 - good - #00e400
+        //  51 - 100 - average - #ffff00
+        //  101 - 200 - little bad - #ff7e00
+        //  201 - 300 - bad - #ff0000
+        //  301 - 400 - worse - #99004c
+        //  401 - 500 - very bad - #000000
+        if (iaq >= 401.0 && iaq <= 500) {
+            msg += "Very bad";
+            textView.setBackgroundColor(0x2A000000);
+        } else if (iaq >= 301 && iaq <= 400) {
+            msg += "Worse";
+            textView.setBackgroundColor(0x2A99004C);
+        } else if (iaq >= 201 && iaq <= 300) {
+            msg += "Bad";
+            textView.setBackgroundColor(0x2AFF0000);
+        } else if (iaq >= 101 && iaq <= 200) {
+            msg += "Little bad";
+            textView.setBackgroundColor(0x2AFF7E00);
+        } else if (iaq >= 51 && iaq <= 100){
+            msg += "Average";
+            textView.setBackgroundColor(0x2AFFFF00);
+        } else if (iaq >= 0 && iaq <= 50){
+            msg += "Good";
+            textView.setBackgroundColor(0x2A00E400);
+        } else {
+            msg += "Unknown";
+            textView.setBackgroundColor(0xFA202020);
+        }
+        msg += " Air Quality";
+        textView.setText(msg);
     }
 }

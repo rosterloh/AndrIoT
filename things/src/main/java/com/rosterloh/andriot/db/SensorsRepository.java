@@ -10,6 +10,8 @@ import com.rosterloh.andriot.sensors.MqttEvent;
 import com.rosterloh.andriot.sensors.SensorHub;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -26,20 +28,15 @@ public class SensorsRepository {
     private final AppExecutors mAppExecutors;
     private final SensorDao mSensorDao;
     private final SensorHub mSensorHub;
-    //private final MQTTPublisher mMQTTPublisher;
-    //private final FirebaseAdapter mFirebase;
 
     private LiveData<List<SensorData>> mSensorData;
     private MutableLiveData<SensorData> mCurrentData = new MutableLiveData<>();
 
     @Inject
-    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorHub sensorHub
-            /*, MQTTPublisher mqttPublisher, FirebaseAdapter firebaseAdapter*/) {
+    SensorsRepository(AppExecutors appExecutors, SensorDao sensorDao, SensorHub sensorHub) {
         mAppExecutors = appExecutors;
         mSensorDao = sensorDao;
         mSensorHub = sensorHub;
-        //mMQTTPublisher = mqttPublisher;
-        //mFirebase = firebaseAdapter;
 
         mSensorData = mSensorDao.load();
         mSensorData.observeForever(data -> {
@@ -47,7 +44,7 @@ public class SensorsRepository {
                 Timber.d("Empty data received");
                 //mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new LocalSettings()));
             } else {
-                Timber.d("New data " + data.toString());
+                Timber.d("New data " + data.get(data.size() - 1).toString());
                 if(data.size() > 0) {
                     mCurrentData.setValue(data.get(data.size() - 1));
                 } else {
@@ -77,26 +74,20 @@ public class SensorsRepository {
                     Timber.w("Unknown topic " + event.getTopic());
             }
         });
-/*
+
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                appExecutors.diskIO().execute(() -> {
+                appExecutors.mainThread().execute(() -> {
                     SensorData data = mSensorHub.getSensorData();
                     if (data != null) {
-                        SensorData current = mCurrentData.getValue();
-                        if (current != null) {
-                            data.setECO2(current.getECO2());
-                            data.setTVOC(current.getTVOC());
-                        }
-                        mSensorDao.insert(data);
-
+                        appExecutors.diskIO().execute(() -> mSensorDao.insert(data));
                         //mFirebase.uploadSensorData(data);
                     }
                 });
             }
-        }, INIT_DELAY, POLL_RATE);*/
+        }, INIT_DELAY, POLL_RATE);
     }
 
     public LiveData<List<SensorData>> loadValues() {

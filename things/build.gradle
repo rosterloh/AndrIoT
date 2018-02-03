@@ -57,7 +57,7 @@ repositories {
 dependencies {
     implementation project(path: ':common')
     implementation deps.androidthings
-    implementation 'com.github.knobtviker:bme680:1.0.6'
+    implementation 'com.github.knobtviker:bme680:1.0.8'
     // Support
     implementation deps.support.app_compat
     implementation deps.support.cardview
@@ -80,7 +80,7 @@ dependencies {
     implementation deps.dagger.android_support
     annotationProcessor deps.dagger.android_support_compiler
     annotationProcessor deps.dagger.compiler
-
+    // Other
     implementation deps.retrofit.runtime
     implementation deps.retrofit.gson
     implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.1-LOCAL"

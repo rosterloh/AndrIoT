@@ -14,6 +14,8 @@ import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.di.AppComponent;
 import com.rosterloh.andriot.di.DaggerAppComponent;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
@@ -78,13 +80,6 @@ public class ThingsApp extends DaggerApplication implements SensorEventListener 
                     Timber.d("New air quality " + sensorEvent.values[Bme680SensorDriver.INDOOR_AIR_QUALITY_INDEX]);
                     sensorsRepository.setSensorValue(type, sensorEvent.values[Bme680SensorDriver.INDOOR_AIR_QUALITY_INDEX]);
                 }
-                //IAQ classification and color-coding
-                //  0 - 50 - good - #00e400
-                //  51 - 100 - average - #ffff00
-                //  101 - 200 - little bad - #ff7e00
-                //  201 - 300 - bad - #ff0000
-                //  301 - 400 - worse - #99004c
-                //  401 - 500 - very bad - #000000
                 break;
             default:
                 Timber.w("Unknown sensor changed " + sensorEvent);
@@ -101,8 +96,8 @@ public class ThingsApp extends DaggerApplication implements SensorEventListener 
         switch (sensor.getType()) {
             case Sensor.TYPE_AMBIENT_TEMPERATURE:
             case Sensor.TYPE_RELATIVE_HUMIDITY:
-            //case Sensor.TYPE_PRESSURE:
-            case Sensor.TYPE_LIGHT:
+            case Sensor.TYPE_PRESSURE:
+            //case Sensor.TYPE_LIGHT:
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL);
                 break;
             case Sensor.TYPE_DEVICE_PRIVATE_BASE:

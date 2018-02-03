@@ -22,7 +22,10 @@ versions.dexmaker = "2.2.0"
 versions.constraint_layout = "1.1.0-beta4"
 versions.glide = "3.8.0"
 versions.timber = "4.6.0"
-versions.android_gradle_plugin = "3.1.0-alpha09"
+versions.android_gradle_plugin = "3.2.0-alpha01"
+versions.google_services_plugin = "3.2.0"
+versions.firebase_plugin = "1.1.5"
+versions.fabric_plugin = "1.25.1"
 versions.rxjava2 = "2.1.9"
 versions.rx_android = "2.0.1"
 versions.atsl_runner = "1.0.1"
@@ -127,6 +130,9 @@ deps.mock_web_server = "com.squareup.okhttp3:mockwebserver:$versions.mockwebserv
 deps.rxjava2 = "io.reactivex.rxjava2:rxjava:$versions.rxjava2"
 deps.rx_android = "io.reactivex.rxjava2:rxandroid:$versions.rx_android"
 deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+deps.google_services_plugin = "com.google.gms:google-services:$versions.google_services_plugin"
+deps.firebase_plugin = "com.google.firebase:firebase-plugins:$versions.firebase_plugin"
+deps.fabric_plugin = "io.fabric.tools:gradle:$versions.fabric_plugin"
 deps.nearby_service_id = "com.rosterloh.andriot.service"
 deps.androidthings = "com.google.android.things:androidthings:$versions.things"
 ext.deps = deps
@@ -143,6 +149,6 @@ def addRepos(RepositoryHandler handler) {
     handler.mavenLocal()
     handler.maven { url 'https://maven.fabric.io/public' }
     handler.maven { url "https://jitpack.io" }
-    handler.maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    //handler.maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 ext.addRepos = this.&addRepos

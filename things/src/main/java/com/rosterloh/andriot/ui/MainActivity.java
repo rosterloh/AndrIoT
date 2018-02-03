@@ -9,11 +9,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.rosterloh.andriot.R;
-import com.rosterloh.andriot.sensors.SensorHub;
 import com.rosterloh.andriot.ui.dash.DashFragment;
 import com.rosterloh.andriot.ui.dash.GraphFragment;
-
-import javax.inject.Inject;
 
 import dagger.android.support.DaggerAppCompatActivity;
 import timber.log.Timber;
@@ -28,9 +25,6 @@ public class MainActivity extends DaggerAppCompatActivity {
     private static final int FRAGMENT_DASH = 0;
     private static final int FRAGMENT_TIMELINE = 1;
     private static final int FRAGMENT_SETTINGS = 2;
-
-    @Inject
-    SensorHub mSensorHub;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

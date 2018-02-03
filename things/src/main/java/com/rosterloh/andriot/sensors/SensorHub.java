@@ -7,7 +7,9 @@ import com.crashlytics.android.Crashlytics;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
 import com.google.android.things.pio.PeripheralManagerService;
+import com.knobtviker.android.things.contrib.driver.bme680.Bme680;
 import com.knobtviker.android.things.contrib.driver.bme680.Bme680SensorDriver;
+import com.rosterloh.andriot.db.SensorData;
 
 import java.io.IOException;
 
@@ -29,6 +31,7 @@ public class SensorHub {
     private Gpio mLed;
     private Gpio mButton;
     private Gpio mPir;
+    private Bme680 mBme680;
 
     private MutableLiveData<Boolean> mButtonData = new MutableLiveData<>();
 
@@ -89,12 +92,21 @@ public class SensorHub {
             Crashlytics.logException(e);
         }
 
-        try {
+        try {/*
             final Bme680SensorDriver mBmeSensorDriver = new Bme680SensorDriver(I2C_BUS);
             mBmeSensorDriver.registerTemperatureSensor();
-            mBmeSensorDriver.registerHumiditySensor();
             mBmeSensorDriver.registerPressureSensor();
-            mBmeSensorDriver.registerGasSensor();
+            mBmeSensorDriver.registerHumiditySensor();
+            mBmeSensorDriver.registerGasSensor();*/
+            mBme680 = new Bme680(I2C_BUS);
+            mBme680.setTemperatureOversample(Bme680.OVERSAMPLING_8X);
+            mBme680.setPressureOversample(Bme680.OVERSAMPLING_4X);
+            mBme680.setHumidityOversample(Bme680.OVERSAMPLING_2X);
+            mBme680.setFilter(3);
+            mBme680.setGasStatus(Bme680.ENABLE_GAS);
+            mBme680.setGasHeaterProfile(Bme680.PROFILE_0, 320, 150);
+            mBme680.selectGasHeaterProfile(Bme680.PROFILE_0);
+            Timber.d(getSensorData().toString());
         } catch (IOException e) {
             Timber.w("BME680 failed to start or is not present for this device");
         }
@@ -120,28 +132,23 @@ public class SensorHub {
     public LiveData<Boolean> getButtonData() {
         return mButtonData;
     }
-/*
+
     public SensorData getSensorData() {
         try {
-            float[] val1 = {0f, 0f};
-            int[] val2 = {0 ,0, 0, 0};
-            if (mHtu21d != null) {
-                val1 = mHtu21d.readTemperatureAndHumidity();
-            } else if(mBmx280 != null) {
-                val1 = mBmx280.readTemperatureAndHumidity();
+            float[] val = {0f, 0f, 0f, 0f};
+            if (mBme680 != null) {
+                val[0] = mBme680.readTemperature();
+                val[1] = mBme680.readHumidity();
+                val[2] = mBme680.readPressure();
+                val[3] = mBme680.readAirQuality();
+                return new SensorData(val);
             }
-            if (mCcs811 != null) {
-                val2 = mCcs811.readAlgorithmResults();
-                Timber.d("Status: " + val2[2] + " Error: " + val2[3]);
-
-            }
-            return new SensorData(val1, val2);
         } catch (IOException e) {
             Crashlytics.logException(e);
         }
         return null;
     }
-*/
+
     @Override
     protected void finalize() throws Throwable {
 

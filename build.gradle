@@ -3,9 +3,9 @@ buildscript {
     addRepos(repositories)
     dependencies {
         classpath deps.android_gradle_plugin
-        classpath 'com.google.gms:google-services:3.2.0'
-        classpath 'com.google.firebase:firebase-plugins:1.1.5'
-        classpath 'io.fabric.tools:gradle:1.25.1'
+        classpath deps.google_services_plugin
+        classpath deps.firebase_plugin
+        classpath deps.fabric_plugin
     }
 }
 

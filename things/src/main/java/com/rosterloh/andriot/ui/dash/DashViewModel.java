@@ -33,6 +33,4 @@ public class DashViewModel extends ViewModel {
     LiveData<List<SensorData>> getSensorDataList() {
         return mSensorDataList;
     }
-
-
 }
