@@ -83,7 +83,7 @@ dependencies {
     // Other
     implementation deps.retrofit.runtime
     implementation deps.retrofit.gson
-    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.1-LOCAL"
+    implementation "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.1-SNAPSHOT"
     implementation "org.eclipse.paho:org.eclipse.paho.android.service:1.1.2-SNAPSHOT"
     implementation deps.timber
     implementation 'io.jsonwebtoken:jjwt:0.9.0'
