@@ -19,8 +19,6 @@ public class DashModule {
 
     @Provides
     ScreenManager provideScreenManager() {
-        ScreenManager sm = new ScreenManager(Display.DEFAULT_DISPLAY);
-        sm.setBrightnessMode(ScreenManager.BRIGHTNESS_MODE_MANUAL);
-        return sm;
+        return ScreenManager.getInstance(Display.DEFAULT_DISPLAY);
     }
 }

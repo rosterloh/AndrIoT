@@ -4,7 +4,7 @@ import android.support.annotation.IntDef;
 
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -40,9 +40,8 @@ public class MotionSensor implements AutoCloseable {
 
     public MotionSensor(String pin) throws IOException {
 
-        PeripheralManagerService pioService = new PeripheralManagerService();
-
-        Gpio gpio = pioService.openGpio(pin);
+        final PeripheralManager peripheralManager = PeripheralManager.getInstance();
+        Gpio gpio = peripheralManager.openGpio(pin);
 
         try {
             connect(gpio);

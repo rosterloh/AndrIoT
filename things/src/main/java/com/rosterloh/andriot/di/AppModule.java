@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.hardware.SensorManager;
 
+import com.google.android.things.pio.PeripheralManager;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
 import com.rosterloh.andriot.db.SensorDao;

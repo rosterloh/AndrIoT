@@ -2,6 +2,7 @@ package com.rosterloh.andriot.sensors;
 
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -150,8 +151,6 @@ public class DeskCamera {
         }
     }
 
-
-
     /**
      * Begin a still image capture
      */
@@ -172,8 +171,6 @@ public class DeskCamera {
         }
     }
 
-
-
     /**
      * Execute a new capture request within the active session
      */
@@ -190,9 +187,6 @@ public class DeskCamera {
             Timber.d("camera capture exception");
         }
     }
-
-
-
 
     /**
      * Close the camera resources
@@ -226,15 +220,72 @@ public class DeskCamera {
             StreamConfigurationMap configs = characteristics.get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             for (int format : configs.getOutputFormats()) {
-                Timber.d("Getting sizes for format: " + format);
-                for (Size s : configs.getOutputSizes(format)) {
-                    Timber.d("\t" + s.toString());
+                StringBuilder sb = new StringBuilder();
+                switch (format) {
+                    case PixelFormat.RGBA_8888:
+                        sb.append("RGBA_8888 ");
+                        break;
+                    case ImageFormat.PRIVATE:
+                        sb.append("PRIVATE ");
+                        break;
+                    case ImageFormat.YUV_420_888:
+                        sb.append("YUV_420_888 ");
+                        break;
+                    case ImageFormat.JPEG:
+                        sb.append("JPEG ");
+                        break;
+                    default:
+                        sb.append("0x");
+                        sb.append(Integer.toHexString(format));
+                        sb.append(" ");
+                        break;
                 }
+                sb.append("supports ");
+                for (Size s : configs.getOutputSizes(format)) {
+                    sb.append(s.toString());
+                }
+                Timber.d(sb.toString());
             }
             int[] effects = characteristics.get(CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS);
+            StringBuilder sb = new StringBuilder();
+            sb.append("Effects available: ");
             for (int effect : effects) {
-                Timber.d("Effect available: " + effect);
+                switch (effect) {
+                    case CaptureRequest.CONTROL_EFFECT_MODE_OFF:
+                        sb.append("OFF ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_MONO:
+                        sb.append("MONO ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_NEGATIVE:
+                        sb.append("NEGATIVE ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_SOLARIZE:
+                        sb.append("SOLARIZE ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_SEPIA:
+                        sb.append("SEPIA ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_POSTERIZE:
+                        sb.append("POSTERIZE ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_WHITEBOARD:
+                        sb.append("WHITEBOARD ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_BLACKBOARD:
+                        sb.append("BLACKBOARD ");
+                        break;
+                    case CaptureRequest.CONTROL_EFFECT_MODE_AQUA:
+                        sb.append("AQUA ");
+                        break;
+                    default:
+                        sb.append("0x");
+                        sb.append(Integer.toHexString(effect));
+                        sb.append(" ");
+                        break;
+                }
             }
+            Timber.d(sb.toString());
         } catch (CameraAccessException e) {
             Timber.d("Cam access exception getting characteristics.");
         }

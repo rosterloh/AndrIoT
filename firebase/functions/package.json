@@ -3,16 +3,23 @@
   "description": "Cloud Functions for AndrIoT Firebase",
   "version": "0.0.1",
   "author": "Richard Osterloh <richard.osterloh@gmail.com>",
-  "engines": {
-    "node": "~4.2"
-  },
   "scripts": {
-    "start": "firebase deploy --only functions",
-    "deploy": "firebase deploy --only functions"
+    "lint": "./node_modules/.bin/eslint --max-warnings=0 .",
+    "serve": "firebase serve --only functions",
+    "shell": "firebase experimental:functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
   },
   "dependencies": {
-    "firebase-admin": "~5.2.1",
-    "firebase-functions": "^0.6.2"
+    "firebase-admin": "~5.8.1",
+    "firebase-functions": "^0.8.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.13.1",
+    "eslint-plugin-promise": "^3.6.0"
   },
   "private": true
 }

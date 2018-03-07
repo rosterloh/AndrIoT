@@ -2,7 +2,7 @@ package com.rosterloh.andriot.sensors;
 
 import android.graphics.Color;
 
-import com.google.android.things.pio.PeripheralManagerService;
+import com.google.android.things.pio.PeripheralManager;
 import com.google.android.things.pio.SpiDevice;
 
 import java.io.IOException;
@@ -61,8 +61,8 @@ public class NeoPixel implements AutoCloseable {
     public NeoPixel(String port, Mode mode, Direction direction) throws IOException {
         mMode = mode;
         mDirection = direction;
-        PeripheralManagerService pioService = new PeripheralManagerService();
-        mDevice = pioService.openSpiDevice(port);
+        final PeripheralManager peripheralManager = PeripheralManager.getInstance();
+        mDevice = peripheralManager.openSpiDevice(port);
         try {
             configure(mDevice);
         } catch (IOException e) {

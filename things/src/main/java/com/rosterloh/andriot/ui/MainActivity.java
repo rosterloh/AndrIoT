@@ -102,6 +102,8 @@ public class MainActivity extends DaggerAppCompatActivity {
                 api.getErrorDialog(this, result, GOOGLE_PLAY_SERVICES_REQUEST).show();
             }
             */
+        } else {
+            Timber.d("Play Service Version: " + api.GOOGLE_PLAY_SERVICES_VERSION_CODE);
         }
     }
 

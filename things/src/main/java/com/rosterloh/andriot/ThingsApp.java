@@ -8,8 +8,8 @@ import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 
 import com.google.android.things.AndroidThings;
-import com.knobtviker.android.things.contrib.driver.bme680.Bme680;
-import com.knobtviker.android.things.contrib.driver.bme680.Bme680SensorDriver;
+import com.knobtviker.android.things.contrib.community.driver.bme680.Bme680;
+import com.knobtviker.android.things.contrib.community.driver.bme680.Bme680SensorDriver;
 import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.di.AppComponent;
 import com.rosterloh.andriot.di.DaggerAppComponent;
@@ -42,7 +42,7 @@ public class ThingsApp extends DaggerApplication implements SensorEventListener 
             Timber.plant(new Timber.DebugTree());
         }
 
-        Timber.i("Built with Things Version: " + AndroidThings.getVersionString());
+        Timber.i("Built with Things Version: " + AndroidThings.RELEASE);
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {

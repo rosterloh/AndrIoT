@@ -6,9 +6,8 @@ import android.arch.lifecycle.MutableLiveData;
 import com.crashlytics.android.Crashlytics;
 import com.google.android.things.pio.Gpio;
 import com.google.android.things.pio.GpioCallback;
-import com.google.android.things.pio.PeripheralManagerService;
-import com.knobtviker.android.things.contrib.driver.bme680.Bme680;
-import com.knobtviker.android.things.contrib.driver.bme680.Bme680SensorDriver;
+import com.google.android.things.pio.PeripheralManager;
+import com.knobtviker.android.things.contrib.community.driver.bme680.Bme680;
 import com.rosterloh.andriot.db.SensorData;
 
 import java.io.IOException;
@@ -71,19 +70,18 @@ public class SensorHub {
 
     @Inject
     public SensorHub() {
-
-        PeripheralManagerService pioService = new PeripheralManagerService();
+        final PeripheralManager peripheralManager = PeripheralManager.getInstance();
         try {
-            mLed = pioService.openGpio(LED_GPIO);
+            mLed = peripheralManager.openGpio(LED_GPIO);
             mLed.setDirection(Gpio.DIRECTION_OUT_INITIALLY_LOW);
 
-            mButton = pioService.openGpio(BUTTON_GPIO);
+            mButton = peripheralManager.openGpio(BUTTON_GPIO);
             mButton.setDirection(Gpio.DIRECTION_IN);
             mButton.setEdgeTriggerType(Gpio.EDGE_FALLING);
             mButton.setActiveType(Gpio.ACTIVE_LOW);
             mButton.registerGpioCallback(mButtonInterrupt);
 
-            mPir = pioService.openGpio(PIR_GPIO);
+            mPir = peripheralManager.openGpio(PIR_GPIO);
             mPir.setDirection(Gpio.DIRECTION_IN);
             mPir.setEdgeTriggerType(Gpio.EDGE_BOTH);
             mPir.setActiveType(Gpio.ACTIVE_HIGH);
