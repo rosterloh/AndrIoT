@@ -57,7 +57,7 @@ repositories {
 dependencies {
     implementation project(path: ':common')
     compileOnly deps.androidthings
-    implementation 'com.github.knobtviker:bme680:1.0.9'
+    implementation 'com.knobtviker.android.things.contrib.community.driver:bme680:1.1.0'
     // Support
     implementation deps.support.app_compat
     implementation deps.support.cardview

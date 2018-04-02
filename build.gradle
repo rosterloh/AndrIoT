@@ -11,22 +11,12 @@ buildscript {
 
 plugins {
     id 'com.github.ben-manes.versions' version '0.17.0'
-    id "net.ltgt.errorprone" version "0.0.13"
 }
 
 allprojects {
+
     addRepos(repositories)
 }
-
-subprojects {
-    apply from: "$rootProject.projectDir/quality/quality.gradle"
-
-    afterEvaluate {
-        check.dependsOn 'checkstyle', 'findbugs'/*, 'pmd'*/, 'lint'
-    }
-}
-
-apply from: 'quality/jacoco.gradle'
 
 task clean(type: Delete) {
     delete rootProject.buildDir

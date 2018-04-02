@@ -44,8 +44,8 @@ public class SensorsRepository {
                 Timber.d("Empty data received");
                 //mAppExecutors.diskIO().execute(() -> mSettingsDao.insert(new LocalSettings()));
             } else {
-                Timber.d("New data " + data.get(data.size() - 1).toString());
                 if(data.size() > 0) {
+                    Timber.d("New data " + data.get(data.size() - 1).toString());
                     mCurrentData.setValue(data.get(data.size() - 1));
                 } else {
                     mCurrentData.setValue(new SensorData(new float[]{0, 0, 0 ,0}));
