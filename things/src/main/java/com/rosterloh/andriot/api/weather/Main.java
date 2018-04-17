@@ -1,25 +1,14 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Main {
 
-    @SerializedName("temp")
-    @Expose
-    private Double mTemp;
-    @SerializedName("temp_min")
-    @Expose
-    private Double mTempMin;
-    @SerializedName("temp_max")
-    @Expose
-    private Double mTempMax;
-    @SerializedName("pressure")
-    @Expose
-    private Double mPressure;
-    @SerializedName("humidity")
-    @Expose
-    private Integer mHumidity;
+    @Json(name = "temp") private Double mTemp;
+    @Json(name = "temp_min") private Double mTempMin;
+    @Json(name = "temp_max") private Double mTempMax;
+    @Json(name = "pressure") private Double mPressure;
+    @Json(name = "humidity") private Integer mHumidity;
 
     public Double getTemp() {
         return mTemp;

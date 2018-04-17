@@ -1,28 +1,15 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Sys {
 
-    @SerializedName("type")
-    @Expose
-    private Integer mType;
-    @SerializedName("id")
-    @Expose
-    private Integer mId;
-    @SerializedName("message")
-    @Expose
-    private Double mMessage;
-    @SerializedName("country")
-    @Expose
-    private String mCountry;
-    @SerializedName("sunrise")
-    @Expose
-    private Integer mSunrise;
-    @SerializedName("sunset")
-    @Expose
-    private Integer mSunset;
+    @Json(name = "type") private Integer mType;
+    @Json(name = "id") private Integer mId;
+    @Json(name = "message") private Double mMessage;
+    @Json(name = "country") private String mCountry;
+    @Json(name = "sunrise") private Integer mSunrise;
+    @Json(name = "sunset") private Integer mSunset;
 
     public Integer getType() {
         return mType;

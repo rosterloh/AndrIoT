@@ -1,16 +1,11 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Coord {
 
-    @SerializedName("lon")
-    @Expose
-    private Double mLon;
-    @SerializedName("lat")
-    @Expose
-    private Double mLat;
+    @Json(name = "lon") private Double mLon;
+    @Json(name = "lat") private Double mLat;
 
     public Double getLon() {
         return mLon;

@@ -1,13 +1,10 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Clouds {
 
-    @SerializedName("all")
-    @Expose
-    private Integer mAll;
+    @Json(name = "all") private Integer mAll;
 
     public Integer getAll() {
         return mAll;

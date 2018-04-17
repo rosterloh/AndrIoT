@@ -44,7 +44,7 @@ public class LocalSettings {
 
     @Ignore
     public LocalSettings() {
-        mDeviceId = Build.SERIAL;
+        mDeviceId = Build.getSerial();
         mIpAddress = "";
         mRefreshRate = DEFAULT_REFRESH_MS;
         mLatitude = DEFAULT_LATITUDE;

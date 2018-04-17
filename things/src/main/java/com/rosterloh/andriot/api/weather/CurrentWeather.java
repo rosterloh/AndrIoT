@@ -1,22 +1,13 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class CurrentWeather {
 
-    @SerializedName("id")
-    @Expose
-    private Integer mId;
-    @SerializedName("main")
-    @Expose
-    private String mMain;
-    @SerializedName("description")
-    @Expose
-    private String mDescription;
-    @SerializedName("icon")
-    @Expose
-    private String mIcon;
+    @Json(name = "id") private Integer mId;
+    @Json(name = "main") private String mMain;
+    @Json(name = "description") private String mDescription;
+    @Json(name = "icon") private String mIcon;
 
     public Integer getId() {
         return mId;

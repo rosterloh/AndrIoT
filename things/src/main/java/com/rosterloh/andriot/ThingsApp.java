@@ -14,8 +14,6 @@ import com.rosterloh.andriot.db.SensorsRepository;
 import com.rosterloh.andriot.di.AppComponent;
 import com.rosterloh.andriot.di.DaggerAppComponent;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;

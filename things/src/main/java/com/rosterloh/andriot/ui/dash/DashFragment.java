@@ -4,11 +4,12 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.things.device.ScreenManager;
+//import com.google.android.things.device.ScreenManager;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.databinding.DashFragmentBinding;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
@@ -25,9 +26,6 @@ public class DashFragment extends DaggerFragment {
 
     @Inject
     ConnectionsServer mConnectionsServer;
-
-    @Inject
-    ScreenManager mScreenManager;
 
     private DashFragmentBinding mBinding;
     private DashViewModel mDashViewModel;
@@ -49,7 +47,7 @@ public class DashFragment extends DaggerFragment {
             if (value != null) {
                 boolean currentValue = (boolean) value;
                 mBinding.setMotion(currentValue);
-                mScreenManager.setBrightness(currentValue ? 255 : 1);
+                //ScreenManager(Display.DEFAULT_DISPLAY).setBrightness(currentValue ? 255 : 1);
             }
         });
         mDashViewModel.getSensorData().observe(this, sensors -> mBinding.setSensors(sensors));

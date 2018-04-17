@@ -2,11 +2,9 @@ package com.rosterloh.andriot.di;
 
 import android.app.Application;
 import android.arch.persistence.room.Room;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.hardware.SensorManager;
 
-import com.google.android.things.pio.PeripheralManager;
 import com.rosterloh.andriot.api.WeatherService;
 import com.rosterloh.andriot.bluetooth.GattServer;
 import com.rosterloh.andriot.db.SensorDao;
@@ -17,14 +15,12 @@ import com.rosterloh.andriot.db.WeatherDao;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
 import com.rosterloh.andriot.scheduler.ThingsScheduler;
 
-import java.io.InputStream;
-
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 @Module
 class AppModule {
@@ -34,17 +30,11 @@ class AppModule {
         return application.getApplicationContext();
     }
 
-    @Provides
-    InputStream provideInputStream(Context context) {
-        return context.getResources().openRawResource(context.
-                getResources().getIdentifier("rsa_private_pkcs8", "raw", context.getPackageName()));
-    }
-
     @Provides @Singleton
     WeatherService provideWeatherService() {
         return new Retrofit.Builder()
                 .baseUrl("http://api.openweathermap.org/data/2.5/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create())
                 .build()
                 .create(WeatherService.class);
     }

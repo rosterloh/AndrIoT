@@ -1,16 +1,11 @@
 package com.rosterloh.andriot.api.weather;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.squareup.moshi.Json;
 
 public class Wind {
 
-    @SerializedName("speed")
-    @Expose
-    private Double mSpeed;
-    @SerializedName("deg")
-    @Expose
-    private Double mDeg;
+    @Json(name = "speed") private Double mSpeed;
+    @Json(name = "deg") private Double mDeg;
 
     public Double getSpeed() {
         return mSpeed;

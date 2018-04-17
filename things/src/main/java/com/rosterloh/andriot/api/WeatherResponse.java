@@ -1,54 +1,29 @@
 package com.rosterloh.andriot.api;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
 import com.rosterloh.andriot.api.weather.Clouds;
 import com.rosterloh.andriot.api.weather.Coord;
 import com.rosterloh.andriot.api.weather.CurrentWeather;
 import com.rosterloh.andriot.api.weather.Main;
 import com.rosterloh.andriot.api.weather.Sys;
 import com.rosterloh.andriot.api.weather.Wind;
+import com.squareup.moshi.Json;
 
 import java.util.List;
 
 public class WeatherResponse {
 
-    @SerializedName("coord")
-    @Expose
-    private Coord mCoord;
-    @SerializedName("weather")
-    @Expose
-    private List<CurrentWeather> mWeather = null;
-    @SerializedName("base")
-    @Expose
-    private String mBase;
-    @SerializedName("main")
-    @Expose
-    private Main mMain;
-    @SerializedName("visibility")
-    @Expose
-    private Integer mVisibility;
-    @SerializedName("wind")
-    @Expose
-    private Wind mWind;
-    @SerializedName("clouds")
-    @Expose
-    private Clouds mClouds;
-    @SerializedName("dt")
-    @Expose
-    private Integer mDt;
-    @SerializedName("sys")
-    @Expose
-    private Sys mSys;
-    @SerializedName("id")
-    @Expose
-    private Integer mId;
-    @SerializedName("name")
-    @Expose
-    private String mName;
-    @SerializedName("cod")
-    @Expose
-    private Integer mCod;
+    @Json(name = "coord") private Coord mCoord;
+    @Json(name = "weather") private List<CurrentWeather> mWeather = null;
+    @Json(name = "base") private String mBase;
+    @Json(name = "main") private Main mMain;
+    @Json(name = "visibility") private Integer mVisibility;
+    @Json(name = "wind") private Wind mWind;
+    @Json(name = "clouds") private Clouds mClouds;
+    @Json(name = "dt") private Integer mDt;
+    @Json(name = "sys") private Sys mSys;
+    @Json(name = "id") private Integer mId;
+    @Json(name = "name") private String mName;
+    @Json(name = "cod") private Integer mCod;
 
     public Coord getCoord() {
         return mCoord;
