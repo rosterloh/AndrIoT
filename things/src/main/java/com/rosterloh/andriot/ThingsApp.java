@@ -8,6 +8,7 @@ import android.hardware.SensorManager;
 import android.support.annotation.NonNull;
 
 import com.google.android.things.AndroidThings;
+import com.google.android.things.device.TimeManager;
 import com.knobtviker.android.things.contrib.community.driver.bme680.Bme680;
 import com.knobtviker.android.things.contrib.community.driver.bme680.Bme680SensorDriver;
 import com.rosterloh.andriot.db.SensorsRepository;
@@ -41,6 +42,7 @@ public class ThingsApp extends DaggerApplication implements SensorEventListener 
         }
 
         Timber.i("Built with Things Version: " + AndroidThings.RELEASE);
+        TimeManager.getInstance().setTimeZone("Europe/London");
 
         SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {

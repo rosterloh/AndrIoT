@@ -4,12 +4,11 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 
-//import com.google.android.things.device.ScreenManager;
 import com.rosterloh.andriot.R;
 import com.rosterloh.andriot.databinding.DashFragmentBinding;
 import com.rosterloh.andriot.nearby.ConnectionsServer;
@@ -47,7 +46,10 @@ public class DashFragment extends DaggerFragment {
             if (value != null) {
                 boolean currentValue = (boolean) value;
                 mBinding.setMotion(currentValue);
-                //ScreenManager(Display.DEFAULT_DISPLAY).setBrightness(currentValue ? 255 : 1);
+                WindowManager.LayoutParams lp = getActivity().getWindow().getAttributes();
+                lp.screenBrightness = currentValue ? WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+                        : WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF;
+                getActivity().getWindow().setAttributes(lp);
             }
         });
         mDashViewModel.getSensorData().observe(this, sensors -> mBinding.setSensors(sensors));

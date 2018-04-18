@@ -26,7 +26,7 @@ versions.timber = "4.7.0"
 versions.android_gradle_plugin = "3.2.0-alpha11"
 versions.google_services_plugin = "3.2.1"
 versions.firebase_plugin = "1.1.5"
-versions.fabric_plugin = "1.25.2"
+versions.fabric_plugin = "1.25.3"
 versions.rxjava2 = "2.1.12"
 versions.rx_android = "2.0.1"
 versions.atsl_runner = "1.0.1"
@@ -127,6 +127,7 @@ deps.kotlin = kotlin
 def things = [:]
 things.core = "com.google.android.things:androidthings:$versions.things"
 things.bme680 = "com.knobtviker.android.things.contrib.community.driver:bme680:1.1.0"
+things.bme280 = "com.google.android.things.contrib:driver-bmx280:0.5"
 deps.things = things
 
 deps.paging = "android.arch.paging:runtime:$versions.paging"
