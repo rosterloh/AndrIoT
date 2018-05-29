@@ -12,9 +12,10 @@
     "logs": "firebase functions:log"
   },
   "dependencies": {
-    "firebase-admin": "~5.8.1",
-    "firebase-functions": "^0.8.1",
-    "request": "^2.83.0",
+    "apollo-server": "^2.0.0-beta.2",
+    "firebase-admin": "~5.12.1",
+    "firebase-functions": "^1.0.3",
+    "graphql": "^0.13.2",
     "request-promise": "^4.2.2"
   },
   "devDependencies": {

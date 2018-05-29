@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "andriot-b80e9"
+    "default": "andriot-b80e9",
+    "andriot": "andriot-b80e9"
   }
 }
