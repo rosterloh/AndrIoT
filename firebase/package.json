@@ -1,0 +1,29 @@
+{
+    "name": "andriot-functions",
+    "description": "Cloud Functions for AndrIoT Firebase",
+    "version": "0.0.1",
+    "author": "Richard Osterloh <richard.osterloh@gmail.com>",
+    "scripts": {
+      "lint": "./node_modules/.bin/eslint --max-warnings=0 .",
+      "preserve": "yarn build",
+      "serve": "firebase serve --only functions",
+      "shell": "firebase experimental:functions:shell",
+      "start": "npm run shell",
+      "predeploy": "yarn build",
+      "deploy": "firebase deploy",
+      "logs": "firebase functions:log",
+      "build": "babel \"firebaseFunctions\" --out-dir \"functions\" --copy-files --ignore \"node_modules\"",
+      "postbuild": "cd \"functions\" && yarn"
+    },
+    "dependencies": {},
+    "devDependencies": {
+      "babel-cli": "^6.26.0",
+      "babel-plugin-transform-object-rest-spread": "^6.26.0",
+      "babel-plugin-transform-runtime": "^6.23.0",
+      "babel-preset-env": "^1.7.0",
+      "eslint": "^4.13.1",
+      "eslint-plugin-promise": "^3.6.0",
+      "rimraf": "^2.6.2"
+    },
+    "private": true
+  }

@@ -1,0 +1,15 @@
+{
+  "name": "AndrIoT",
+  "description": "Cloud Functions for AndrIoT Firebase",
+  "version": "0.0.1",
+  "author": "Richard Osterloh <richard.osterloh@gmail.com>",
+  "dependencies": {
+    "apollo-server": "^2.0.0-beta.2",
+    "firebase-admin": "~5.12.1",
+    "firebase-functions": "^1.0.3",
+    "graphql": "^0.13.2",
+    "request-promise": "^4.2.2"
+  },
+  "devDependencies": {},
+  "private": true
+}
